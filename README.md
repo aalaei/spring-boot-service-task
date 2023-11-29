@@ -16,6 +16,7 @@ This repository contains a Java Spring Boot web application that provides a REST
   - [GraphQL](#graphql)
 - [Git Version Control](#git-version-control)
 - [Bash Script](#bash-script)
+- [TODO](#project-roadmap-todo-checklist)
 - [License](#license)
 
 ## Prerequisites
@@ -82,6 +83,50 @@ The `run.sh` script simplifies the process of building and running the applicati
 ```bash
 chmod +x run.sh
 ```
+
+# Project Roadmap Todo Checklist
+
+- [x] Initialize a Git repository in the project.
+- [x] Commit regularly with clear commit messages.
+- [x] Track development steps and changes.
+
+- [x] Create a new Spring Boot project using [Spring Initializr](https://start.spring.io/).
+- [x] Choose dependencies: Spring Web, Spring Data MongoDB, Spring Data Redis, and Lombok (optional).
+- [x] Generate the project and import it into your preferred IDE.
+
+- [x] Write a bash script for building, packaging, and running the application.
+- [x] Provide clear instructions on setting up and running the application.
+- [x] Include information on profiles, MongoDB and Redis setup, and other relevant details.
+
+- [x] Create the `Service`, `Resource`, and `Owner` classes.
+- [x] Use annotations like `@Document` for MongoDB entities.
+- [-] Define relationships using annotations like `@DBRef`.
+
+- [x] Create a `ServiceController` class.
+- [x] Implement CRUD methods for the `Service` object.
+- [x] Use `@RestController` and map endpoints for Create, Read, Update, and Delete operations.
+- [-] Implement validation and exception handling.
+- [ ] Implement GraphQL API.
+
+- [x] Create two profiles, e.g., `dev` and `prod`.
+- [x] Configure profile-specific properties in `application.properties` or `application.yml`.
+- [x] Include database connection details for each profile.
+
+- [ ] Configure Redis caching by adding `@EnableCaching` to the main application class.
+- [ ] Use `@Cacheable` and `@CachePut` annotations in service methods.
+- [ ] Implement caching and updating data in Redis.
+
+- [ ] Implement encryption/decryption for critical text fields.
+
+- [ ] Create scripts to dump MongoDB and Redis data locally.
+
+- [ ] Mapping between DTOs and entities.
+- [ ] Write unit tests for controllers, services, and repositories.
+- [ ] Document code using JavaDoc for better readability.
+- [ ] CI/CD Github workflow.
+- [x] Dockerize Application.
+- [x] API documentation and Swagger UI.
+- [ ] Implement Java Client App.
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](https://opensource.org/licenses/MIT) file for details.
