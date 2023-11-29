@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+
+# Ignore Task PDF file
+SwisscomTask3.pdf
