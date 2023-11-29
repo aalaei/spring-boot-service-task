@@ -1,4 +1,4 @@
-# Spring Boot Web Application with MongoDB, Redis (Interview Taks)
+# Spring Boot Web Application with MongoDB, Redis (Interview Task)
 
 ![Tests Workflow](https://github.com/aalaei/spring-boot-service-task/actions/workflows/maven.yml/badge.svg)
 ![Release Workflow](https://github.com/aalaei/spring-boot-service-task/actions/workflows/release.yml/badge.svg)
