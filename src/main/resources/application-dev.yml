@@ -1,0 +1,7 @@
+spring:
+  data:
+    mongodb:
+      uri: "mongodb://root:letmein@localhost:27017/demo?authSource=admin"
+      authentication-database: admin
+      database: demo
+

@@ -1,6 +1,6 @@
 spring:
-  data:
-    mongodb:
-      uri: "mongodb://root:letmein@localhost:27017/demo?authSource=admin"
-      authentication-database: admin
-      database: demo
+  profiles:
+    active: dev
+application:
+  title: Service API
+  version: 1.0
