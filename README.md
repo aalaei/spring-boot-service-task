@@ -1,7 +1,7 @@
 # Spring Boot Web Application with MongoDB, Redis (Interview Taks)
 
-![Tests Workflow](https://github.com/aalaei/spring-test/actions/workflows/maven.yml/badge.svg)
-![Release Workflow](https://github.com/aalaei/spring-test/actions/workflows/release.yml/badge.svg)
+![Tests Workflow](https://github.com/aalaei/spring-boot-service-task/actions/workflows/maven.yml/badge.svg)
+![Release Workflow](https://github.com/aalaei/spring-boot-service-task/actions/workflows/release.yml/badge.svg)
 
 This repository contains a Java Spring Boot web application that provides a REST API for managing a "Service" object with nested "Resource" and "Owner" objects. The application persists data in MongoDB, implements Redis caching, and includes optional features like encryption of critical text fields.
 
