@@ -1,4 +1,4 @@
-# Spring Boot Web Application with MongoDB, Redis(Interview Taks)
+# Spring Boot Web Application with MongoDB, Redis (Interview Taks)
 
 This repository contains a Java Spring Boot web application that provides a REST API for managing a "Service" object with nested "Resource" and "Owner" objects. The application persists data in MongoDB, implements Redis caching, and includes optional features like encryption of critical text fields.
 
