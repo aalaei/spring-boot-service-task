@@ -100,13 +100,14 @@ chmod +x run.sh
 
 - [x] Create the `Service`, `Resource`, and `Owner` classes.
 - [x] Use annotations like `@Document` for MongoDB entities.
-- [-] Define relationships using annotations like `@DBRef`.
+- [ ] Define relationships using annotations like `@DBRef`.
 
 - [x] Create a `ServiceController` class.
 - [x] Implement CRUD methods for the `Service` object.
 - [x] Use `@RestController` and map endpoints for Create, Read, Update, and Delete operations.
-- [-] Implement validation and exception handling.
+- [ ] Implement validation and exception handling.
 - [ ] Implement GraphQL API.
+- [ ] Authentication and Authorization using JWT.
 
 - [x] Create two profiles, e.g., `dev` and `prod`.
 - [x] Configure profile-specific properties in `application.properties` or `application.yml`.
