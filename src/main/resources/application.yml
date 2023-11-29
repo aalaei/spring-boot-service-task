@@ -1,0 +1,5 @@
+spring:
+  data:
+    mongodb:
+      uri: "mongodb://root:lwtmwin@localhost:27017/demo"
+      authentication-database: admin
