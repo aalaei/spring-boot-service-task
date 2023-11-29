@@ -1,0 +1,27 @@
+version: '3.1'
+services:
+  task3-mongo:
+    container_name: task3_mongo
+    image: mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: letmein
+      MONGO_INITDB_DATABASE: 'service-db'
+    volumes:
+      - task3_mongo:/data/db
+    ports:
+      - '27017:27017'
+  
+  task3-mongo-express:
+    container_name: task3_mongo_express
+    image: mongo-express
+    restart: unless-stopped
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: letmein
+      ME_CONFIG_MONGODB_URL: mongodb://root:letmein@task3-mongo:27017/
+volumes:
+  task3_mongo:
