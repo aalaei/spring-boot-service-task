@@ -11,7 +11,7 @@ import java.util.UUID;
 @Data
 @Builder
 @AllArgsConstructor
-//@NoArgsConstructor
+@NoArgsConstructor
 public class Resource {
     private String id;
     private String criticalText;
