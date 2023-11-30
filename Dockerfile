@@ -3,7 +3,7 @@ WORKDIR /project
 COPY .mvn/ .mvn
 COPY mvnw pom.xml ./
 COPY src ./src
-RUN mvn clean package -DskipTests
+RUN mvn clean package -DskipTests -Pprod
 
 #----------------------------------------------------------------------------------------------------------------
 FROM eclipse-temurin:21-jre-alpine
