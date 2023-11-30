@@ -1,7 +1,9 @@
 spring:
   data:
     mongodb:
-      uri: "mongodb://root:letmein@localhost:27017/demo?authSource=admin"
-      authentication-database: admin
-      database: demo
+      uri: "mongodb://root:letmein@localhost:27017/serviceDB?authSource=admin"
 
+
+logging:
+  file:
+    name: Application.log
