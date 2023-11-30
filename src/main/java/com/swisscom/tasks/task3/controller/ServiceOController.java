@@ -172,11 +172,11 @@ public class ServiceOController {
                     )
             }
     )
-    @PutMapping("/update/{ID}")
+    @PutMapping("/{ID}")
     //TODO: Change Service Objects to DTO
     public ResponseEntity<HttpResponse> updateById(@PathVariable("ID") String id, @RequestBody ServiceO serviceO) {
-        boolean  is_updated = serviceOService.updateById(id, serviceO);
-        if (is_updated){
+        try {
+            serviceOService.updateById(id, serviceO);
             return ResponseEntity.ok().body(
                     HttpResponse.builder()
                             .message("Updated")
@@ -185,15 +185,25 @@ public class ServiceOController {
                             .status(HttpStatus.OK)
                             .build()
             );
+        } catch (ServiceOServiceException serviceOServiceException) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    HttpResponse.builder()
+                            .message("Not Found")
+                            .timeStamp(now().toString())
+                            .statusCode(HttpStatus.NOT_FOUND.value())
+                            .status(HttpStatus.NOT_FOUND)
+                            .build()
+            );
+        } catch (Exception e){
+            return ResponseEntity.badRequest().body(
+                    HttpResponse.builder()
+                            .message("Failed to update")
+                            .timeStamp(now().toString())
+                            .statusCode(HttpStatus.BAD_REQUEST.value())
+                            .status(HttpStatus.BAD_REQUEST)
+                            .build()
+            );
         }
-        return ResponseEntity.ok().body(
-                HttpResponse.builder()
-                        .message("Failed to update")
-                        .timeStamp(now().toString())
-                        .statusCode(HttpStatus.NOT_FOUND.value())
-                        .status(HttpStatus.NOT_FOUND)
-                        .build()
-        );
     }
     @Operation(
             description = "Delete a service by ID",
@@ -217,7 +227,7 @@ public class ServiceOController {
                     )
             }
     )
-    @DeleteMapping("/del/{ID}")
+    @DeleteMapping("/{ID}")
     public ResponseEntity<HttpResponse> deleteById(@PathVariable("ID") String id) {
         try {
             boolean is_deleted = serviceOService.deleteById(id);
