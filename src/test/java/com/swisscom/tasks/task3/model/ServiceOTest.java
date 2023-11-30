@@ -10,7 +10,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 class ServiceOTest {
-
     @Test
     void getId() {
         List<Owner> owners1= List.of(
@@ -80,17 +79,38 @@ class ServiceOTest {
         }
     }
 
-    @Disabled
     @Test
-    void getCriticalText() {
-    }
-    @Disabled
-    @Test
-    void getResources() {
+    void ShouldEqualCriticalText() {
+        ServiceO serviceO= ServiceO.builder()
+                .id("id")
+                .criticalText("criticalText")
+                .build();
+        assertEquals("criticalText", serviceO.getCriticalText());
     }
 
-    @Disabled
     @Test
-    void setCriticalText() {
+    void shouldEqualAllCriticalTexts() {
+        ServiceO serviceO = ServiceO.builder()
+                .id("id")
+                .criticalText("criticalText1")
+                .resources(List.of(
+                        Resource.builder()
+                                .id("id")
+                                .criticalText("criticalText2")
+                                .owners(List.of(
+                                        Owner.builder()
+                                                .id("id")
+                                                .criticalText("criticalText3")
+                                                .name("name")
+                                                .accountNumber("accountNumber")
+                                                .level(1)
+                                                .build()
+                                ))
+                                .build()
+                )).build();
+        assertEquals("criticalText1", serviceO.getCriticalText());
+        assertEquals("criticalText2", serviceO.getResources().get(0).getCriticalText());
+        assertEquals("criticalText3", serviceO.getResources().get(0).getOwners().get(0).getCriticalText());
     }
+
 }
