@@ -56,7 +56,7 @@ public class ServiceOController {
                     HttpResponse.builder()
                             .timeStamp(now().toString())
                             .message("OK")
-                            .data(Map.of("service", serviceO))
+                            .data(Map.of("service", serviceONew))
                             .status(HttpStatus.CREATED)
                             .statusCode(HttpStatus.CREATED.value())
                             .build()
