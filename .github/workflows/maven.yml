@@ -27,12 +27,13 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
         cache: maven
-    - name: Build with Maven
-      run: mvn -B package --file pom.xml
 
     # Run tests
     - name: Test with Maven
       run: mvn -B test --file pom.xml
+
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
 
     # Upload the build artifact for deployment later in the workflow
     - name: Upload a Build Artifact
