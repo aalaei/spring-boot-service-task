@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ServiceOService {
-    String save(ServiceO service);
+    ServiceO save(ServiceO service);
 
     List<ServiceO> getAll();
 

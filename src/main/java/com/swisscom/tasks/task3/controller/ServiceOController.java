@@ -210,30 +210,45 @@ public class ServiceOController {
                     @ApiResponse(
                             description =  "Method NOT Allowed. Not able to delete",
                             responseCode = "405"
+                    ),
+                    @ApiResponse(
+                            description =  "Not Found. No service exists with this ID",
+                            responseCode = "404"
                     )
             }
     )
     @DeleteMapping("/del/{ID}")
     public ResponseEntity<HttpResponse> deleteById(@PathVariable("ID") String id) {
-        boolean is_deleted = serviceOService.deleteById(id);
-        if(is_deleted){
-            return ResponseEntity.ok().body(
+        try {
+            boolean is_deleted = serviceOService.deleteById(id);
+            if (is_deleted) {
+                return ResponseEntity.ok().body(
+                        HttpResponse.builder()
+                                .message("Deleted")
+                                .status(HttpStatus.OK)
+                                .statusCode(HttpStatus.OK.value())
+                                .timeStamp(now().toString())
+                                .build()
+                );
+            }
+            return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(
                     HttpResponse.builder()
-                            .message("Deleted")
-                            .status(HttpStatus.OK)
-                            .statusCode(HttpStatus.OK.value())
+                            .message("Failed to Delete")
+                            .status(HttpStatus.METHOD_NOT_ALLOWED)
+                            .statusCode(HttpStatus.METHOD_NOT_ALLOWED.value())
+                            .timeStamp(now().toString())
+                            .build()
+            );
+        }catch (ServiceOServiceException serviceOServiceException){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    HttpResponse.builder()
+                            .message("Not Found")
+                            .status(HttpStatus.NOT_FOUND)
+                            .statusCode(HttpStatus.NOT_FOUND.value())
                             .timeStamp(now().toString())
                             .build()
             );
         }
-        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(
-                HttpResponse.builder()
-                    .message("Failed to Delete")
-                    .status(HttpStatus.METHOD_NOT_ALLOWED)
-                    .statusCode(HttpStatus.METHOD_NOT_ALLOWED.value())
-                    .timeStamp(now().toString())
-                    .build()
-        );
     }
 
     private URI getUri() {
