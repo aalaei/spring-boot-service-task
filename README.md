@@ -103,12 +103,12 @@ chmod +x run.sh
 
 - [x] Create the `Service`, `Resource`, and `Owner` classes.
 - [x] Use annotations like `@Document` for MongoDB entities.
-- [ ] Define relationships using annotations like `@DBRef`.
+- [x] Define relationships using annotations like `@DBRef`.
 
 - [x] Create a `ServiceController` class.
 - [x] Implement CRUD methods for the `Service` object.
 - [x] Use `@RestController` and map endpoints for Create, Read, Update, and Delete operations.
-- [ ] Implement validation and exception handling.
+- [x] Implement validation and exception handling.
 - [ ] Implement GraphQL API.
 - [ ] Authentication and Authorization using JWT.
 
@@ -116,7 +116,7 @@ chmod +x run.sh
 - [x] Configure profile-specific properties in `application.properties` or `application.yml`.
 - [x] Include database connection details for each profile.
 
-- [ ] Configure Redis caching by adding `@EnableCaching` to the main application class.
+- [x] Configure Redis caching by adding `@EnableCaching` to the main application class.
 - [ ] Use `@Cacheable` and `@CachePut` annotations in service methods.
 - [ ] Implement caching and updating data in Redis.
 
@@ -125,7 +125,7 @@ chmod +x run.sh
 - [ ] Create scripts to dump MongoDB and Redis data locally.
 
 - [ ] Mapping between DTOs and entities.
-- [ ] Write unit tests for controllers, services, and repositories.
+- [x] Write unit tests for controllers, services, and repositories.
 - [ ] Document code using JavaDoc for better readability.
 - [x] CI/CD Github workflow.
 - [x] Dockerize Application.
