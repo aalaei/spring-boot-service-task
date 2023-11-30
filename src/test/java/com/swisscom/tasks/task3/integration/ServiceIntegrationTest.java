@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class ServiceITest {
+public class ServiceIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -41,6 +41,49 @@ public class ServiceITest {
     @BeforeEach
     void setUp() {
         serviceRepository.deleteAll();
+    }
+    @Test
+    void hasSavedService() throws Exception{
+        // given
+        String id= "id";
+        ServiceO serviceO = ServiceO.builder()
+                .id(id)
+                .criticalText("criticalText")
+                .resources(
+                List.of(
+                        Resource.builder()
+                                .criticalText("criticalText1")
+                                .owners(
+                                List.of(
+                                        Owner.builder()
+                                                .id("id")
+                                                .criticalText("criticalText2")
+                                                .name("name")
+                                                .accountNumber("accountNumber")
+                                                .level(1)
+                                                .build()
+                                ))
+                                .build()
+                ))
+                .build();
+        mockMvc.perform(post("/api/v1/service")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(serviceO)));
+
+        ResultActions resultActions = mockMvc
+                .perform(get("/api/v1/service/"+id)
+                        .contentType(MediaType.APPLICATION_JSON));
+        // then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(HttpStatus.OK.name()))
+                .andExpect(jsonPath("$.statusCode").value(HttpStatus.OK.value()))
+                .andExpect(jsonPath("$.message").value("OK"))
+                .andExpect(jsonPath("$.data.service").exists())
+                .andExpect(jsonPath("$.data.service.criticalText").value(serviceO.getCriticalText()))
+                .andExpect(jsonPath("$.data.service.resources[0].criticalText")
+                        .value(serviceO.getResources().get(0).getCriticalText()))
+                .andExpect(jsonPath("$.data.service.resources[0].owners[0].criticalText")
+                        .value(serviceO.getResources().get(0).getOwners().get(0).getCriticalText()));
     }
     @Test
     void canAddNewService() throws Exception {
