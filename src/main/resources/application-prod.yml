@@ -1,7 +1,7 @@
 spring:
   data:
     mongodb:
-      url: ${DATABASE_URL}
+      uri: ${DATABASE_URL}
 logging:
   file:
     name: Application.log
