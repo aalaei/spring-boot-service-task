@@ -1,7 +1,0 @@
-spring:
-  data:
-    mongodb:
-      uri: "mongodb://root:letmein@localhost:27017/db?authSource=admin"
-logging:
-  file:
-    name: Application.log

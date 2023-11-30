@@ -65,7 +65,7 @@ The API provides the following endpoints for CRUD operations on the "Service" ob
 Refer to the API documentation or Swagger UI for detailed information on request and response structures.
 
 ## Spring Profiles
-The application supports two Spring profiles: `dev` and `test`. Configure profile-specific properties in `application-dev.yml` and `application-test.yml`.
+The application supports two Spring profiles: `dev` and `prod`. Configure profile-specific properties in `application-dev.yml` and `application-prod.yml`.
 
 To activate a profile, set the `spring.profiles.active` property in `application.yml` or choose the profile in `pom.xml` file.
 
