@@ -1,6 +1,9 @@
 spring:
   profiles:
     active: @spring.profiles.active@
+  data:
+    mongodb:
+      auto-index-creation: true
 application:
   title: Service API
   version: 1.0
