@@ -2,6 +2,7 @@ package com.swisscom.tasks.task3.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.springframework.http.HttpStatus;
 
@@ -12,6 +13,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT;
 @Data
 @SuperBuilder
 @JsonInclude(NON_DEFAULT)
+@NoArgsConstructor
 public class HttpResponse {
     protected String timeStamp;
     protected int statusCode;
