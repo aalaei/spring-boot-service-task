@@ -6,7 +6,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Package Boot-Spring Spplication
+name: Package Boot-Spring Application
 on:
   push:
     tags: [ "v*" ]
