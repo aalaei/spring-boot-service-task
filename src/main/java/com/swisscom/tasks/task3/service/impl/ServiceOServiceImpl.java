@@ -26,7 +26,10 @@ public class ServiceOServiceImpl implements ServiceOService {
     public ServiceO save(ServiceO serviceO) {
         if (serviceO.getId() != null && serviceORepository.existsById(serviceO.getId()))
             throw new ServiceOServiceException("Another service with id "+serviceO.getId()+" exists before");
-        serviceO.getResources().forEach(r -> r.setOwners(r.getOwners().stream().map(ownerRepository::save).toList()));
+        serviceO.getResources().forEach(r -> {
+            if(r!=null)
+                r.setOwners(r.getOwners().stream().map(ownerRepository::save).toList());
+        });
         serviceO.setResources(serviceO.getResources().stream().map(resourceRepository::save).toList());
         return serviceORepository.save(serviceO);
     }
@@ -46,8 +49,14 @@ public class ServiceOServiceImpl implements ServiceOService {
         Optional<ServiceO> serviceO = serviceORepository.findById(id);
         if (serviceO.isPresent()) {
             serviceO.get().getResources().forEach(r -> {
-                r.getOwners().forEach(o -> ownerRepository.deleteById(o.getId()));
-                resourceRepository.deleteById(r.getId());
+                if(r != null){
+                    r.getOwners().forEach(o -> {
+                        if (o != null)
+                            ownerRepository.deleteById(o.getId());
+                    }
+                    );
+                    resourceRepository.deleteById(r.getId());
+                }
             });
             serviceORepository.deleteById(id);
             return true;
@@ -60,7 +69,11 @@ public class ServiceOServiceImpl implements ServiceOService {
     public boolean updateById(String id, ServiceO serviceO) {
         if (serviceORepository.existsById(id)) {
             serviceO.setId(id);
-            serviceO.getResources().forEach(r -> r.setOwners(r.getOwners().stream().map(ownerRepository::save).toList()));
+            serviceO.getResources().forEach(r ->
+            {
+                if(r!=null)
+                    r.setOwners(r.getOwners().stream().map(ownerRepository::save).toList());
+            });
             serviceO.setResources(serviceO.getResources().stream().map(resourceRepository::save).toList());
             serviceORepository.save(serviceO);
             return true;
