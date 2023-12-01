@@ -135,7 +135,7 @@ public class ServiceOServiceImpl implements ServiceOService {
      * @throws IllegalArgumentException in case the given {@code id} is {@literal null}.
      */
     @Override
-    @CacheEvict(key = "#id", allEntries = true)
+    @CacheEvict(key = "#id")
     public boolean deleteById(String id) {
         Optional<ServiceO> serviceO = serviceORepository.findById(id);
         log.info("Deleting service with id {}", id);
