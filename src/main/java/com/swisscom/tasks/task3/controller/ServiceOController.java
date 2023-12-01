@@ -1,5 +1,9 @@
 package com.swisscom.tasks.task3.controller;
 
+import com.swisscom.tasks.task3.dto.service.ServiceIdDTO;
+import com.swisscom.tasks.task3.dto.service.ServiceODTO;
+import com.swisscom.tasks.task3.dto.service.ServiceODTODefault;
+import com.swisscom.tasks.task3.dto.mapper.DTOMapper;
 import com.swisscom.tasks.task3.exception.ServiceOServiceException;
 import com.swisscom.tasks.task3.model.HttpResponse;
 import com.swisscom.tasks.task3.model.ServiceO;
@@ -7,6 +11,8 @@ import com.swisscom.tasks.task3.service.ServiceOService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.NotNull;
+import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,14 +33,15 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @RestController
 @Slf4j
-@RequestMapping("/api/v1/service")
+@RequestMapping("/api/v1/services")
 @Tag(name = "Service", description = "Service API")
 public class ServiceOController {
     private final ServiceOService serviceOService;
+    private final DTOMapper dtoMapper;
     /**
      * Saves a given service.
      *
-     * @param serviceO must not be {@literal null}.
+     * @param serviceODTO must not be {@literal null}. It is {@link ServiceODTO} object.
      * @return the saved service will never be {@literal null}. It returns {@link HttpResponse} object.
      * @throws ServiceOServiceException if service with same id already exists.
     */
@@ -57,9 +64,10 @@ public class ServiceOController {
             }
     )
     @PostMapping
-    public ResponseEntity<HttpResponse> save(@RequestBody ServiceO serviceO) {
+    public ResponseEntity<HttpResponse> createService(@RequestBody ServiceODTODefault serviceODTO) {
+        ServiceO serviceO = dtoMapper.map(serviceODTO, ServiceO.class);
         try {
-            ServiceO serviceONew = serviceOService.save(serviceO);
+            ServiceO serviceONew = serviceOService.create(serviceO);
             return ResponseEntity.created(getUri()).body(
                     HttpResponse.builder()
                             .timeStamp(now().toString())
@@ -81,13 +89,13 @@ public class ServiceOController {
         }
     }
     /**
-     * Retrieves all services.
+     * Retrieves all services(All the Details).
      *
-     * @return all services. It returns {@link HttpResponse} object.
+     * @return all services. It returns {@link HttpResponse} object. Each service is {@link ServiceO}
     */
     @Operation(
-            description = "Get All services",
-            summary = "Services",
+            description = "Get All services(With the details)",
+            summary = "Services(With the details)",
             responses = {
                     @ApiResponse(
                             description = "Success",
@@ -103,9 +111,9 @@ public class ServiceOController {
                     )
             }
     )
-    @GetMapping
-    public ResponseEntity<HttpResponse> getAll() {
-        List<ServiceO> serviceObjects= serviceOService.getAll();
+    @GetMapping("all")
+    public ResponseEntity<HttpResponse> getAllServicesDetailed() {
+        List<ServiceO> serviceObjects= serviceOService.getAllDetailed();
         return ResponseEntity.ok().body(
                 HttpResponse.builder()
                         .timeStamp(now().toString())
@@ -116,16 +124,19 @@ public class ServiceOController {
                         .build()
         );
     }
+
     /**
-     * Retrieves a service by its id.
+     * Retrieves services based on the specified criteria. If the ID is specified, it retrieves a specific service by its ID;
+     * otherwise, it retrieves a list of all services with only their IDs.
      *
-     * @param id must not be {@literal null}.
-     * @return the service with the given id or {@literal Optional#empty()} if none found. It returns {@link HttpResponse} object.
-     * @throws IllegalArgumentException if {@code id} is {@literal null}.
-    */
+     * @param id The unique identifier of the service to be retrieved.
+     * @return An {@link HttpResponse} object containing either the service with the given ID (if specified) or a list of all services
+     * (only IDs). If the ID is specified, the response data object's 'service' field holds an {@link Optional} of {@link ServiceODTO};
+     * otherwise, it returns an array of {@link ServiceIdDTO} within the 'services' field.
+     */
     @Operation(
-            description = "Get a service by ID",
-            summary = "Service by ID",
+            description = "Get a service by ID (If ID is not provided, it returns all services IDs)",
+            summary = "Service by ID/All Services IDs",
             responses = {
                     @ApiResponse(
                             description = "Success",
@@ -145,16 +156,29 @@ public class ServiceOController {
                     )
             }
     )
-    @GetMapping("/{ID}")
-    public ResponseEntity<HttpResponse> getById(@PathVariable("ID") String id) {
-        Optional<ServiceO> serviceO= serviceOService.getById(id);
-        if(serviceO.isPresent())
+    @GetMapping
+    public ResponseEntity<HttpResponse> getByIdOrAllIds(@PathParam("id") String id) {
+        if(id==null || id.isEmpty()){
+            List<ServiceIdDTO> serviceObjects= serviceOService.getAllIds();
+            return ResponseEntity.ok().body(
+                    HttpResponse.builder()
+                            .timeStamp(now().toString())
+                            .message("OK")
+                            .data(Map.of("services", serviceObjects))
+                            .status(HttpStatus.OK)
+                            .statusCode(HttpStatus.OK.value())
+                            .build()
+            );
+        }
+        Optional<ServiceODTODefault> serviceODTO=
+                dtoMapper.mapOptional(serviceOService.getById(id), ServiceODTODefault.class);
+        if(serviceODTO.isPresent())
         {
             return ResponseEntity.ok().body(
                     HttpResponse.builder()
                             .timeStamp(now().toString())
                             .message("OK")
-                            .data(Map.of("service", serviceO))
+                            .data(Map.of("service", serviceODTO))
                             .status(HttpStatus.OK)
                             .statusCode(HttpStatus.OK.value())
                             .build()
@@ -164,20 +188,20 @@ public class ServiceOController {
                 HttpResponse.builder()
                         .timeStamp(now().toString())
                         .message("Not Found")
-                        .data(Map.of("service", serviceO))
+                        .data(Map.of("service", Optional.empty()))
                         .status(HttpStatus.NOT_FOUND)
                         .statusCode(HttpStatus.NOT_FOUND.value())
                         .build()
         );
     }
     /**
-     * Updates the service with the given id.
+     * Updates the service with the given ID.
      *
-     * @param id must not be {@literal null}.
-     * @param serviceO must not be {@literal null}.
-     * @return {@literal true} if service was updated, {@literal false} otherwise. It returns {@link HttpResponse} object.
-     * @throws IllegalArgumentException in case the given {@code id} is {@literal null}.
-    */
+     * @param id The unique identifier of the service to be updated. Must not be {@literal null}.
+     * @param serviceODTO The updated service data. Must not be {@literal null}.
+     * @return An {@link HttpResponse} object containing the updated {@link ServiceODTO} if the service was successfully updated.
+     * @throws IllegalArgumentException if the given {@code id} is {@literal null}.
+     */
     @Operation(
             description = "Update a service by ID",
             summary = "Update Service",
@@ -200,15 +224,17 @@ public class ServiceOController {
                     )
             }
     )
-    @PutMapping("/{ID}")
-    //TODO: Change Service Objects to DTO
-    public ResponseEntity<HttpResponse> updateById(@PathVariable("ID") String id, @RequestBody ServiceO serviceO) {
+    @PutMapping
+    public ResponseEntity<HttpResponse> updateServiceById(@NotNull @PathParam("ID") String id,
+                                                          @NotNull @RequestBody ServiceODTODefault serviceODTO) {
+        ServiceO serviceO = dtoMapper.map(serviceODTO, ServiceO.class);
         try {
-            serviceOService.updateById(id, serviceO);
+            ServiceODTODefault newServiceODTO= dtoMapper.map(serviceOService.updateById(id, serviceO), ServiceODTODefault.class);
             return ResponseEntity.ok().body(
                     HttpResponse.builder()
                             .message("Updated")
                             .timeStamp(now().toString())
+                            .data(Map.of("service", newServiceODTO))
                             .statusCode(HttpStatus.OK.value())
                             .status(HttpStatus.OK)
                             .build()
@@ -234,12 +260,14 @@ public class ServiceOController {
         }
     }
     /**
-     * Deletes the service with the given id.
+     * Deletes the service with the given ID.
      *
-     * @param id must not be {@literal null}.
-     * @return {@literal true} if service was deleted, {@literal false} otherwise. It returns {@link HttpResponse} object.
-     * @throws IllegalArgumentException in case the given {@code id} is {@literal null}.
-    */
+     * @param id The unique identifier of the service to be deleted. Must not be {@literal null}.
+     * @return An {@link HttpResponse} object representing the result of the deletion operation. If the service is successfully deleted,
+     * the response status is {@link HttpStatus#OK}. If the service does not exist, the response status is {@link HttpStatus#NOT_FOUND}.
+     * If the deletion operation is not allowed, the response status is {@link HttpStatus#METHOD_NOT_ALLOWED}.
+     * @throws IllegalArgumentException if the given {@code id} is {@literal null}.
+     */
     @Operation(
             description = "Delete a service by ID",
             summary = "Delete Service",
@@ -262,8 +290,8 @@ public class ServiceOController {
                     )
             }
     )
-    @DeleteMapping("/{ID}")
-    public ResponseEntity<HttpResponse> deleteById(@PathVariable("ID") String id) {
+    @DeleteMapping()
+    public ResponseEntity<HttpResponse> deleteServiceById(@NotNull @PathParam("ID") String id) {
         try {
             boolean is_deleted = serviceOService.deleteById(id);
             if (is_deleted) {
