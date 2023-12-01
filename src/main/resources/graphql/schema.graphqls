@@ -3,7 +3,9 @@ type Query{
     service(id: ID!): Service
 }
 type Mutation{
-    addService(service: ServiceInput): Service
+    createService(service: ServiceInput): Service
+    updateService(id: ID!, service: ServiceInput): Service
+    deleteService(id: ID!): Service
 }
 input ServiceInput{
     criticalText: String
