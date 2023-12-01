@@ -126,7 +126,7 @@ chmod +x run.sh
 
 - [ ] Mapping between DTOs and entities.
 - [x] Write unit tests for controllers, services, and repositories.
-- [ ] Document code using JavaDoc for better readability.
+- [x] Document code using JavaDoc for better readability.
 - [x] CI/CD Github workflow.
 - [x] Dockerize Application.
 - [x] API documentation and Swagger UI.
