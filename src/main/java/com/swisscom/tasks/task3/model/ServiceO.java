@@ -14,6 +14,9 @@ import java.util.List;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
+/**
+ * This class is used to represent and store service object.
+ */
 @Data
 @Builder
 @Document(collection = "service")

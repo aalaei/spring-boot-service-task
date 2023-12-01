@@ -14,7 +14,9 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
-
+/**
+ * This class is used to represent and store resource object.
+ */
 @Data
 @Builder
 @AllArgsConstructor

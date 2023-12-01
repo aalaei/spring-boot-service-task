@@ -10,6 +10,10 @@ import java.util.Map;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT;
 
+/**
+ * This class is used to return a response to the client.
+ * It is used to return a response in case of an error or a success.
+ */
 @Data
 @SuperBuilder
 @JsonInclude(NON_DEFAULT)
