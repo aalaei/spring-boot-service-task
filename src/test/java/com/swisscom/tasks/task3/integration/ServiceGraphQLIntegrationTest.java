@@ -4,6 +4,7 @@ import com.swisscom.tasks.task3.configuration.DTOMapperBean;
 import com.swisscom.tasks.task3.dto.mapper.DTOMapper;
 import com.swisscom.tasks.task3.dto.service.ServiceODTONoID;
 import com.swisscom.tasks.task3.model.ServiceO;
+import com.swisscom.tasks.task3.service.ServiceOService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ServiceGraphQLIntegrationTest {
+    @Autowired
+    ServiceOService serviceOService;
     private HttpGraphQlTester graphQlTester;
     @Autowired
     private DTOMapper dtoMapper;
@@ -24,12 +27,9 @@ public class ServiceGraphQLIntegrationTest {
     @LocalServerPort
     int port;
 
-    @BeforeAll
-    static void beforeAll() {
-
-    }
     @BeforeEach
     void setUp() {
+        serviceOService.deleteAll();
         dtoMapper = new DTOMapper(new DTOMapperBean().modelMapper());
         WebTestClient client = WebTestClient.bindToServer()
                 .baseUrl(String.format("http://localhost:%s/graphql", port))
@@ -43,7 +43,6 @@ public class ServiceGraphQLIntegrationTest {
     }
     @Test
     void shouldReturnBook(){
-
         //given
         // language= GraphQL
         String mutation = """
@@ -109,7 +108,7 @@ public class ServiceGraphQLIntegrationTest {
     }
 
     @Test
-    void findAllShouldReturnAllServices(){
+    void findAllShouldNotReturnAllServices(){
         // language=NGraphQL
         String document = """
             query {
@@ -123,8 +122,55 @@ public class ServiceGraphQLIntegrationTest {
                 .execute()
                 .path("services")
                 .entityList(ServiceO.class)
-                .hasSizeGreaterThan(0);
-
+                .hasSize(0);
+    }
+    @Test
+    void findAllShouldReturnAllServices(){
+        //given
+        // language= GraphQL
+        String mutation = """
+            mutation createService($service: ServiceInput!) {
+                createService(service: $service){
+                    id
+                    criticalText
+                    resources{
+                        id
+                        criticalText
+                        owners{
+                            id
+                            criticalText
+                            name
+                            level
+                            accountNumber
+                        }
+                    }
+                 }
+            }
+        """;
+        graphQlTester.document(mutation)
+                .variable("service", dtoMapper.map(ServiceO.builder()
+                        .criticalText("criticalText")
+                        .build(), ServiceODTONoID.class))
+                .execute()
+                .path("createService")
+                .entity(ServiceO.class)
+                .satisfies(s -> {
+                    assertEquals("criticalText", s.getCriticalText());
+                });
+        // language=NGraphQL
+        String document = """
+            query {
+                services{
+                    id
+                    criticalText
+                }
+            }
+        """;
+        graphQlTester.document(document)
+                .execute()
+                .path("services")
+                .entityList(ServiceO.class)
+                .hasSize(1);
     }
     @Test
     void shouldUpdateService() {
