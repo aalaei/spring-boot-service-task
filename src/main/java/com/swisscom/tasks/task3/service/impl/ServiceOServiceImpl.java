@@ -151,7 +151,7 @@ public class ServiceOServiceImpl implements ServiceOService {
     }
 
     /**
-     * Deletes all services. It also deletes all resources and owners of this service.
+     * Deletes all services. It also deletes all resources and owners.
      * @return {@literal true} if all services were deleted, {@literal false} otherwise.
      */
     @Override
@@ -159,6 +159,8 @@ public class ServiceOServiceImpl implements ServiceOService {
     public boolean deleteAll() {
         log.info("Deleting all services");
         serviceORepository.deleteAll();
+        ownerRepository.deleteAll();
+        resourceRepository.deleteAll();
         return true;
     }
 
