@@ -4,6 +4,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
+/**
+ * Bean for {@link ModelMapper}.
+ */
 @Component
 public class DTOMapperBean {
     @Bean

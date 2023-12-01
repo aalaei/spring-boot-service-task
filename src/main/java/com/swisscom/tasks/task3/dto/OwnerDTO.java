@@ -4,6 +4,9 @@ import lombok.Data;
 
 import java.io.Serializable;
 
+/**
+ * Owner DTO.
+ */
 @Data
 public class OwnerDTO implements Serializable {
     private String criticalText;

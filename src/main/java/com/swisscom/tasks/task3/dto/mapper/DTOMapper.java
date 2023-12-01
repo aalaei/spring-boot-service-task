@@ -6,6 +6,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+/**
+ * DTO mapper. A Util class for mapping DTOs to entities and vice versa.
+ */
 @RequiredArgsConstructor
 @Component
 public class DTOMapper {

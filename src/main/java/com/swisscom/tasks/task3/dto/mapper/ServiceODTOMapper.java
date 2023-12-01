@@ -9,6 +9,9 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * ServiceO DTO mapper. A Util class for mapping ServiceO DTOs to entities and vice versa(Legacy).
+ */
 @Component
 public class ServiceODTOMapper {
     public static ServiceODTODefault fromServiceO(ServiceO serviceO) {
