@@ -30,4 +30,9 @@ public class ServiceOGraphQLController {
 //        ).collect(Collectors.toList());
         return serviceOIterable;
     }
+
+    @QueryMapping("service")
+    Optional<ServiceO> serviceById(@Argument String id) {
+        return serviceOService.getById(id);
+    }
 }
