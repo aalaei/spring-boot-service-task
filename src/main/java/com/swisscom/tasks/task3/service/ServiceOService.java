@@ -20,6 +20,8 @@ public interface ServiceOService {
 
     boolean deleteById(String id);
 
+    boolean deleteAll();
+
     ServiceO updateById(String id, ServiceO serviceO);
 
     ServiceO updateById(String id, ServiceO serviceO, boolean cascade);
