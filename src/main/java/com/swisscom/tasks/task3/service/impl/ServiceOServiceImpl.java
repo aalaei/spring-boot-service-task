@@ -25,6 +25,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Service
 @Slf4j
+@CacheConfig(cacheNames = "service")
 public class ServiceOServiceImpl implements ServiceOService {
 
     private final ServiceORepository serviceORepository;
@@ -85,6 +86,7 @@ public class ServiceOServiceImpl implements ServiceOService {
     public ServiceO create(ServiceO serviceO) {
         if (serviceO.getId() != null && serviceORepository.existsById(serviceO.getId()))
             throw new ServiceOServiceException("Another service with id " + serviceO.getId() + " exists before");
+        log.info("Saving a new service");
         saveCascade(serviceO);
         return serviceORepository.save(serviceO);
     }
@@ -119,7 +121,7 @@ public class ServiceOServiceImpl implements ServiceOService {
      * @throws IllegalArgumentException if {@code id} is {@literal null}.
      */
     @Override
-    @Cacheable(value = "service", key = "#id")
+    @Cacheable(key = "#id")
     public Optional<ServiceO> getById(String id) {
         log.info("Getting service with id {}", id);
         return serviceORepository.findById(id);
@@ -133,9 +135,10 @@ public class ServiceOServiceImpl implements ServiceOService {
      * @throws IllegalArgumentException in case the given {@code id} is {@literal null}.
      */
     @Override
-    @CacheEvict(value = "service", key = "#id")
+    @CacheEvict(key = "#id", allEntries = true)
     public boolean deleteById(String id) {
         Optional<ServiceO> serviceO = serviceORepository.findById(id);
+        log.info("Deleting service with id {}", id);
         if (serviceO.isPresent()) {
             if (serviceO.get().getResources() != null) {
                 deleteCascade(serviceO.get());
@@ -170,8 +173,9 @@ public class ServiceOServiceImpl implements ServiceOService {
      * @throws IllegalArgumentException in case the given {@code id} is {@literal null}.
      */
     @Override
-    @CachePut(value = "service", key = "#id")
+    @CachePut(key = "#id")
     public ServiceO updateById(String id, ServiceO serviceO, boolean cascade) {
+        log.info("Updating service with id {}", id);
         if (serviceORepository.existsById(id)) {
             serviceO.setId(id);
             if (cascade)
