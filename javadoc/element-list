@@ -1,0 +1,8 @@
+com.swisscom.tasks.task3
+com.swisscom.tasks.task3.configuration
+com.swisscom.tasks.task3.controller
+com.swisscom.tasks.task3.exception
+com.swisscom.tasks.task3.model
+com.swisscom.tasks.task3.repository
+com.swisscom.tasks.task3.service
+com.swisscom.tasks.task3.service.impl
