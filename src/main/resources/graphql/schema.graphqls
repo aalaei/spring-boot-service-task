@@ -1,5 +1,6 @@
 type Query{
     services: [Service]
+    service(id: ID!): Service
 }
 type Service{
     id: ID!
