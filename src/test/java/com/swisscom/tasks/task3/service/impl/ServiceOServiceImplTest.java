@@ -45,7 +45,7 @@ class ServiceOServiceImplTest {
     @Test
     void canGetAllServices() {
         // when
-        underTest.getAll();
+        underTest.getAllDetailed();
         // then
         verify(serviceORepository).findAll();
     }
@@ -69,7 +69,7 @@ class ServiceOServiceImplTest {
                 )
                 ).build();
         // when
-        underTest.save(serviceO);
+        underTest.create(serviceO);
         // then
         ArgumentCaptor<ServiceO> serviceArgumentCaptor =
                 ArgumentCaptor.forClass(ServiceO.class);
@@ -91,7 +91,7 @@ class ServiceOServiceImplTest {
                 .willReturn(true);
         // when
         // then
-        assertThatThrownBy(() -> underTest.save(serviceO))
+        assertThatThrownBy(() -> underTest.create(serviceO))
                 .isInstanceOf(ServiceOServiceException.class)
                 .hasMessageContaining("Another service with id "+id+" exists before");
         verify(serviceORepository, never()).save(any());
