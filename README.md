@@ -60,7 +60,13 @@ The API provides the following endpoints for CRUD operations on the "Service" ob
 * `GET /api/v1/service`: Retrieve a list of services.
 * `PUT /api/v1/service/{id}`: Update an existing service.
 * `DELETE /api/v1/service/{id}`: Delete a service by ID.
-* `GET /health`: Check the health status of the application. 
+
+The API provides a single endpoint for health status checking:
+* `GET /health`: Check the application's health status.
+
+The API provides the following paths for API documentation and Swagger UI:
+* `/swagger-ui.html`: Swagger UI
+* `/v3/api-docs`: API Documentation JSON
 
 Refer to the API documentation or Swagger UI for detailed information on request and response structures.
 
