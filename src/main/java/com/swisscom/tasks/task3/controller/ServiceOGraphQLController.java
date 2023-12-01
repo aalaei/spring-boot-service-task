@@ -35,4 +35,14 @@ public class ServiceOGraphQLController {
     Optional<ServiceO> serviceById(@Argument String id) {
         return serviceOService.getById(id);
     }
+    @MutationMapping
+    ServiceO addService(@Argument ServiceInput service) {
+        ServiceO serviceO = dtoMapper.map(service, ServiceO.class);
+        serviceOService.create(serviceO);
+        return serviceO;
+    }
+    record ServiceInput(String criticalText, List<ResourceInput> resources){}
+    record ResourceInput(String criticalText, List<OwnerInput> owners){}
+    record OwnerInput(String criticalText, String name, String accountNumber, Integer level){}
+
 }
