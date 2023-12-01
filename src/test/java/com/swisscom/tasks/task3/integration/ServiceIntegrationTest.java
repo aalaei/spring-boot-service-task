@@ -22,8 +22,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -41,6 +40,16 @@ public class ServiceIntegrationTest {
     @BeforeEach
     void setUp() {
         serviceRepository.deleteAll();
+    }
+    @Test
+    void isHealthy() throws Exception {
+        // when
+        ResultActions resultActions = mockMvc
+                .perform(get("/health")
+                        .contentType(MediaType.APPLICATION_JSON));
+        // then
+        resultActions.andExpect(status().isOk())
+                .andExpect(content().string("Healthy"));
     }
     @Test
     void hasSavedService() throws Exception{
