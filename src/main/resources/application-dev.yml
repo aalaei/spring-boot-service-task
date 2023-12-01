@@ -4,6 +4,10 @@ spring:
       uri: "mongodb://root:letmein@localhost:27017/serviceDB?authSource=admin"
     redis:
       url: "redis://localhost:6379"
+  graphql:
+    graphiql:
+      enabled: true
+
 logging:
   file:
     name: Application.log

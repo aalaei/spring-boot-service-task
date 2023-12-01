@@ -1,0 +1,40 @@
+type Query{
+    services: [Service]
+    service(id: ID!): Service
+}
+type Mutation{
+    createService(service: ServiceInput): Service
+    updateService(id: ID!, service: ServiceInput): Service
+    deleteService(id: ID!): Service
+}
+input ServiceInput{
+    criticalText: String
+    resources: [ResourceInput]
+}
+input ResourceInput{
+    criticalText: String
+    owners: [OwnerInput]
+}
+input OwnerInput{
+    criticalText: String
+    name: String
+    accountNumber: String
+    level: Int
+}
+type Service{
+    id: ID!
+    criticalText: String
+    resources: [Resource]
+}
+type Resource{
+    id: ID!
+    criticalText: String
+    owners: [Owner]
+}
+type Owner{
+    id: ID!
+    criticalText: String
+    name: String
+    accountNumber: String
+    level: Int
+}

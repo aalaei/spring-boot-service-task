@@ -151,6 +151,18 @@ public class ServiceOServiceImpl implements ServiceOService {
     }
 
     /**
+     * Deletes all services. It also deletes all resources and owners of this service.
+     * @return {@literal true} if all services were deleted, {@literal false} otherwise.
+     */
+    @Override
+    @CacheEvict(allEntries = true)
+    public boolean deleteAll() {
+        log.info("Deleting all services");
+        serviceORepository.deleteAll();
+        return true;
+    }
+
+    /**
      * Updates the service with the given id. It also updates all resources and owners of this service.
      *
      * @param id       must not be {@literal null}.
