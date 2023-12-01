@@ -1,4 +1,4 @@
-package com.swisscom.tasks.task3.dto;
+package com.swisscom.tasks.task3.dto.service;
 
 import lombok.Data;
 

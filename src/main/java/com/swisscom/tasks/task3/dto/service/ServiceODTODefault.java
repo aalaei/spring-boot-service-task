@@ -1,0 +1,5 @@
+package com.swisscom.tasks.task3.dto.service;
+import com.swisscom.tasks.task3.model.Resource;
+
+public class ServiceODTODefault extends ServiceODTO<Resource> {
+}
