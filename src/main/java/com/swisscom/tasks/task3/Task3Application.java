@@ -5,6 +5,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.scheduling.annotation.EnableAsync;
 
+/**
+ * This is the main class of the application.
+ * It is used to start the application.
+ */
 @EnableAsync
 @SpringBootApplication
 @EnableCaching

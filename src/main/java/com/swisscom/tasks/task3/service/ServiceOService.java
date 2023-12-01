@@ -5,6 +5,9 @@ import com.swisscom.tasks.task3.model.ServiceO;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service for {@link ServiceO} entity.
+ */
 public interface ServiceOService {
     ServiceO save(ServiceO service);
 

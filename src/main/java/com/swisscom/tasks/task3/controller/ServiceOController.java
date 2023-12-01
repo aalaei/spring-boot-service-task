@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,13 +20,24 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
+/**
+ * Controller for {@link ServiceO} entity. It exposes all CRUD operations on {@link ServiceO} entity.
+ * Http response is {@link HttpResponse} object.
+ */
 @RequiredArgsConstructor
 @RestController
+@Slf4j
 @RequestMapping("/api/v1/service")
 @Tag(name = "Service", description = "Service API")
 public class ServiceOController {
     private final ServiceOService serviceOService;
+    /**
+     * Saves a given service.
+     *
+     * @param serviceO must not be {@literal null}.
+     * @return the saved service will never be {@literal null}. It returns {@link HttpResponse} object.
+     * @throws ServiceOServiceException if service with same id already exists.
+    */
     @Operation(
             description = "Register a new service",
             summary = "New Service",
@@ -37,10 +49,6 @@ public class ServiceOController {
                     @ApiResponse(
                             description =  "Unauthorized. Invalid token",
                             responseCode = "403"
-                    ),
-                    @ApiResponse(
-                            description =  "Bad Request",
-                            responseCode = "400"
                     ),
                     @ApiResponse(
                             description = "Method Not Allowed",
@@ -72,6 +80,11 @@ public class ServiceOController {
             );
         }
     }
+    /**
+     * Retrieves all services.
+     *
+     * @return all services. It returns {@link HttpResponse} object.
+    */
     @Operation(
             description = "Get All services",
             summary = "Services",
@@ -103,6 +116,13 @@ public class ServiceOController {
                         .build()
         );
     }
+    /**
+     * Retrieves a service by its id.
+     *
+     * @param id must not be {@literal null}.
+     * @return the service with the given id or {@literal Optional#empty()} if none found. It returns {@link HttpResponse} object.
+     * @throws IllegalArgumentException if {@code id} is {@literal null}.
+    */
     @Operation(
             description = "Get a service by ID",
             summary = "Service by ID",
@@ -150,6 +170,14 @@ public class ServiceOController {
                         .build()
         );
     }
+    /**
+     * Updates the service with the given id.
+     *
+     * @param id must not be {@literal null}.
+     * @param serviceO must not be {@literal null}.
+     * @return {@literal true} if service was updated, {@literal false} otherwise. It returns {@link HttpResponse} object.
+     * @throws IllegalArgumentException in case the given {@code id} is {@literal null}.
+    */
     @Operation(
             description = "Update a service by ID",
             summary = "Update Service",
@@ -205,6 +233,13 @@ public class ServiceOController {
             );
         }
     }
+    /**
+     * Deletes the service with the given id.
+     *
+     * @param id must not be {@literal null}.
+     * @return {@literal true} if service was deleted, {@literal false} otherwise. It returns {@link HttpResponse} object.
+     * @throws IllegalArgumentException in case the given {@code id} is {@literal null}.
+    */
     @Operation(
             description = "Delete a service by ID",
             summary = "Delete Service",
