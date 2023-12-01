@@ -2,6 +2,23 @@ type Query{
     services: [Service]
     service(id: ID!): Service
 }
+type Mutation{
+    addService(service: ServiceInput): Service
+}
+input ServiceInput{
+    criticalText: String
+    resources: [ResourceInput]
+}
+input ResourceInput{
+    criticalText: String
+    owners: [OwnerInput]
+}
+input OwnerInput{
+    criticalText: String
+    name: String
+    accountNumber: String
+    level: Int
+}
 type Service{
     id: ID!
     criticalText: String
