@@ -11,6 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/health")
 @Tag(name = "Health", description = "Health API")
 public class HealthController {
+    /**
+     * Health check
+     * @return Healthy
+     */
     @Operation(
             description = "Health check",
             summary = "Health check",
@@ -25,6 +29,7 @@ public class HealthController {
                     )
             }
     )
+
     @GetMapping
     public String health() {
         return "Healthy";
