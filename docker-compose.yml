@@ -22,8 +22,14 @@ services:
         - "3000:8080"
       environment:
         DATABASE_URL: mongodb://root:letmein@task3-mongo:27017/serviceDB?authSource=admin
+        REDIS_URL: redis://task3-redis:6379
 
-  
+  task3-redis:
+    container_name: task3_redis
+    image: redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
   task3-mongo-express:
     container_name: task3_mongo_express
     image: mongo-express

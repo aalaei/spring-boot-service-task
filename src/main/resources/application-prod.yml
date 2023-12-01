@@ -2,6 +2,5 @@ spring:
   data:
     mongodb:
       uri: ${DATABASE_URL}
-logging:
-  file:
-    name: Application.log
+    redis:
+      url: ${REDIS_URL}
