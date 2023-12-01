@@ -124,7 +124,7 @@ chmod +x run.sh
 - [x] Include database connection details for each profile.
 
 - [x] Configure Redis caching by adding `@EnableCaching` to the main application class.
-- [ ] Use `@Cacheable` and `@CachePut` annotations in service methods.
+- [x] Use `@Cacheable` and `@CachePut` annotations in service methods.
 - [x] Implement caching and updating data in Redis.
 
 - [ ] Implement encryption/decryption for critical text fields.

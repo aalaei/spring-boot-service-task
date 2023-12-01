@@ -9,6 +9,7 @@ import com.swisscom.tasks.task3.repository.ServiceORepository;
 import com.swisscom.tasks.task3.service.ServiceOService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -94,7 +95,6 @@ public class ServiceOServiceImpl implements ServiceOService {
      * @return A List of all services(Only ID).
      */
     @Override
-    //    @Cacheable(value = "service")
     public List<ServiceIdDTO> getAllIds() {
         log.info("Getting all services(Ids)");
         return serviceORepository.findAllIds();
@@ -106,7 +106,6 @@ public class ServiceOServiceImpl implements ServiceOService {
      * @return all services.
      */
     @Override
-//    @Cacheable(value = "service")
     public List<ServiceO> getAllDetailed() {
         log.info("Getting all services(Detailed)");
         return serviceORepository.findAll();
@@ -120,7 +119,7 @@ public class ServiceOServiceImpl implements ServiceOService {
      * @throws IllegalArgumentException if {@code id} is {@literal null}.
      */
     @Override
-//    @Cacheable(value = "service", key = "#id")
+    @Cacheable(value = "service", key = "#id")
     public Optional<ServiceO> getById(String id) {
         log.info("Getting service with id {}", id);
         return serviceORepository.findById(id);
@@ -134,7 +133,7 @@ public class ServiceOServiceImpl implements ServiceOService {
      * @throws IllegalArgumentException in case the given {@code id} is {@literal null}.
      */
     @Override
-//    @CacheEvict(value = "service", key = "#id")
+    @CacheEvict(value = "service", key = "#id")
     public boolean deleteById(String id) {
         Optional<ServiceO> serviceO = serviceORepository.findById(id);
         if (serviceO.isPresent()) {
@@ -171,7 +170,7 @@ public class ServiceOServiceImpl implements ServiceOService {
      * @throws IllegalArgumentException in case the given {@code id} is {@literal null}.
      */
     @Override
-//    @CachePut(value = "service", key = "#id")
+    @CachePut(value = "service", key = "#id")
     public ServiceO updateById(String id, ServiceO serviceO, boolean cascade) {
         if (serviceORepository.existsById(id)) {
             serviceO.setId(id);
