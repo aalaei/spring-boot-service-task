@@ -12,10 +12,10 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableAsync
 @SpringBootApplication
 @EnableCaching
-public class Task3Application {
+public class Application {
 
     public static void main(String[] args) {
-        SpringApplication.run(Task3Application.class, args);
+        SpringApplication.run(Application.class, args);
     }
 
 }
