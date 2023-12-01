@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.List;
 
 @Data
-public class ServiceODTO implements  Serializable{
+public class ServiceODTO<T> implements  Serializable{
     private String criticalText;
-    private List<Resource> resources;
+    private List<T> resources;
 }
