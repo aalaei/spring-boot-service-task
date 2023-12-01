@@ -41,6 +41,11 @@ jobs:
         mongodb-password: letmein
         mongodb-db: serviceDB
 
+    - name: Start Redis
+      uses: shogo82148/actions-setup-redis@v1
+      with:
+        redis-version: "6.x"
+    
     # Run tests
     - name: Test with Maven
       run: mvn -B test --file pom.xml
