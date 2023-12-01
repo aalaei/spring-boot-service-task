@@ -125,13 +125,13 @@ chmod +x run.sh
 
 - [x] Configure Redis caching by adding `@EnableCaching` to the main application class.
 - [ ] Use `@Cacheable` and `@CachePut` annotations in service methods.
-- [ ] Implement caching and updating data in Redis.
+- [x] Implement caching and updating data in Redis.
 
 - [ ] Implement encryption/decryption for critical text fields.
 
 - [ ] Create scripts to dump MongoDB and Redis data locally.
 
-- [ ] Mapping between DTOs and entities.
+- [x] Mapping between DTOs and entities.
 - [x] Write unit tests for controllers, services, and repositories.
 - [x] Document code using JavaDoc for better readability.
 - [x] CI/CD Github workflow.
