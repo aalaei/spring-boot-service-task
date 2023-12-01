@@ -1,5 +1,5 @@
 # Spring Boot Web Application with MongoDB, Redis (Interview Task)
-
+[![Javadoc](https://img.shields.io/badge/JavaDoc-Online-green)](https://aalaei.github.io/spring-boot-service-task/javadoc/)
 ![Tests Workflow](https://github.com/aalaei/spring-boot-service-task/actions/workflows/maven.yml/badge.svg)
 ![Release Workflow](https://github.com/aalaei/spring-boot-service-task/actions/workflows/release.yml/badge.svg)
 
