@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.List;
 
 @Data
-public class ResourceDTO<T> implements Serializable{
+public class ResourceDTO<T> implements Serializable {
     private String criticalText;
     private List<T> owners;
 }

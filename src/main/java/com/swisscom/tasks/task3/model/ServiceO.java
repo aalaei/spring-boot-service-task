@@ -24,7 +24,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @JsonInclude(NON_NULL)
 @AllArgsConstructor
 @NoArgsConstructor
-public class ServiceO  implements Serializable {
+public class ServiceO implements Serializable {
     @Id
     private String id;
     @Indexed

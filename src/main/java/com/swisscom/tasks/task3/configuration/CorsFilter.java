@@ -6,15 +6,16 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+
 // Enables CORS for all requests
 @Component
 public class CorsFilter implements Filter {
 
     /**
-     * @param req - request
-     * @param res - response
+     * @param req   - request
+     * @param res   - response
      * @param chain - filter chain
-     * @throws IOException - IO exception
+     * @throws IOException      - IO exception
      * @throws ServletException - Servlet exception
      */
     @Override
@@ -31,9 +32,11 @@ public class CorsFilter implements Filter {
     }
 
     @Override
-    public void init(FilterConfig filterConfig) {}
+    public void init(FilterConfig filterConfig) {
+    }
 
     @Override
-    public void destroy() {}
+    public void destroy() {
+    }
 }
 

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class HealthController {
     /**
      * Health check
+     *
      * @return Healthy
      */
     @Operation(
@@ -24,7 +25,7 @@ public class HealthController {
                             responseCode = "200"
                     ),
                     @ApiResponse(
-                            description =  "Unhealthy",
+                            description = "Unhealthy",
                             responseCode = "500"
                     )
             }

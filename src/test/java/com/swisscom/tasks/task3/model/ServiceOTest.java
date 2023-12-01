@@ -8,11 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 class ServiceOTest {
     @Test
     void getId() {
-        List<Owner> owners1= List.of(
+        List<Owner> owners1 = List.of(
                 Owner.builder()
                         .id("id1")
                         .criticalText("criticalText11")
@@ -29,7 +31,7 @@ class ServiceOTest {
                         .level(2)
                         .build()
         );
-        List<Owner> owners2= List.of(
+        List<Owner> owners2 = List.of(
                 Owner.builder()
                         .id("id3")
                         .criticalText("criticalText21")
@@ -81,7 +83,7 @@ class ServiceOTest {
 
     @Test
     void ShouldEqualCriticalText() {
-        ServiceO serviceO= ServiceO.builder()
+        ServiceO serviceO = ServiceO.builder()
                 .id("id")
                 .criticalText("criticalText")
                 .build();

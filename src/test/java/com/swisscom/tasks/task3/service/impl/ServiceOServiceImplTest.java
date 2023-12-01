@@ -49,24 +49,25 @@ class ServiceOServiceImplTest {
         // then
         verify(serviceORepository).findAll();
     }
+
     @Test
     void canAddService() {
         // given
         ServiceO serviceO = ServiceO.builder()
                 .criticalText("criticalText")
                 .resources(List.of(
-                        Resource.builder()
-                                .criticalText("criticalText")
-                                .owners(List.of(
-                                        Owner.builder()
-                                                .criticalText("criticalText")
-                                                .name("name")
-                                                .accountNumber("accountNumber")
-                                                .level(1)
-                                                .build()
-                                ))
-                                .build()
-                )
+                                Resource.builder()
+                                        .criticalText("criticalText")
+                                        .owners(List.of(
+                                                Owner.builder()
+                                                        .criticalText("criticalText")
+                                                        .name("name")
+                                                        .accountNumber("accountNumber")
+                                                        .level(1)
+                                                        .build()
+                                        ))
+                                        .build()
+                        )
                 ).build();
         // when
         underTest.create(serviceO);
@@ -85,7 +86,7 @@ class ServiceOServiceImplTest {
     @Test
     void willThrowWhenAddServiceWithDuplicateId() {
         // given
-        String id="id";
+        String id = "id";
         ServiceO serviceO = ServiceO.builder().id(id).build();
         given(serviceORepository.existsById(id))
                 .willReturn(true);
@@ -93,28 +94,29 @@ class ServiceOServiceImplTest {
         // then
         assertThatThrownBy(() -> underTest.create(serviceO))
                 .isInstanceOf(ServiceOServiceException.class)
-                .hasMessageContaining("Another service with id "+id+" exists before");
+                .hasMessageContaining("Another service with id " + id + " exists before");
         verify(serviceORepository, never()).save(any());
         verify(resourceRepository, never()).save(any());
         verify(ownerRepository, never()).save(any());
     }
+
     @Test
     void canDeleteService() {
         // given
         String id = "id";
         given(serviceORepository.findById(id))
                 .willReturn(Optional.of(ServiceO.builder()
-                                .resources(List.of(
-                                        Resource.builder()
-                                                .owners(List.of(
-                                                        Owner.builder()
-                                                                .id("id")
-                                                                .level(1)
-                                                                .name("name")
-                                                                .build()
-                                                ))
-                                                .build()
-                                ))
+                        .resources(List.of(
+                                Resource.builder()
+                                        .owners(List.of(
+                                                Owner.builder()
+                                                        .id("id")
+                                                        .level(1)
+                                                        .name("name")
+                                                        .build()
+                                        ))
+                                        .build()
+                        ))
                         .id(id)
                         .build()));
         // when
@@ -140,6 +142,7 @@ class ServiceOServiceImplTest {
         verify(resourceRepository, never()).deleteById(any());
         verify(ownerRepository, never()).deleteById(any());
     }
+
     @Test
     void canEditService() {
         // given
@@ -147,18 +150,18 @@ class ServiceOServiceImplTest {
         ServiceO newServiceO = ServiceO.builder()
                 .criticalText("newCriticalText1")
                 .resources(List.of(
-                        Resource.builder()
-                                .criticalText("newCriticalText2")
-                                .owners(List.of(
-                                        Owner.builder()
-                                                .criticalText("newCriticalText3")
-                                                .name("newName")
-                                                .accountNumber("newAccountNumber")
-                                                .level(1)
-                                                .build()
-                                ))
-                                .build()
-                )
+                                Resource.builder()
+                                        .criticalText("newCriticalText2")
+                                        .owners(List.of(
+                                                Owner.builder()
+                                                        .criticalText("newCriticalText3")
+                                                        .name("newName")
+                                                        .accountNumber("newAccountNumber")
+                                                        .level(1)
+                                                        .build()
+                                        ))
+                                        .build()
+                        )
                 ).build();
         given(serviceORepository.existsById(id))
                 .willReturn(true);
@@ -175,6 +178,7 @@ class ServiceOServiceImplTest {
         verify(resourceRepository).save(newServiceO.getResources().get(0));
         verify(ownerRepository).save(newServiceO.getResources().get(0).getOwners().get(0));
     }
+
     @Test
     void willThrowWhenEditServiceNotFound() {
         // given

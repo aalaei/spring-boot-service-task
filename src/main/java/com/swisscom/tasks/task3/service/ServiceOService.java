@@ -21,4 +21,6 @@ public interface ServiceOService {
     boolean deleteById(String id);
 
     ServiceO updateById(String id, ServiceO serviceO);
+
+    ServiceO updateById(String id, ServiceO serviceO, boolean cascade);
 }

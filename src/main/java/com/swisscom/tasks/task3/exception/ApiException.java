@@ -7,12 +7,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * This class is used to represent an exception in the application api.
  */
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-public class ApiException extends RuntimeException{
+public class ApiException extends RuntimeException {
     /**
      * Constructor for ApiException
+     *
      * @param message - Error message for ApiException
      */
-    public ApiException(String message){
+    public ApiException(String message) {
         super(message);
     }
 }

@@ -1,4 +1,5 @@
 package com.swisscom.tasks.task3.integration;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.swisscom.tasks.task3.dto.service.ServiceODTODefault;
@@ -48,6 +49,7 @@ public class ServiceIntegrationTest {
     void setUp() {
         serviceRepository.deleteAll();
     }
+
     @Test
     void isHealthy() throws Exception {
         // when
@@ -59,27 +61,28 @@ public class ServiceIntegrationTest {
         resultActions.andExpect(status().isOk())
                 .andExpect(content().string("Healthy"));
     }
+
     @Test
-    void hasSavedService() throws Exception{
+    void hasSavedService() throws Exception {
         // given
         ServiceO serviceO = ServiceO.builder()
                 .criticalText("criticalText")
                 .resources(
-                List.of(
-                        Resource.builder()
-                                .criticalText("criticalText1")
-                                .owners(
-                                List.of(
-                                        Owner.builder()
-                                                .id("id")
-                                                .criticalText("criticalText2")
-                                                .name("name")
-                                                .accountNumber("accountNumber")
-                                                .level(1)
-                                                .build()
-                                ))
-                                .build()
-                ))
+                        List.of(
+                                Resource.builder()
+                                        .criticalText("criticalText1")
+                                        .owners(
+                                                List.of(
+                                                        Owner.builder()
+                                                                .id("id")
+                                                                .criticalText("criticalText2")
+                                                                .name("name")
+                                                                .accountNumber("accountNumber")
+                                                                .level(1)
+                                                                .build()
+                                                ))
+                                        .build()
+                        ))
                 .build();
         MvcResult getServicesResult = mockMvc.perform(post(serviceEndpoint)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -110,29 +113,30 @@ public class ServiceIntegrationTest {
                 .andExpect(jsonPath("$.data.service.resources[0].owners[0].criticalText")
                         .value(serviceO.getResources().get(0).getOwners().get(0).getCriticalText()));
     }
+
     @Test
     void canAddNewService() throws Exception {
         // given
         ServiceODTODefault serviceODTO = dTOMapper.map(
                 new ServiceO(
-                    null,
-                    "criticalText",
-                    List.of(
-                            Resource.builder()
-                                    .criticalText("criticalText1")
-                                    .owners(List.of(
-                                            Owner.builder()
-                                                    .id("id")
-                                                    .criticalText("criticalText2")
-                                                    .name("name")
-                                                    .accountNumber("accountNumber")
-                                                    .level(1)
-                                                    .build()
-                                    ))
-                                    .build()
-                    )
+                        null,
+                        "criticalText",
+                        List.of(
+                                Resource.builder()
+                                        .criticalText("criticalText1")
+                                        .owners(List.of(
+                                                Owner.builder()
+                                                        .id("id")
+                                                        .criticalText("criticalText2")
+                                                        .name("name")
+                                                        .accountNumber("accountNumber")
+                                                        .level(1)
+                                                        .build()
+                                        ))
+                                        .build()
+                        )
                 )
-        , ServiceODTODefault.class);
+                , ServiceODTODefault.class);
 
         // when
         ResultActions resultActions = mockMvc
@@ -150,7 +154,7 @@ public class ServiceIntegrationTest {
                         .value(serviceODTO.getResources().get(0).getCriticalText()))
                 .andExpect(jsonPath("$.data.service.resources[0].owners[0].criticalText")
                         .value(serviceODTO.getResources().get(0).getOwners().get(0).getCriticalText()));
-        MvcResult mvcResult=resultActions.andReturn();
+        MvcResult mvcResult = resultActions.andReturn();
         HttpResponse httpResponse = objectMapper.readValue(
                 mvcResult.getResponse().getContentAsString(),
                 HttpResponse.class
@@ -196,7 +200,7 @@ public class ServiceIntegrationTest {
                         .content(objectMapper.writeValueAsString(serviceO)))
                 .andExpect(status().isCreated());
 
-        MvcResult getServicesResult = mockMvc.perform(get(serviceEndpoint+"/all")
+        MvcResult getServicesResult = mockMvc.perform(get(serviceEndpoint + "/all")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -217,8 +221,8 @@ public class ServiceIntegrationTest {
 
         String id = services.stream()
                 .filter(s -> s.getCriticalText().equals(serviceO.getCriticalText()) && (
-                  s.getResources().get(0).getOwners().get(0).getCriticalText()
-                          .equals(serviceO.getResources().get(0).getOwners().get(0).getCriticalText())
+                        s.getResources().get(0).getOwners().get(0).getCriticalText()
+                                .equals(serviceO.getResources().get(0).getOwners().get(0).getCriticalText())
                 ))
                 .map(ServiceO::getId)
                 .findFirst()
@@ -234,6 +238,7 @@ public class ServiceIntegrationTest {
         boolean exists = serviceRepository.existsById(id);
         assertThat(exists).isFalse();
     }
+
     @Test
     void ThrowWhenDeleteServiceNotFound() throws Exception {
         // given
@@ -247,8 +252,9 @@ public class ServiceIntegrationTest {
                 .andExpect(jsonPath("$.statusCode").value(HttpStatus.NOT_FOUND.value()))
                 .andExpect(jsonPath("$.message").value("Not Found"));
     }
+
     @Test
-    void canEditService()throws Exception {
+    void canEditService() throws Exception {
         // given
         ServiceO serviceO = new ServiceO(
                 "id",
@@ -291,7 +297,7 @@ public class ServiceIntegrationTest {
                         .content(objectMapper.writeValueAsString(serviceO)))
                 .andExpect(status().isCreated());
 
-        MvcResult getServicesResult = mockMvc.perform(get(serviceEndpoint+"/all")
+        MvcResult getServicesResult = mockMvc.perform(get(serviceEndpoint + "/all")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -329,17 +335,18 @@ public class ServiceIntegrationTest {
 
         // then
         resultActions.andExpect(status().isOk());
-        Optional<ServiceO> extractedService=serviceRepository.findById(id);
+        Optional<ServiceO> extractedService = serviceRepository.findById(id);
         assertThat(extractedService.isPresent()).isTrue();
 
         ServiceODTONoID extractedServiceNoId =
                 dTOMapper.map(extractedService.get(), ServiceODTONoID.class);
-        ServiceODTONoID newServiceNoID=
+        ServiceODTONoID newServiceNoID =
                 dTOMapper.map(newService, ServiceODTONoID.class);
         //TODO add DTO equal
         assertThat(extractedServiceNoId).isEqualTo(newServiceNoID);
 
     }
+
     @Test
     void ThrowWhenEditServiceNotFound() throws Exception {
         // given

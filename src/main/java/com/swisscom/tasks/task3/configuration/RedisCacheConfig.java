@@ -10,14 +10,15 @@ import org.springframework.data.redis.serializer.RedisSerializationContext.Seria
 import java.time.Duration;
 
 
- /**
+/**
  * This class is used to configure the Redis cache.
  * Cache is expired after 60 minutes.
  * Cache is disabled for null values.
+ *
  * @see <a href="https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.caching.provider.redis">Spring Boot Features: Redis Cache</a>
  * @see <a href="https://docs.spring.io/spring-data/redis/reference/redis/redis-cache.html">Redis Cache::  Spring Data Redis</a>
- * */
- @AutoConfiguration
+ */
+@AutoConfiguration
 public class RedisCacheConfig {
     @Bean
     public RedisCacheConfiguration cacheConfiguration() {
@@ -26,6 +27,7 @@ public class RedisCacheConfig {
                 .disableCachingNullValues()
                 .serializeValuesWith(SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
     }
+
     @Bean
     public RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer() {
         return (builder) -> builder

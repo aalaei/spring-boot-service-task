@@ -14,8 +14,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableCaching
 public class Task3Application {
 
-	public static void main(String[] args) {
-		SpringApplication.run(Task3Application.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(Task3Application.class, args);
+    }
 
 }

@@ -12,12 +12,13 @@ import java.util.stream.Collectors;
 @Component
 public class ServiceODTOMapper {
     public static ServiceODTODefault fromServiceO(ServiceO serviceO) {
-        ServiceODTODefault serviceODTO=new ServiceODTODefault();
+        ServiceODTODefault serviceODTO = new ServiceODTODefault();
         BeanUtils.copyProperties(serviceO, serviceODTO);
         return serviceODTO;
     }
+
     public static ServiceO toServiceO(ServiceODTODefault serviceODTO) {
-        ServiceO serviceO=new ServiceO();
+        ServiceO serviceO = new ServiceO();
         BeanUtils.copyProperties(serviceODTO, serviceO);
         return serviceO;
     }
@@ -25,17 +26,19 @@ public class ServiceODTOMapper {
     public static Collection<ServiceODTODefault> fromServiceOs(Collection<ServiceO> serviceOs) {
         return serviceOs.stream().map(ServiceODTOMapper::fromServiceO).collect(Collectors.toList());
     }
+
     public static Collection<ServiceO> toServiceOs(Collection<ServiceODTODefault> serviceODTOs) {
         return serviceODTOs.stream().map(ServiceODTOMapper::toServiceO).collect(Collectors.toList());
     }
 
     public static Optional<ServiceODTODefault> fromOptionalServiceO(Optional<ServiceO> serviceO) {
-        if(serviceO.isEmpty())
+        if (serviceO.isEmpty())
             return Optional.empty();
         return serviceO.map(ServiceODTOMapper::fromServiceO);
     }
+
     public static Optional<ServiceO> toOptionalServiceO(Optional<ServiceODTODefault> serviceODTO) {
-        if(serviceODTO.isEmpty())
+        if (serviceODTO.isEmpty())
             return Optional.empty();
         return serviceODTO.map(ServiceODTOMapper::toServiceO);
     }

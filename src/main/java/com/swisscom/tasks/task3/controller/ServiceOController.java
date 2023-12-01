@@ -26,6 +26,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
 /**
  * Controller for {@link ServiceO} entity. It exposes all CRUD operations on {@link ServiceO} entity.
  * Http response is {@link HttpResponse} object.
@@ -38,13 +39,14 @@ import java.util.Optional;
 public class ServiceOController {
     private final ServiceOService serviceOService;
     private final DTOMapper dtoMapper;
+
     /**
      * Saves a given service.
      *
      * @param serviceODTO must not be {@literal null}. It is {@link ServiceODTO} object.
      * @return the saved service will never be {@literal null}. It returns {@link HttpResponse} object.
      * @throws ServiceOServiceException if service with same id already exists.
-    */
+     */
     @Operation(
             description = "Register a new service",
             summary = "New Service",
@@ -54,7 +56,7 @@ public class ServiceOController {
                             responseCode = "200"
                     ),
                     @ApiResponse(
-                            description =  "Unauthorized. Invalid token",
+                            description = "Unauthorized. Invalid token",
                             responseCode = "403"
                     ),
                     @ApiResponse(
@@ -77,7 +79,7 @@ public class ServiceOController {
                             .statusCode(HttpStatus.CREATED.value())
                             .build()
             );
-        }catch (ServiceOServiceException serviceOServiceException){
+        } catch (ServiceOServiceException serviceOServiceException) {
             return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(
                     HttpResponse.builder()
                             .timeStamp(now().toString())
@@ -88,11 +90,12 @@ public class ServiceOController {
             );
         }
     }
+
     /**
      * Retrieves all services(All the Details).
      *
      * @return all services. It returns {@link HttpResponse} object. Each service is {@link ServiceO}
-    */
+     */
     @Operation(
             description = "Get All services(With the details)",
             summary = "Services(With the details)",
@@ -102,18 +105,18 @@ public class ServiceOController {
                             responseCode = "200"
                     ),
                     @ApiResponse(
-                            description =  "Unauthorized. Invalid token",
+                            description = "Unauthorized. Invalid token",
                             responseCode = "403"
                     ),
                     @ApiResponse(
-                            description =  "Not Found. No services exists",
+                            description = "Not Found. No services exists",
                             responseCode = "404"
                     )
             }
     )
     @GetMapping("all")
     public ResponseEntity<HttpResponse> getAllServicesDetailed() {
-        List<ServiceO> serviceObjects= serviceOService.getAllDetailed();
+        List<ServiceO> serviceObjects = serviceOService.getAllDetailed();
         return ResponseEntity.ok().body(
                 HttpResponse.builder()
                         .timeStamp(now().toString())
@@ -143,23 +146,23 @@ public class ServiceOController {
                             responseCode = "200"
                     ),
                     @ApiResponse(
-                            description =  "Unauthorized. Invalid token",
+                            description = "Unauthorized. Invalid token",
                             responseCode = "403"
                     ),
                     @ApiResponse(
-                            description =  "Not Found. No service exists with this ID",
+                            description = "Not Found. No service exists with this ID",
                             responseCode = "404"
                     ),
                     @ApiResponse(
-                            description =  "Bad Request",
+                            description = "Bad Request",
                             responseCode = "400"
                     )
             }
     )
     @GetMapping
     public ResponseEntity<HttpResponse> getByIdOrAllIds(@PathParam("id") String id) {
-        if(id==null || id.isEmpty()){
-            List<ServiceIdDTO> serviceObjects= serviceOService.getAllIds();
+        if (id == null || id.isEmpty()) {
+            List<ServiceIdDTO> serviceObjects = serviceOService.getAllIds();
             return ResponseEntity.ok().body(
                     HttpResponse.builder()
                             .timeStamp(now().toString())
@@ -170,10 +173,9 @@ public class ServiceOController {
                             .build()
             );
         }
-        Optional<ServiceODTODefault> serviceODTO=
+        Optional<ServiceODTODefault> serviceODTO =
                 dtoMapper.mapOptional(serviceOService.getById(id), ServiceODTODefault.class);
-        if(serviceODTO.isPresent())
-        {
+        if (serviceODTO.isPresent()) {
             return ResponseEntity.ok().body(
                     HttpResponse.builder()
                             .timeStamp(now().toString())
@@ -194,10 +196,11 @@ public class ServiceOController {
                         .build()
         );
     }
+
     /**
      * Updates the service with the given ID.
      *
-     * @param id The unique identifier of the service to be updated. Must not be {@literal null}.
+     * @param id          The unique identifier of the service to be updated. Must not be {@literal null}.
      * @param serviceODTO The updated service data. Must not be {@literal null}.
      * @return An {@link HttpResponse} object containing the updated {@link ServiceODTO} if the service was successfully updated.
      * @throws IllegalArgumentException if the given {@code id} is {@literal null}.
@@ -211,15 +214,15 @@ public class ServiceOController {
                             responseCode = "200"
                     ),
                     @ApiResponse(
-                            description =  "Unauthorized. Invalid token",
+                            description = "Unauthorized. Invalid token",
                             responseCode = "403"
                     ),
                     @ApiResponse(
-                            description =  "Not Found. No service exists with this ID",
+                            description = "Not Found. No service exists with this ID",
                             responseCode = "404"
                     ),
                     @ApiResponse(
-                            description =  "Bad Request",
+                            description = "Bad Request",
                             responseCode = "400"
                     )
             }
@@ -229,7 +232,7 @@ public class ServiceOController {
                                                           @NotNull @RequestBody ServiceODTODefault serviceODTO) {
         ServiceO serviceO = dtoMapper.map(serviceODTO, ServiceO.class);
         try {
-            ServiceODTODefault newServiceODTO= dtoMapper.map(serviceOService.updateById(id, serviceO), ServiceODTODefault.class);
+            ServiceODTODefault newServiceODTO = dtoMapper.map(serviceOService.updateById(id, serviceO), ServiceODTODefault.class);
             return ResponseEntity.ok().body(
                     HttpResponse.builder()
                             .message("Updated")
@@ -248,7 +251,7 @@ public class ServiceOController {
                             .status(HttpStatus.NOT_FOUND)
                             .build()
             );
-        } catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(
                     HttpResponse.builder()
                             .message("Failed to update")
@@ -259,6 +262,7 @@ public class ServiceOController {
             );
         }
     }
+
     /**
      * Deletes the service with the given ID.
      *
@@ -277,15 +281,15 @@ public class ServiceOController {
                             responseCode = "200"
                     ),
                     @ApiResponse(
-                            description =  "Unauthorized. Invalid token",
+                            description = "Unauthorized. Invalid token",
                             responseCode = "403"
                     ),
                     @ApiResponse(
-                            description =  "Method NOT Allowed. Not able to delete",
+                            description = "Method NOT Allowed. Not able to delete",
                             responseCode = "405"
                     ),
                     @ApiResponse(
-                            description =  "Not Found. No service exists with this ID",
+                            description = "Not Found. No service exists with this ID",
                             responseCode = "404"
                     )
             }
@@ -312,7 +316,7 @@ public class ServiceOController {
                             .timeStamp(now().toString())
                             .build()
             );
-        }catch (ServiceOServiceException serviceOServiceException){
+        } catch (ServiceOServiceException serviceOServiceException) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     HttpResponse.builder()
                             .message("Not Found")

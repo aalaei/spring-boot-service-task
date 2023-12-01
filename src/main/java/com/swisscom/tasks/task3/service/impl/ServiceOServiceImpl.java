@@ -9,6 +9,9 @@ import com.swisscom.tasks.task3.repository.ServiceORepository;
 import com.swisscom.tasks.task3.service.ServiceOService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,15 +32,15 @@ public class ServiceOServiceImpl implements ServiceOService {
 
     /**
      * Saves a given service. It also saves all resources and owners of this service.
+     *
      * @param serviceO - must not be {@literal null}.
      */
-    private void saveCascade(ServiceO serviceO)
-    {
-        if(serviceO.getResources() != null) {
+    private void saveCascade(ServiceO serviceO) {
+        if (serviceO.getResources() != null) {
             serviceO.getResources().forEach(r -> {
                 if (r == null)
                     return;
-                r.setOwners( r.getOwners()==null ?  null :
+                r.setOwners(r.getOwners() == null ? null :
                         r.getOwners().stream().map(o -> {
                             if (o == null)
                                 return null;
@@ -47,12 +50,17 @@ public class ServiceOServiceImpl implements ServiceOService {
             serviceO.setResources(serviceO.getResources().stream().map(resourceRepository::save).toList());
         }
     }
-    private void deleteCascade(ServiceO serviceO)
-    {
-        if(serviceO.getResources() != null) {
+
+    /**
+     * Deletes a given service. It also deletes all resources and owners of this service.
+     *
+     * @param serviceO - must not be {@literal null}.
+     */
+    private void deleteCascade(ServiceO serviceO) {
+        if (serviceO.getResources() != null) {
             serviceO.getResources().forEach(r -> {
                 if (r != null) {
-                    if(r.getOwners() != null) {
+                    if (r.getOwners() != null) {
                         r.getOwners().forEach(o -> {
                                     if (o != null)
                                         ownerRepository.deleteById(o.getId());
@@ -64,23 +72,25 @@ public class ServiceOServiceImpl implements ServiceOService {
             });
         }
     }
+
     /**
      * Saves a given service.
      *
      * @param serviceO must not be {@literal null}.
      * @return the saved service will never be {@literal null}.
      * @throws ServiceOServiceException if service with same id already exists.
-    */
+     */
     @Override
     public ServiceO create(ServiceO serviceO) {
         if (serviceO.getId() != null && serviceORepository.existsById(serviceO.getId()))
-            throw new ServiceOServiceException("Another service with id "+serviceO.getId()+" exists before");
+            throw new ServiceOServiceException("Another service with id " + serviceO.getId() + " exists before");
         saveCascade(serviceO);
         return serviceORepository.save(serviceO);
     }
 
     /**
      * Retrieves all services(Only ID).
+     *
      * @return A List of all services(Only ID).
      */
     @Override
@@ -94,7 +104,7 @@ public class ServiceOServiceImpl implements ServiceOService {
      * Retrieves all services.
      *
      * @return all services.
-    */
+     */
     @Override
 //    @Cacheable(value = "service")
     public List<ServiceO> getAllDetailed() {
@@ -108,7 +118,7 @@ public class ServiceOServiceImpl implements ServiceOService {
      * @param id must not be {@literal null}.
      * @return the service with the given id or {@literal Optional#empty()} if none found.
      * @throws IllegalArgumentException if {@code id} is {@literal null}.
-    */
+     */
     @Override
 //    @Cacheable(value = "service", key = "#id")
     public Optional<ServiceO> getById(String id) {
@@ -122,13 +132,13 @@ public class ServiceOServiceImpl implements ServiceOService {
      * @param id must not be {@literal null}.
      * @return {@literal true} if service was deleted, {@literal false} otherwise.
      * @throws IllegalArgumentException in case the given {@code id} is {@literal null}.
-    */
+     */
     @Override
 //    @CacheEvict(value = "service", key = "#id")
     public boolean deleteById(String id) {
         Optional<ServiceO> serviceO = serviceORepository.findById(id);
         if (serviceO.isPresent()) {
-            if(serviceO.get().getResources() != null) {
+            if (serviceO.get().getResources() != null) {
                 deleteCascade(serviceO.get());
             }
             serviceORepository.deleteById(id);
@@ -137,20 +147,36 @@ public class ServiceOServiceImpl implements ServiceOService {
             throw new ServiceOServiceException("Service with id " + id + " does not exists");
 //        return false;
     }
+
     /**
      * Updates the service with the given id. It also updates all resources and owners of this service.
      *
-     * @param id must not be {@literal null}.
+     * @param id       must not be {@literal null}.
      * @param serviceO must not be {@literal null}.
      * @return {@literal true} if service was updated, {@literal false} otherwise.
      * @throws IllegalArgumentException in case the given {@code id} is {@literal null}.
-    */
+     */
+    @Override
+    public ServiceO updateById(String id, ServiceO serviceO) {
+        return updateById(id, serviceO, true);
+    }
+
+    /**
+     * Updates the service with the given id. It also updates all resources and owners of this service.
+     *
+     * @param id       must not be {@literal null}.
+     * @param serviceO must not be {@literal null}.
+     * @param cascade  if true, it also updates all resources and owners of this service.
+     * @return {@literal true} if service was updated, {@literal false} otherwise.
+     * @throws IllegalArgumentException in case the given {@code id} is {@literal null}.
+     */
     @Override
 //    @CachePut(value = "service", key = "#id")
-    public ServiceO updateById(String id, ServiceO serviceO) {
+    public ServiceO updateById(String id, ServiceO serviceO, boolean cascade) {
         if (serviceORepository.existsById(id)) {
             serviceO.setId(id);
-            saveCascade(serviceO);
+            if (cascade)
+                saveCascade(serviceO);
             serviceORepository.save(serviceO);
             return serviceO;
         }
