@@ -18,7 +18,7 @@ public interface ResourceService {
 
     boolean deleteAll();
 
-    Resource updateById(String id, Resource resource);
+    Resource updateById(String id, Resource resource, boolean cascade);
 
     Page<Resource> getAllPaged(PageRequest pr);
 }

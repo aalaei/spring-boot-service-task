@@ -3,6 +3,7 @@ package com.swisscom.tasks.task3.service.impl;
 import com.swisscom.tasks.task3.exception.ResourceServiceException;
 import com.swisscom.tasks.task3.model.Resource;
 import com.swisscom.tasks.task3.model.ServiceO;
+import com.swisscom.tasks.task3.repository.OwnerRepository;
 import com.swisscom.tasks.task3.repository.ResourceRepository;
 import com.swisscom.tasks.task3.repository.ServiceORepository;
 import com.swisscom.tasks.task3.service.ResourceService;
@@ -25,12 +26,20 @@ import java.util.Optional;
 public class ResourceServiceImpl implements ResourceService {
     private final ResourceRepository resourceRepository;
     private final ServiceORepository serviceORepository;
+    private final OwnerRepository ownerRepository;
+    /**
+     * Saves a given resource. It also adds the resource to the parent service.
+     *
+     * @param resource - must not be {@literal null}.
+     * @param serviceID - id of the parent service.
+     */
     @Override
     public Resource create(Resource resource, String serviceID){
         ServiceO parentService= serviceORepository
                 .findById(serviceID).orElseThrow(()->
                         new ResourceServiceException("Service with id "+serviceID+" not found"));
         Resource newResource= resourceRepository.save(resource);
+        saveCascade(newResource);
         if(parentService.getResources()==null){
             parentService.setResources(List.of(newResource));
         }else{
@@ -40,42 +49,107 @@ public class ResourceServiceImpl implements ResourceService {
         return newResource;
     }
 
+    /**
+     * Returns all resources.
+     * @return - all resources.
+     */
     @Override
     public List<Resource> getAll() {
         return resourceRepository.findAll();
     }
 
+    /**
+     * Returns a resource by id.
+     * @param id - id of the resource.
+     * @return - a resource by id.
+     */
     @Override
     @Cacheable(key = "#id")
     public Optional<Resource> getById(String id) {
         return resourceRepository.findById(id);
     }
 
+    /**
+     * Deletes a given resource. It also deletes all owners of this resource.
+     *
+     * @param resource - must not be {@literal null}.
+     */
+    private void deleteCascade(Resource resource) {
+        if (resource.getOwners() != null) {
+            resource.getOwners().forEach(o -> {
+                if (o != null)
+                            ownerRepository.deleteById(o.getId());
+            }
+            );
+        }
+    }
+
+    /**
+     * Saves a given resource. It also saves all owners of this resource.
+     *
+     * @param resource - must not be {@literal null}.
+     */
+    private void saveCascade(Resource resource) {
+
+        resource.setOwners(resource.getOwners() == null ? null :
+                resource.getOwners().stream().map(o -> {
+                    if (o == null)
+                        return null;
+                    return ownerRepository.save(o);
+                }).toList());
+    }
+
+
+    /**
+     * Deletes a resource by id. It also deletes all owners of this resource.
+     * @param id - id of the resource to be deleted.
+     * @return - true if deleted successfully.
+     */
     @Override
     @CacheEvict(key = "#id")
     public boolean deleteById(String id) {
-        if(!resourceRepository.existsById(id))
-            return false;;
+        Resource resource = resourceRepository.findById(id).orElseThrow(() ->
+                new ResourceServiceException("Resource with id " + id + " not found"));
+        deleteCascade(resource);
         resourceRepository.deleteById(id);
         return true;
     }
 
+    /**
+     * Deletes all resources. It also deletes all owners.
+     * @return - true if deleted successfully.
+     */
     @Override
     @CacheEvict(allEntries = true)
     public boolean deleteAll() {
         resourceRepository.deleteAll();
+        ownerRepository.deleteAll();
         return true;
     }
 
+    /**
+     * Updates a resource by id.
+     * @param id - id of the resource to be updated.
+     * @param resource - updated version of the resource.
+     * @param cascade - if true, it also updates all owners of this resource.
+     * @return - updated version of the resource.
+     */
     @Override
     @CachePut(key = "#id")
-    public Resource updateById(String id, Resource resource) {
+    public Resource updateById(String id, Resource resource, boolean cascade) {
         if(!resourceRepository.existsById(id))
-            return null;
+            throw new ResourceServiceException("Resource with id " + id + " not found");
         resource.setId(id);
+        if (cascade)
+            saveCascade(resource);
         return resourceRepository.save(resource);
     }
 
+    /**
+     * Returns all resources in pages.
+     * @param pr - page request of type {@link PageRequest}.
+     * @return - all resources in pages.
+     */
     @Override
     public Page<Resource> getAllPaged(PageRequest pr) {
         return resourceRepository.findAll(pr);
