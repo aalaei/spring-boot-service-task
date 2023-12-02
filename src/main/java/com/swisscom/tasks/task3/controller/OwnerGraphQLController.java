@@ -37,13 +37,13 @@ public class OwnerGraphQLController {
     /**
      * Created and Returns an owner
      * @param owner - owner Input object.
-     * @param resourceID - id of the parent resource.
+     * @param resourceId - id of the parent resource.
      * @return Created owner.
      */
     @MutationMapping
-    Owner createOwner(@Argument OwnerInput owner, @Argument String resourceID){
+    Owner createOwner(@Argument OwnerInput owner, @Argument String resourceId){
         Owner ownerO = dtoMapper.map(owner, Owner.class);
-        ownerService.create(ownerO, resourceID);
+        ownerService.create(ownerO, resourceId);
         return ownerO;
     }
 
