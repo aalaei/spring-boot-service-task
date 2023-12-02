@@ -1,7 +1,7 @@
 package com.swisscom.tasks.task3.dto.service;
 
 import com.swisscom.tasks.task3.dto.OwnerDTO;
-import com.swisscom.tasks.task3.dto.ResourceDTO;
+import com.swisscom.tasks.task3.dto.resource.ResourceDTO;
 import lombok.EqualsAndHashCode;
 
 /**
