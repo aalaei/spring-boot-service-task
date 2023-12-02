@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface OwnerService {
-    Owner create(Owner owner);
+    Owner create(Owner owner, String resourceID);
 
     List<Owner> getAll();
 

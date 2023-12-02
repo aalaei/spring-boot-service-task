@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ResourceService {
-    Resource create(Resource resource);
+    Resource create(Resource resource, String serviceID);
 
     List<Resource> getAll();
 

@@ -1,7 +1,10 @@
 package com.swisscom.tasks.task3.service.impl;
 
+import com.swisscom.tasks.task3.exception.OwnerServiceException;
 import com.swisscom.tasks.task3.model.Owner;
+import com.swisscom.tasks.task3.model.Resource;
 import com.swisscom.tasks.task3.repository.OwnerRepository;
+import com.swisscom.tasks.task3.repository.ResourceRepository;
 import com.swisscom.tasks.task3.service.OwnerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,9 +25,21 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class OwnerServiceImpl implements OwnerService {
     private final OwnerRepository ownerRepository;
+    private final ResourceRepository resourceRepository;
     @Override
-    public Owner create(Owner owner) {
-        return ownerRepository.save(owner);
+    public Owner create(Owner owner, String resourceID)
+    {
+        Resource parentResource= resourceRepository
+                .findById(resourceID).orElseThrow(()->
+                        new OwnerServiceException("Resource with id "+resourceID+" not found"));
+        Owner newOwner= ownerRepository.save(owner);
+        if(parentResource.getOwners()==null){
+            parentResource.setOwners(List.of(newOwner));
+        }else{
+            parentResource.getOwners().add(newOwner);
+        }
+        resourceRepository.save(parentResource);
+        return newOwner;
     }
 
     @Override

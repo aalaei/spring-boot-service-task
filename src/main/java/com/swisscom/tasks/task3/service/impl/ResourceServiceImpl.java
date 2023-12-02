@@ -1,7 +1,10 @@
 package com.swisscom.tasks.task3.service.impl;
 
+import com.swisscom.tasks.task3.exception.ResourceServiceException;
 import com.swisscom.tasks.task3.model.Resource;
+import com.swisscom.tasks.task3.model.ServiceO;
 import com.swisscom.tasks.task3.repository.ResourceRepository;
+import com.swisscom.tasks.task3.repository.ServiceORepository;
 import com.swisscom.tasks.task3.service.ResourceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,9 +24,20 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ResourceServiceImpl implements ResourceService {
     private final ResourceRepository resourceRepository;
+    private final ServiceORepository serviceORepository;
     @Override
-    public Resource create(Resource resource) {
-        return resourceRepository.save(resource);
+    public Resource create(Resource resource, String serviceID){
+        ServiceO parentService= serviceORepository
+                .findById(serviceID).orElseThrow(()->
+                        new ResourceServiceException("Service with id "+serviceID+" not found"));
+        Resource newResource= resourceRepository.save(resource);
+        if(parentService.getResources()==null){
+            parentService.setResources(List.of(newResource));
+        }else{
+            parentService.getResources().add(newResource);
+        }
+        serviceORepository.save(parentService);
+        return newResource;
     }
 
     @Override
