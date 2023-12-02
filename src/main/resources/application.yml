@@ -6,7 +6,14 @@ spring:
       auto-index-creation: true
   cache:
     type: redis
+  config:
+    import: optional:secrets.yml
 application:
   title: Service API
   version: 1.0
-
+  security:
+    jwt:
+      secret-key: secret-key
+      expiration: 86400000 # a day
+      refresh-token:
+        expiration: 604800000 # 7 days
