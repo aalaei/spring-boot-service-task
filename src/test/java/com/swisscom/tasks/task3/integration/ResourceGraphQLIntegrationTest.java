@@ -2,8 +2,11 @@ package com.swisscom.tasks.task3.integration;
 
 import com.swisscom.tasks.task3.configuration.DTOMapperBean;
 import com.swisscom.tasks.task3.dto.mapper.DTOMapper;
+import com.swisscom.tasks.task3.dto.resource.ResourceDTONoID;
 import com.swisscom.tasks.task3.dto.service.ServiceODTONoID;
+import com.swisscom.tasks.task3.model.Resource;
 import com.swisscom.tasks.task3.model.ServiceO;
+import com.swisscom.tasks.task3.service.ResourceService;
 import com.swisscom.tasks.task3.service.ServiceOService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,12 +16,15 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.graphql.test.tester.HttpGraphQlTester;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class ServiceGraphQLIntegrationTest {
+public class ResourceGraphQLIntegrationTest {
     @Autowired
-    ServiceOService serviceOService;
+    ResourceService resourceService;
     private HttpGraphQlTester graphQlTester;
     @Autowired
     private DTOMapper dtoMapper;
@@ -28,7 +34,7 @@ public class ServiceGraphQLIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        serviceOService.deleteAll();
+        resourceService.deleteAll();
         dtoMapper = new DTOMapper(new DTOMapperBean().modelMapper());
         WebTestClient client = WebTestClient.bindToServer()
                 .baseUrl(String.format("http://localhost:%s/graphql", port))
@@ -41,77 +47,78 @@ public class ServiceGraphQLIntegrationTest {
         assertNotNull(graphQlTester);
     }
     @Test
-    void shouldReturnService(){
+    void shouldReturnResource(){
         //given
         // language=GraphQL
-        String mutation = """
+        String mutation1 = """
             mutation createService($service: ServiceInput!) {
                 createService(service: $service){
                     id
                     criticalText
-                    resources{
-                        id
-                        criticalText
-                        owners{
-                            id
-                            criticalText
-                            name
-                            level
-                            accountNumber
-                        }
-                    }
                  }
             }
         """;
         ServiceO service = ServiceO.builder()
                 .criticalText("criticalText")
                 .build();
-        ServiceO savedService = graphQlTester.document(mutation)
+        ServiceO savedService = graphQlTester.document(mutation1)
                 .variable("service", dtoMapper.map(service, ServiceODTONoID.class))
                 .execute()
                 .path("createService")
                 .entity(ServiceO.class)
                 .satisfies(s -> {
                     assertEquals(service.getCriticalText(), s.getCriticalText());
-                })
-                .get();
+                }).get();
+        assertNotNull(savedService.getId());
+        // language=GraphQL
+        String mutation = """
+            mutation createResource($resource: ResourceInput!, $id: ID!) {
+                createResource(resource: $resource, serviceId: $id){
+                    id
+                    criticalText
+                 }
+            }
+        """;
+        //when
+        Resource resource= Resource.builder().criticalText("resourceCriticalText")
+                .owners(List.of())
+                .build();
+
+
+        Resource resource1 = graphQlTester.document(mutation)
+                .variable("resource", dtoMapper.map(resource, ResourceDTONoID.class))
+                .variable("id", savedService.getId())
+                .execute()
+                .path("createResource")
+                .entity(Resource.class)
+                .satisfies(s -> {
+                    assertEquals(resource.getCriticalText(), s.getCriticalText());
+                }).get();
+
         // language=GraphQL
         String document = """
             query($id: ID!) {
-              service(id: $id){
+              resource(id: $id){
                 id
                 criticalText
-                resources{
-                    id
-                    criticalText
-                    owners{
-                        id
-                        criticalText
-                        name
-                        level
-                        accountNumber
-                    }
-                }
               }
             }
         """;
         //when
         graphQlTester.document(document)
-                .variable("id", savedService.getId())
+                .variable("id", resource1.getId())
                 .execute()
-                .path("service")
-                .entity(ServiceO.class)
-                .satisfies(s -> {
-                    assertEquals("criticalText", s.getCriticalText());
-                });
+                .path("resource")
+                .entity(Resource.class)
+                .satisfies(s -> assertEquals(resource.getCriticalText(), s.getCriticalText()));
     }
 
     @Test
-    void findAllShouldNotReturnAllServices(){
+    void findAllShouldNotReturnAllResources(){
         // language=GraphQL
         String document = """
             query {
-                services{
+                resources{
                     id
                     criticalText
                 }
@@ -119,12 +126,12 @@ public class ServiceGraphQLIntegrationTest {
         """;
         graphQlTester.document(document)
                 .execute()
-                .path("services")
-                .entityList(ServiceO.class)
+                .path("resources")
+                .entityList(Resource.class)
                 .hasSize(0);
     }
     @Test
-    void findAllShouldReturnAllServices(){
+    void findAllShouldReturnAllResources(){
         //given
         // language=GraphQL
         String mutation = """
@@ -149,6 +156,10 @@ public class ServiceGraphQLIntegrationTest {
         graphQlTester.document(mutation)
                 .variable("service", dtoMapper.map(ServiceO.builder()
                         .criticalText("criticalText")
+                                .resources(List.of(Resource.builder()
+                                        .criticalText("resourceCriticalText")
+                                        .owners(List.of())
+                                        .build()))
                         .build(), ServiceODTONoID.class))
                 .execute()
                 .path("createService")
@@ -159,7 +170,7 @@ public class ServiceGraphQLIntegrationTest {
         // language=GraphQL
         String document = """
             query {
-                services{
+                resources{
                     id
                     criticalText
                 }
@@ -167,12 +178,16 @@ public class ServiceGraphQLIntegrationTest {
         """;
         graphQlTester.document(document)
                 .execute()
-                .path("services")
-                .entityList(ServiceO.class)
-                .hasSize(1);
+                .path("resources")
+                .entityList(Resource.class)
+                .hasSize(1)
+                .satisfies(s -> {
+                    assertEquals("resourceCriticalText", s.get(0).getCriticalText());
+                });
+        ;
     }
     @Test
-    void shouldUpdateService() {
+    void shouldUpdateResource() {
         //given
         // language=GraphQL
         String mutation = """
@@ -196,6 +211,14 @@ public class ServiceGraphQLIntegrationTest {
                 """;
         ServiceO service = ServiceO.builder()
                 .criticalText("criticalText")
+                .resources(
+                        List.of(
+                                Resource.builder()
+                                        .criticalText("resourceCriticalText")
+                                        .owners(List.of())
+                                        .build()
+                        )
+                )
                 .build();
         ServiceO savedService = graphQlTester.document(mutation)
                 .variable("service", dtoMapper.map(service, ServiceODTONoID.class))
@@ -208,44 +231,8 @@ public class ServiceGraphQLIntegrationTest {
                 .get();
         // language=GraphQL
         String updateMutation = """
-                    mutation updateService($id: ID!, $service: ServiceInput!) {
-                        updateService(id: $id, service: $service){
-                            id
-                            criticalText
-                            resources{
-                                id
-                                criticalText
-                                owners{
-                                    id
-                                    criticalText
-                                    name
-                                    level
-                                    accountNumber
-                                }
-                            }
-                         }
-                    }
-                """;
-        ServiceO updatedService = ServiceO.builder()
-                .criticalText("updatedCriticalText")
-                .build();
-        ServiceO updatedSavedService = graphQlTester.document(updateMutation)
-                .variable("id", savedService.getId())
-                .variable("service", dtoMapper.map(updatedService, ServiceODTONoID.class))
-                .execute()
-                .path("updateService")
-                .entity(ServiceO.class)
-                .satisfies(s -> {
-                    assertEquals(updatedService.getCriticalText(), s.getCriticalText());
-                })
-                .get();
-        // language=GraphQL
-        String document = """
-                    query($id: ID!) {
-                      service(id: $id){
-                        id
-                        criticalText
-                        resources{
+                    mutation updateResource($id: ID!, $resource: ResourceInput!) {
+                        updateResource(id: $id, resource: $resource){
                             id
                             criticalText
                             owners{
@@ -255,22 +242,50 @@ public class ServiceGraphQLIntegrationTest {
                                 level
                                 accountNumber
                             }
+                         }
+                    }
+                """;
+        Resource updatedResource = Resource.builder()
+                .criticalText("updatedCriticalTextResource")
+                .build();
+        Resource updatedSavedResource = graphQlTester.document(updateMutation)
+                .variable("id", savedService.getResources().get(0).getId())
+                .variable("resource", dtoMapper.map(updatedResource, ResourceDTONoID.class))
+                .execute()
+                .path("updateResource")
+                .entity(Resource.class)
+                .satisfies(s -> {
+                    assertEquals(updatedResource.getCriticalText(), s.getCriticalText());
+                })
+                .get();
+        // language=GraphQL
+        String document = """
+                    query($id: ID!) {
+                      resource(id: $id){
+                        id
+                        criticalText
+                        owners{
+                            id
+                            criticalText
+                            name
+                            level
+                            accountNumber
                         }
                       }
                     }
                 """;
         //when
         graphQlTester.document(document)
-                .variable("id", updatedSavedService.getId())
+                .variable("id", updatedSavedResource.getId())
                 .execute()
-                .path("service")
-                .entity(ServiceO.class)
+                .path("resource")
+                .entity(Resource.class)
                 .satisfies(s -> {
-                    assertEquals("updatedCriticalText", s.getCriticalText());
+                    assertEquals(updatedResource.getCriticalText(), s.getCriticalText());
                 });
     }
     @Test
-    void shouldDeleteService() {
+    void shouldDeleteResource() {
         //given
         // language=GraphQL
         String mutation = """
@@ -294,6 +309,14 @@ public class ServiceGraphQLIntegrationTest {
                 """;
         ServiceO service = ServiceO.builder()
                 .criticalText("criticalText")
+                .resources(
+                        List.of(
+                                Resource.builder()
+                                        .criticalText("resourceCriticalText")
+                                        .owners(List.of())
+                                        .build()
+                        )
+                )
                 .build();
         ServiceO savedService = graphQlTester.document(mutation)
                 .variable("service", dtoMapper.map(service, ServiceODTONoID.class))
@@ -306,40 +329,33 @@ public class ServiceGraphQLIntegrationTest {
                 .get();
         // language=GraphQL
         String deleteMutation = """
-                    mutation deleteService($id: ID!) {
-                        deleteService(id: $id){
+                    mutation deleteResource($id: ID!) {
+                        deleteResource(id: $id){
                             id
                             criticalText
-                            resources{
+                            owners{
                                 id
                                 criticalText
-                                owners{
-                                    id
-                                    criticalText
-                                    name
-                                    level
-                                    accountNumber
-                                }
+                                name
+                                level
+                                accountNumber
                             }
                          }
                     }
                 """;
-        ServiceO deletedService = graphQlTester.document(deleteMutation)
-                .variable("id", savedService.getId())
+        Resource deletedResource = graphQlTester.document(deleteMutation)
+                .variable("id", savedService.getResources().get(0).getId())
                 .execute()
-                .path("deleteService")
-                .entity(ServiceO.class)
+                .path("deleteResource")
+                .entity(Resource.class)
                 .satisfies(s -> {
-                    assertEquals(savedService.getId(), s.getId());
+                    assertEquals(savedService.getResources().get(0).getId(), s.getId());
                 })
                 .get();
         // language=GraphQL
         String document = """
                     query($id: ID!) {
-                      service(id: $id){
-                        id
-                        criticalText
-                        resources{
+                        resource(id: $id){
                             id
                             criticalText
                             owners{
@@ -350,15 +366,14 @@ public class ServiceGraphQLIntegrationTest {
                                 accountNumber
                             }
                         }
-                      }
                     }
                 """;
         //when
         graphQlTester.document(document)
-                .variable("id", deletedService.getId())
+                .variable("id", deletedResource.getId())
                 .execute()
-                .path("service")
+                .path("resource")
                 .valueIsNull();
-        assertEquals(deletedService.getId(), savedService.getId());
+        assertEquals(deletedResource.getId(), savedService.getResources().get(0).getId());
     }
 }
