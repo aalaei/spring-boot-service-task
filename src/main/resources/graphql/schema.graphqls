@@ -9,8 +9,8 @@ type Query{
 }
 type Mutation{
     createService(service: ServiceInput!): Service
-    createResource(serviceId: ID!, resource: ResourceInput!): Resource
-    createOwner(resourceId: ID!, owner: OwnerInput!): Owner
+    createResource(resource: ResourceInput!, serviceId: ID!): Resource
+    createOwner(owner: OwnerInput!, resourceId: ID!): Owner
     updateService(id: ID!, service: ServiceInput!): Service
     updateResource(id: ID!, resource: ResourceInput!): Resource
     updateOwner(id: ID!, owner: OwnerInput!): Owner
