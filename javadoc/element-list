@@ -9,3 +9,4 @@ com.swisscom.tasks.task3.model
 com.swisscom.tasks.task3.repository
 com.swisscom.tasks.task3.service
 com.swisscom.tasks.task3.service.impl
+com.swisscom.tasks.task3.types
