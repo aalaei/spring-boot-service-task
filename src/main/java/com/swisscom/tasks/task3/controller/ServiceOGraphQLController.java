@@ -7,6 +7,8 @@ import com.swisscom.tasks.task3.model.ServiceO;
 import com.swisscom.tasks.task3.service.ServiceOService;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -33,6 +35,16 @@ public class ServiceOGraphQLController {
         List<ServiceO> serviceOIterable = serviceOService.getAllDetailed();
 //        return serviceOIterable.stream().map(s -> dtoMapper.map(s, ServiceODTODefault.class)).collect(Collectors.toList());
         return serviceOIterable;
+    }
+    /**
+     * Returns all services Page by Page.
+     *
+     * @return all services in Pages.
+     */
+    @QueryMapping
+    Page<ServiceO> servicesPaged(@Argument int page, @Argument int size){
+        PageRequest pr= PageRequest.of(page, size);
+        return serviceOService.getAllPaged(pr);
     }
 
     /**

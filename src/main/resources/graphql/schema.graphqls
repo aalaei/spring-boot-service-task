@@ -1,6 +1,7 @@
 type Query{
     services: [Service]
     service(id: ID!): Service
+    servicesPaged(page: Int, size: Int): [Service]
 }
 type Mutation{
     createService(service: ServiceInput): Service
