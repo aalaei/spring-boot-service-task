@@ -127,7 +127,7 @@ public class ServiceGraphQLIntegrationTest {
     @Test
     void findAllShouldReturnAllServices(){
         //given
-        // language= GraphQL
+        // language=GraphQL
         String mutation = """
             mutation createService($service: ServiceInput!) {
                 createService(service: $service){
@@ -175,7 +175,7 @@ public class ServiceGraphQLIntegrationTest {
     @Test
     void shouldUpdateService() {
         //given
-        // language= GraphQL
+        // language=GraphQL
         String mutation = """
                     mutation createService($service: ServiceInput!) {
                         createService(service: $service){
@@ -207,7 +207,7 @@ public class ServiceGraphQLIntegrationTest {
                     assertEquals(service.getCriticalText(), s.getCriticalText());
                 })
                 .get();
-        // language= GraphQL
+        // language=GraphQL
         String updateMutation = """
                     mutation updateService($id: ID!, $service: ServiceInput!) {
                         updateService(id: $id, service: $service){
@@ -240,7 +240,7 @@ public class ServiceGraphQLIntegrationTest {
                     assertEquals(updatedService.getCriticalText(), s.getCriticalText());
                 })
                 .get();
-        // language= GraphQL
+        // language=GraphQL
         String document = """
                     query($id: ID!) {
                       service(id: $id){
@@ -273,7 +273,7 @@ public class ServiceGraphQLIntegrationTest {
     @Test
     void shouldDeleteService() {
         //given
-        // language= GraphQL
+        // language=GraphQL
         String mutation = """
                     mutation createService($service: ServiceInput!) {
                         createService(service: $service){
@@ -305,7 +305,7 @@ public class ServiceGraphQLIntegrationTest {
                     assertEquals(service.getCriticalText(), s.getCriticalText());
                 })
                 .get();
-        // language= GraphQL
+        // language=GraphQL
         String deleteMutation = """
                     mutation deleteService($id: ID!) {
                         deleteService(id: $id){
@@ -334,7 +334,7 @@ public class ServiceGraphQLIntegrationTest {
                     assertEquals(savedService.getId(), s.getId());
                 })
                 .get();
-        // language= GraphQL
+        // language=GraphQL
         String document = """
                     query($id: ID!) {
                       service(id: $id){
