@@ -26,6 +26,13 @@ import java.util.Optional;
 public class OwnerServiceImpl implements OwnerService {
     private final OwnerRepository ownerRepository;
     private final ResourceRepository resourceRepository;
+
+    /**
+     * Saves a given owner. It also adds the owner to the parent resource.
+     * @param owner - must not be {@literal null}.
+     * @param resourceID - id of the parent resource.
+     * @return - created owner.
+     */
     @Override
     public Owner create(Owner owner, String resourceID)
     {
@@ -42,17 +49,31 @@ public class OwnerServiceImpl implements OwnerService {
         return newOwner;
     }
 
+    /**
+     * Returns all owners.
+     * @return - all owners.
+     */
     @Override
     public List<Owner> getAll() {
         return ownerRepository.findAll();
     }
 
+    /**
+     * Returns an owner by id.
+     * @param id - id of the owner.
+     * @return - an owner by id.
+     */
     @Override
     @Cacheable(key = "#id")
     public Optional<Owner> getById(String id) {
         return ownerRepository.findById(id);
     }
 
+    /**
+     * Deletes an owner by id.
+     * @param id - id of the owner.
+     * @return - true if deleted, false if not found.
+     */
     @Override
     @CacheEvict(key = "#id")
     public boolean deleteById(String id) {
@@ -62,6 +83,10 @@ public class OwnerServiceImpl implements OwnerService {
         return true;
     }
 
+    /**
+     * Deletes all owners.
+     * @return - true if deleted, false if not found.
+     */
     @Override
     @CacheEvict(allEntries = true)
     public boolean deleteAll() {
@@ -69,6 +94,12 @@ public class OwnerServiceImpl implements OwnerService {
         return true;
     }
 
+    /**
+     * Updates an owner by id.
+     * @param id - id of the owner.
+     * @param owner - owner object.
+     * @return - updated owner.
+     */
     @Override
     @CachePut(key = "#id")
     public Owner updateById(String id, Owner owner) {
@@ -78,6 +109,11 @@ public class OwnerServiceImpl implements OwnerService {
         return ownerRepository.save(owner);
     }
 
+    /**
+     * Returns all owners in Pages.
+     * @param pr - {@link  PageRequest} object.
+     * @return - all owners in Pages of {@link Owner}.
+     */
     @Override
     public Page<Owner> getAllPaged(PageRequest pr) {
         return ownerRepository.findAll(pr);
