@@ -13,6 +13,8 @@ import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -198,5 +200,11 @@ public class ServiceOServiceImpl implements ServiceOService {
             return serviceO;
         }
         throw new ServiceOServiceException("Service with id " + id + " does not exists");
+    }
+
+    @Override
+    public Page<ServiceO> getAllPaged(PageRequest pr) {
+        log.info("Getting all services(Detailed) in Pages");
+        return serviceORepository.findAll(pr);
     }
 }

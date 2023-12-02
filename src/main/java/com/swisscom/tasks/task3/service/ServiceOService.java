@@ -2,6 +2,8 @@ package com.swisscom.tasks.task3.service;
 
 import com.swisscom.tasks.task3.dto.service.ServiceIdDTO;
 import com.swisscom.tasks.task3.model.ServiceO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,4 +27,6 @@ public interface ServiceOService {
     ServiceO updateById(String id, ServiceO serviceO);
 
     ServiceO updateById(String id, ServiceO serviceO, boolean cascade);
+
+    Page<ServiceO> getAllPaged(PageRequest pr);
 }
