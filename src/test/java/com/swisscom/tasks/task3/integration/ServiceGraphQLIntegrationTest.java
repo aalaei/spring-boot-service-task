@@ -76,7 +76,7 @@ public class ServiceGraphQLIntegrationTest {
                     assertEquals(service.getCriticalText(), s.getCriticalText());
                 })
                 .get();
-        // language= NGraphQL
+        // language= GraphQL
         String document = """
             query($id: ID!) {
               service(id: $id){
@@ -109,7 +109,7 @@ public class ServiceGraphQLIntegrationTest {
 
     @Test
     void findAllShouldNotReturnAllServices(){
-        // language=NGraphQL
+        // language=GraphQL
         String document = """
             query {
                 services{
@@ -157,7 +157,7 @@ public class ServiceGraphQLIntegrationTest {
                 .satisfies(s -> {
                     assertEquals("criticalText", s.getCriticalText());
                 });
-        // language=NGraphQL
+        // language=GraphQL
         String document = """
             query {
                 services{
@@ -240,7 +240,7 @@ public class ServiceGraphQLIntegrationTest {
                     assertEquals(updatedService.getCriticalText(), s.getCriticalText());
                 })
                 .get();
-        // language= NGraphQL
+        // language= GraphQL
         String document = """
                     query($id: ID!) {
                       service(id: $id){
@@ -334,7 +334,7 @@ public class ServiceGraphQLIntegrationTest {
                     assertEquals(savedService.getId(), s.getId());
                 })
                 .get();
-        // language= NGraphQL
+        // language= GraphQL
         String document = """
                     query($id: ID!) {
                       service(id: $id){
