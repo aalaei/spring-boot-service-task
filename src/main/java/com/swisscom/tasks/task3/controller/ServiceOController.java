@@ -9,12 +9,17 @@ import com.swisscom.tasks.task3.model.HttpResponse;
 import com.swisscom.tasks.task3.model.ServiceO;
 import com.swisscom.tasks.task3.service.ServiceOService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -50,6 +55,14 @@ public class ServiceOController {
     @Operation(
             description = "Register a new service",
             summary = "New Service",
+            parameters = {
+                    @Parameter(
+                            name = "serviceODTO",
+                            description = "Service to be registered",
+                            required = true,
+                            schema = @Schema(implementation = ServiceODTODefault.class)
+                    )
+            },
             responses = {
                     @ApiResponse(
                             description = "Success",
@@ -66,7 +79,7 @@ public class ServiceOController {
             }
     )
     @PostMapping
-    public ResponseEntity<HttpResponse> createService(@RequestBody ServiceODTODefault serviceODTO) {
+    public ResponseEntity<HttpResponse> createService(@RequestBody @NotNull ServiceODTODefault serviceODTO) {
         ServiceO serviceO = dtoMapper.map(serviceODTO, ServiceO.class);
         try {
             ServiceO serviceONew = serviceOService.create(serviceO);
@@ -92,13 +105,29 @@ public class ServiceOController {
     }
 
     /**
-     * Retrieves all services(All the Details).
-     *
+     * Retrieves all services(All the Details). page and size are optional.
+     * It returns {@link HttpResponse} object. Each service is {@link ServiceO}
      * @return all services. It returns {@link HttpResponse} object. Each service is {@link ServiceO}
      */
     @Operation(
-            description = "Get All services(With the details)",
             summary = "Services(With the details)",
+            description = "Get All services(With the details) Page by Page",
+            parameters = {
+                    @Parameter(
+                            name = "page",
+                            description = "Page number",
+                            required = false,
+                            example = "0",
+                            schema = @io.swagger.v3.oas.annotations.media.Schema(type = "integer")
+                    ),
+                    @Parameter(
+                            name = "size",
+                            description = "Page size",
+                            required = false,
+                            example = "10",
+                            schema = @io.swagger.v3.oas.annotations.media.Schema(type = "integer")
+                    )
+            },
             responses = {
                     @ApiResponse(
                             description = "Success",
@@ -115,7 +144,22 @@ public class ServiceOController {
             }
     )
     @GetMapping("all")
-    public ResponseEntity<HttpResponse> getAllServicesDetailed() {
+    public ResponseEntity<HttpResponse> getAllServicesDetailed(
+            @PathParam("page") @Min(0) Integer page, @PathParam("size") @Min(1) Integer size
+    ) {
+        if(page!=null && size!=null){
+            PageRequest pr= PageRequest.of(page, size);
+            Page<ServiceO> serviceObjectsPages = serviceOService.getAllPaged(pr);
+            return ResponseEntity.ok().body(
+                    HttpResponse.builder()
+                            .timeStamp(now().toString())
+                            .message("OK")
+                            .data(Map.of("services", serviceObjectsPages))
+                            .status(HttpStatus.OK)
+                            .statusCode(HttpStatus.OK.value())
+                            .build()
+            );
+        }
         List<ServiceO> serviceObjects = serviceOService.getAllDetailed();
         return ResponseEntity.ok().body(
                 HttpResponse.builder()
@@ -140,6 +184,14 @@ public class ServiceOController {
     @Operation(
             description = "Get a service by ID (If ID is not provided, it returns all services IDs)",
             summary = "Service by ID/All Services IDs",
+            parameters = {
+                    @Parameter(
+                            name = "id",
+                            description = "Service ID",
+                            required = false,
+                            schema = @Schema(type = "string")
+                    )
+            },
             responses = {
                     @ApiResponse(
                             description = "Success",
@@ -208,6 +260,20 @@ public class ServiceOController {
     @Operation(
             description = "Update a service by ID",
             summary = "Update Service",
+            parameters = {
+                    @Parameter(
+                            name = "id",
+                            description = "Service ID",
+                            required = true,
+                            schema = @Schema(type = "string")
+                    ),
+                    @Parameter(
+                            name = "serviceODTO",
+                            description = "Service to be updated",
+                            required = true,
+                            schema = @Schema(implementation = ServiceODTODefault.class)
+                    )
+            },
             responses = {
                     @ApiResponse(
                             description = "Success",
@@ -275,6 +341,14 @@ public class ServiceOController {
     @Operation(
             description = "Delete a service by ID",
             summary = "Delete Service",
+            parameters = {
+                    @Parameter(
+                            name = "id",
+                            description = "Service ID",
+                            required = true,
+                            schema = @Schema(type = "string")
+                    )
+            },
             responses = {
                     @ApiResponse(
                             description = "Success",
