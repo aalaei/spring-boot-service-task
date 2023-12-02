@@ -45,13 +45,13 @@ public class ResourceGraphQLController {
     /**
      * Created and Returns a resource
      * @param resource - resource Input object.
-     * @param serviceID - id of the parent service.
+     * @param serviceId - id of the parent service.
      * @return Created resource.
      */
     @MutationMapping
-    Resource createResource(@Argument ResourceInput resource, @Argument String serviceID) {
+    Resource createResource(@Argument ResourceInput resource, @Argument String serviceId) {
         Resource resourceO = dtoMapper.map(resource, Resource.class);
-        return resourceService.create(resourceO, serviceID);
+        return resourceService.create(resourceO, serviceId);
     }
 
     /**
@@ -63,7 +63,7 @@ public class ResourceGraphQLController {
     @MutationMapping
     Resource updateResource(@Argument String id,  @Argument ResourceInput resource) {
         Resource resourceO = dtoMapper.map(resource, Resource.class);
-        resourceService.updateById(id, resourceO);
+        resourceService.updateById(id, resourceO, true);
         return resourceO;
     }
     /**
