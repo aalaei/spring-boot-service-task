@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 // Enables CORS for all requests
-@Component
+//@Component
 public class CorsFilter implements Filter {
 
     /**
