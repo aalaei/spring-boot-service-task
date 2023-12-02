@@ -116,7 +116,7 @@ chmod +x run.sh
 - [x] Implement CRUD methods for the `Service` object.
 - [x] Use `@RestController` and map endpoints for Create, Read, Update, and Delete operations.
 - [x] Implement validation and exception handling.
-- [ ] Implement GraphQL API.
+- [x] Implement GraphQL API.
 - [ ] Authentication and Authorization using JWT.
 
 - [x] Create two profiles, e.g., `dev` and `prod`.
