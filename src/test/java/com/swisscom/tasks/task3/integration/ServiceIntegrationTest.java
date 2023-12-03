@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.swisscom.tasks.task3.dto.service.ServiceODTODefault;
 import com.swisscom.tasks.task3.dto.mapper.DTOMapper;
 import com.swisscom.tasks.task3.dto.service.ServiceODTONoID;
-import com.swisscom.tasks.task3.model.HttpResponse;
+import com.swisscom.tasks.task3.model.auth.HttpResponse;
 import com.swisscom.tasks.task3.model.Owner;
 import com.swisscom.tasks.task3.model.Resource;
 import com.swisscom.tasks.task3.model.ServiceO;
@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 public class ServiceIntegrationTest {
     private final String serviceEndpoint = "/api/v1/services";
 
@@ -276,7 +276,7 @@ public class ServiceIntegrationTest {
         );
         ServiceO newService = new ServiceO(
                 null,
-                "newCriticalText0",
+                "newCriticalText0001",
                 List.of(
                         Resource.builder()
                                 .criticalText("newCriticalText1")
@@ -337,13 +337,13 @@ public class ServiceIntegrationTest {
         resultActions.andExpect(status().isOk());
         Optional<ServiceO> extractedService = serviceRepository.findById(id);
         assertThat(extractedService.isPresent()).isTrue();
-
+        assertThat(extractedService.get().getCriticalText()).isEqualTo(newService.getCriticalText());
         ServiceODTONoID extractedServiceNoId =
                 dTOMapper.map(extractedService.get(), ServiceODTONoID.class);
         ServiceODTONoID newServiceNoID =
                 dTOMapper.map(newService, ServiceODTONoID.class);
-        //TODO add DTO equal
         assertThat(extractedServiceNoId).isEqualTo(newServiceNoID);
+
 
     }
 
