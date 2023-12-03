@@ -9,9 +9,7 @@ import com.swisscom.tasks.task3.model.HttpResponse;
 import com.swisscom.tasks.task3.model.Owner;
 import com.swisscom.tasks.task3.model.Resource;
 import com.swisscom.tasks.task3.model.ServiceO;
-import com.swisscom.tasks.task3.dto.auth.LoginRequestDTO;
 import com.swisscom.tasks.task3.repository.ServiceORepository;
-import com.swisscom.tasks.task3.service.AuthenticationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +17,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,11 +32,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
-@AutoConfigureMockMvc(addFilters = false)
+@AutoConfigureMockMvc(addFilters = true)
 public class ServiceIntegrationTest {
-
-    @Autowired
-    private AuthenticationService authenticationService;
     private final String serviceEndpoint = "/api/v1/services";
 
     @Autowired
@@ -49,6 +47,8 @@ public class ServiceIntegrationTest {
 
     @Autowired
     private ServiceORepository serviceRepository;
+    RequestPostProcessor authorities = SecurityMockMvcRequestPostProcessors.jwt()
+            .authorities(new SimpleGrantedAuthority("SCOPE_SUPER_USER"));
 
     @BeforeEach
     void setUp() {
@@ -65,7 +65,6 @@ public class ServiceIntegrationTest {
         // then
         resultActions.andExpect(status().isOk())
                 .andExpect(content().string("Healthy"));
-        authenticationService.loginUser(new LoginRequestDTO("admin", "admin"));
     }
 
     @Test
@@ -91,8 +90,10 @@ public class ServiceIntegrationTest {
                         ))
                 .build();
         MvcResult getServicesResult = mockMvc.perform(post(serviceEndpoint)
+                        .with(authorities)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(serviceO)))
+                .andExpect(status().isCreated())
                 .andReturn();
         HttpResponse httpResponse = objectMapper.readValue(
                 getServicesResult.getResponse().getContentAsString(),
@@ -105,6 +106,7 @@ public class ServiceIntegrationTest {
         );
         ResultActions resultActions = mockMvc
                 .perform(get(serviceEndpoint)
+                        .with(authorities)
                         .param("id", services.getId())
                         .contentType(MediaType.APPLICATION_JSON));
         // then
@@ -147,6 +149,7 @@ public class ServiceIntegrationTest {
         // when
         ResultActions resultActions = mockMvc
                 .perform(post(serviceEndpoint)
+                        .with(authorities)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(serviceODTO)));
         // then
@@ -202,11 +205,13 @@ public class ServiceIntegrationTest {
         );
 
         mockMvc.perform(post(serviceEndpoint)
+                        .with(authorities)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(serviceO)))
                 .andExpect(status().isCreated());
 
-        MvcResult getServicesResult = mockMvc.perform(get(serviceEndpoint + "/all")
+        MvcResult getServicesResult = mockMvc.perform(get(serviceEndpoint + "/all").
+                        with(authorities)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -237,7 +242,9 @@ public class ServiceIntegrationTest {
                                 "Service with the specified criteria not found"));
         // when
         ResultActions resultActions = mockMvc
-                .perform(delete(serviceEndpoint).param("id", id));
+                .perform(delete(serviceEndpoint)
+                        .with(authorities)
+                        .param("id", id));
 
         // then
         resultActions.andExpect(status().isOk());
@@ -251,7 +258,9 @@ public class ServiceIntegrationTest {
         String id = "id";
         // when
         ResultActions resultActions = mockMvc
-                .perform(delete(serviceEndpoint).param("id", id));
+                .perform(delete(serviceEndpoint)
+                        .with(authorities)
+                        .param("id", id));
         // then
         resultActions.andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(HttpStatus.NOT_FOUND.name()))
@@ -299,11 +308,13 @@ public class ServiceIntegrationTest {
         );
 
         mockMvc.perform(post(serviceEndpoint)
+                        .with(authorities)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(serviceO)))
                 .andExpect(status().isCreated());
 
         MvcResult getServicesResult = mockMvc.perform(get(serviceEndpoint + "/all")
+                        .with(authorities)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -335,6 +346,7 @@ public class ServiceIntegrationTest {
         // when
         ResultActions resultActions = mockMvc
                 .perform(put(serviceEndpoint).param("id", id)
+                        .with(authorities)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newService))
                 );
@@ -361,6 +373,7 @@ public class ServiceIntegrationTest {
         // when
         ResultActions resultActions = mockMvc
                 .perform(put(serviceEndpoint).param("id", id)
+                        .with(authorities)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newService))
                 );
