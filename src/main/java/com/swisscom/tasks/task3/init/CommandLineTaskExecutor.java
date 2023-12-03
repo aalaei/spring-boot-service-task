@@ -1,7 +1,7 @@
 package com.swisscom.tasks.task3.init;
 
-import com.swisscom.tasks.task3.model.auth.LoginRequest;
-import com.swisscom.tasks.task3.model.auth.LoginResponseDTO;
+import com.swisscom.tasks.task3.dto.auth.LoginRequestDTO;
+import com.swisscom.tasks.task3.dto.auth.LoginResponseDTO;
 import com.swisscom.tasks.task3.model.auth.Role;
 import com.swisscom.tasks.task3.model.auth.User;
 import com.swisscom.tasks.task3.repository.RoleRepository;
@@ -58,7 +58,7 @@ public class CommandLineTaskExecutor implements CommandLineRunner {
         }
         if(Arrays.stream(environment.getActiveProfiles()).anyMatch(env-> env.contains("dev"))) {
             LoginResponseDTO loginResponseDTO = authenticationService.loginUser(
-                    new LoginRequest("admin", "admin")
+                    new LoginRequestDTO("admin", "admin")
             );
             String graphQLConsole = "http://localhost:8080/graphiql#Authorization=Bearer%20" + loginResponseDTO.getJwt();
             log.info("GraphQLConsole: {}", graphQLConsole);

@@ -9,7 +9,7 @@ import com.swisscom.tasks.task3.model.HttpResponse;
 import com.swisscom.tasks.task3.model.Owner;
 import com.swisscom.tasks.task3.model.Resource;
 import com.swisscom.tasks.task3.model.ServiceO;
-import com.swisscom.tasks.task3.model.auth.LoginRequest;
+import com.swisscom.tasks.task3.dto.auth.LoginRequestDTO;
 import com.swisscom.tasks.task3.repository.ServiceORepository;
 import com.swisscom.tasks.task3.service.AuthenticationService;
 import org.junit.jupiter.api.BeforeEach;
@@ -65,7 +65,7 @@ public class ServiceIntegrationTest {
         // then
         resultActions.andExpect(status().isOk())
                 .andExpect(content().string("Healthy"));
-        authenticationService.loginUser(new LoginRequest("admin", "admin"));
+        authenticationService.loginUser(new LoginRequestDTO("admin", "admin"));
     }
 
     @Test

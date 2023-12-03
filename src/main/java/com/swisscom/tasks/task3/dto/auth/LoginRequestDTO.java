@@ -1,14 +1,14 @@
-package com.swisscom.tasks.task3.model.auth;
+package com.swisscom.tasks.task3.dto.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * Login request.
+ * Login request DTO.
  */
 @Getter
 @AllArgsConstructor
-public class LoginRequest {
+public class LoginRequestDTO {
     String username;
     String password;
 }

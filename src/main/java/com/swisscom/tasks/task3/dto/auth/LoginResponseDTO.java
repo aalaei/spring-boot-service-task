@@ -1,6 +1,6 @@
-package com.swisscom.tasks.task3.model.auth;
+package com.swisscom.tasks.task3.dto.auth;
 
-import com.swisscom.tasks.task3.dto.user.UserDTO;
+import com.swisscom.tasks.task3.dto.auth.UserDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -6,11 +6,10 @@ import com.swisscom.tasks.task3.dto.resource.ResourceDTONoID;
 import com.swisscom.tasks.task3.dto.service.ServiceODTONoID;
 import com.swisscom.tasks.task3.model.Resource;
 import com.swisscom.tasks.task3.model.ServiceO;
-import com.swisscom.tasks.task3.model.auth.LoginRequest;
-import com.swisscom.tasks.task3.model.auth.LoginResponseDTO;
+import com.swisscom.tasks.task3.dto.auth.LoginRequestDTO;
+import com.swisscom.tasks.task3.dto.auth.LoginResponseDTO;
 import com.swisscom.tasks.task3.service.AuthenticationService;
 import com.swisscom.tasks.task3.service.ResourceService;
-import com.swisscom.tasks.task3.service.ServiceOService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +41,7 @@ public class ResourceGraphQLIntegrationTest {
         resourceService.deleteAll();
         dtoMapper = new DTOMapper(new DTOMapperBean().modelMapper());
         LoginResponseDTO loginResponseDTO = authenticationService.loginUser(
-                new LoginRequest("admin", "admin")
+                new LoginRequestDTO("admin", "admin")
         );
         WebTestClient client = WebTestClient.bindToServer()
                 .baseUrl(String.format("http://localhost:%s/graphql", port))

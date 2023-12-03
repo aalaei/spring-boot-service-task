@@ -1,10 +1,10 @@
 package com.swisscom.tasks.task3.service;
 
-import com.swisscom.tasks.task3.dto.user.UserDTO;
-import com.swisscom.tasks.task3.dto.user.UserDTOMapper;
+import com.swisscom.tasks.task3.dto.auth.UserDTO;
+import com.swisscom.tasks.task3.dto.auth.UserDTOMapper;
 import com.swisscom.tasks.task3.exception.AuthenticationServiceException;
-import com.swisscom.tasks.task3.model.auth.LoginRequest;
-import com.swisscom.tasks.task3.model.auth.LoginResponseDTO;
+import com.swisscom.tasks.task3.dto.auth.LoginRequestDTO;
+import com.swisscom.tasks.task3.dto.auth.LoginResponseDTO;
 import com.swisscom.tasks.task3.model.auth.Role;
 import com.swisscom.tasks.task3.model.auth.User;
 import com.swisscom.tasks.task3.repository.RoleRepository;
@@ -58,27 +58,29 @@ public class AuthenticationService {
 
         String encodedPassword = passwordEncoder.encode(password);
         Role userRole = roleRepository.findByAuthority(Role.RoleType.USER.name()).orElseThrow(
-                () -> new AssertionError("Role not found: USER")
+                () -> new AuthenticationServiceException("Role not found: USER")
         );
+        if(userRepository.findByUsername(username).isPresent())
+            throw new AuthenticationServiceException("User already exists: "+ username);
         return userDTOMapper.apply(userRepository.save(new User(username, encodedPassword, List.of(userRole))));
     }
 
     /**
      * This method authenticates a user given login credentials.
-     * @param loginRequest - {@link LoginRequest} object.
+     * @param loginRequestDTO - {@link LoginRequestDTO} object.
      * @return - {@link LoginResponseDTO} object.
      */
-    public LoginResponseDTO loginUser(LoginRequest loginRequest){
+    public LoginResponseDTO loginUser(LoginRequestDTO loginRequestDTO){
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUsername(),
-                        loginRequest.getPassword()
+                        loginRequestDTO.getUsername(),
+                        loginRequestDTO.getPassword()
                 )
         );
 
 //        User user = (User) auth.getPrincipal();
-        User user = userRepository.findByUsername(loginRequest.getUsername()).orElseThrow(
-                () -> new AuthenticationServiceException("User not found: "+ loginRequest.getUsername())
+        User user = userRepository.findByUsername(loginRequestDTO.getUsername()).orElseThrow(
+                () -> new AuthenticationServiceException("User not found: "+ loginRequestDTO.getUsername())
         );
         String token = tokenService.generateToken(auth);
         return new LoginResponseDTO(userDTOMapper.apply(user), token);

@@ -1,4 +1,4 @@
-package com.swisscom.tasks.task3.dto.user;
+package com.swisscom.tasks.task3.dto.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
