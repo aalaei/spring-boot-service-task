@@ -1,10 +1,7 @@
 package com.swisscom.tasks.task3.service;
 
-import com.swisscom.tasks.task3.dto.auth.UserDTO;
-import com.swisscom.tasks.task3.dto.auth.UserDTOMapper;
+import com.swisscom.tasks.task3.dto.auth.*;
 import com.swisscom.tasks.task3.exception.AuthenticationServiceException;
-import com.swisscom.tasks.task3.dto.auth.LoginRequestDTO;
-import com.swisscom.tasks.task3.dto.auth.LoginResponseDTO;
 import com.swisscom.tasks.task3.model.auth.Role;
 import com.swisscom.tasks.task3.model.auth.User;
 import com.swisscom.tasks.task3.repository.RoleRepository;
@@ -13,11 +10,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class is used to authenticate a user.
@@ -46,6 +45,19 @@ public class AuthenticationService {
         return userRepository.findByUsername(username).orElseThrow(
                 () ->  new AuthenticationServiceException("User not found: "+ username)
         );
+    }
+
+    /**
+     * This method returns all users.
+     * @param self - username({@link String}) of the user requesting the users.
+     * @return - {@link List} of {@link User} objects.
+     */
+    public List<UserDTO> getAllUserDTOs(String self){
+        User selfUser = getUser(self);
+        List<User> users = userRepository.findAll();
+        if (selfUser.getRoles().stream().anyMatch(role -> role.getAuthority().equals(Role.RoleType.ADMIN.name())))
+            return users.stream().map(userDTOMapper).toList();
+        return users.stream().filter(user -> user.getUsername().equals(self)).map(userDTOMapper).toList();
     }
 
     /**
@@ -79,9 +91,7 @@ public class AuthenticationService {
         );
 
 //        User user = (User) auth.getPrincipal();
-        User user = userRepository.findByUsername(loginRequestDTO.getUsername()).orElseThrow(
-                () -> new AuthenticationServiceException("User not found: "+ loginRequestDTO.getUsername())
-        );
+        User user = getUser(loginRequestDTO.getUsername());
         String token = tokenService.generateToken(auth);
         return new LoginResponseDTO(userDTOMapper.apply(user), token);
     }
@@ -107,16 +117,26 @@ public class AuthenticationService {
      * @param user - new user details({@link User}).
      * @return - {@link UserDTO} object of the updated user.
      */
-    public UserDTO editUser(String self, String username, User user){
+    public UserDTO editUser(String self, String username, UserEditDTO user){
         User selfUser = getUser(self);
         if(selfUser.getRoles().stream().noneMatch(role ->
-                role.getAuthority().equals(Role.RoleType.ADMIN.name())))
+                role.getAuthority().equals(Role.RoleType.ADMIN.name())) && !self.equals(username))
             throw new AuthenticationServiceException("You are not authorized to edit this user");
         User userToEdit = getUser(username);
-        user.setUsername(username);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setId(userToEdit.getId());
-        return userDTOMapper.apply(userRepository.save(user));
+        userToEdit.setFirstName(user.getFirstName());
+        userToEdit.setLastName(user.getLastName());
+        userToEdit.setTitle(user.getTitle());
+        userToEdit.setPassword(passwordEncoder.encode(user.getPassword()));
+        if(user.getRoles()==null)
+            throw  new AuthenticationServiceException("Roles cannot be null");
+        userToEdit.setRoles(
+                user.getRoles().stream().map(role ->
+                        roleRepository.findByAuthority(role).orElseThrow(
+                                () -> new AuthenticationServiceException("Role not found: "+ role)
+                        )
+                ).collect(Collectors.toList())
+        );
+        return userDTOMapper.apply(userRepository.save(userToEdit));
     }
 
     /**
@@ -127,8 +147,8 @@ public class AuthenticationService {
     public void deleteUser(String self, String username){
         User selfUser = getUser(self);
         if(selfUser.getRoles().stream().noneMatch(role ->
-                role.getAuthority().equals(Role.RoleType.ADMIN.name())))
-            throw new AuthenticationServiceException("You are not authorized to edit this user");
+                role.getAuthority().equals(Role.RoleType.ADMIN.name())) && !self.equals(username))
+            throw new AuthenticationServiceException("You are not authorized to delete this user");
         userRepository.delete(getUser(username));
     }
 }

@@ -23,7 +23,6 @@ public class SecurityFilterChainConfig {
 
     private static final String[] WHITE_LIST_URL = {
             "/health",
-            "/1api/v1/auth/register",
             "/api/v1/auth/login",
             "/v3/api-docs",
             "/v3/api-docs/**",

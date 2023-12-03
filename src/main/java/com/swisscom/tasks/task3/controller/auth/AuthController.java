@@ -1,9 +1,8 @@
-package com.swisscom.tasks.task3.controller;
+package com.swisscom.tasks.task3.controller.auth;
 
 import com.swisscom.tasks.task3.dto.auth.UserDTO;
 import com.swisscom.tasks.task3.dto.auth.LoginRequestDTO;
 import com.swisscom.tasks.task3.dto.auth.LoginResponseDTO;
-import com.swisscom.tasks.task3.dto.service.ServiceODTODefault;
 import com.swisscom.tasks.task3.exception.AuthenticationServiceException;
 import com.swisscom.tasks.task3.service.AuthenticationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,10 +24,11 @@ import org.springframework.web.bind.annotation.RestController;
  * Auth controller.
  */
 @RestController
-@RequiredArgsConstructor
 @Tag(name="Authentication", description = "Authentication API")
 @RequestMapping("/api/v1/auth")
+@RequiredArgsConstructor
 public class AuthController {
+
     private final AuthenticationService authenticationService;
 
     /**

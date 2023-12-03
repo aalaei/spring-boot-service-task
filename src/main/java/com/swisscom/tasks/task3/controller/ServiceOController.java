@@ -1,9 +1,9 @@
 package com.swisscom.tasks.task3.controller;
 
+import com.swisscom.tasks.task3.dto.mapper.DTOMapper;
 import com.swisscom.tasks.task3.dto.service.ServiceIdDTO;
 import com.swisscom.tasks.task3.dto.service.ServiceODTO;
 import com.swisscom.tasks.task3.dto.service.ServiceODTODefault;
-import com.swisscom.tasks.task3.dto.mapper.DTOMapper;
 import com.swisscom.tasks.task3.dto.service.ServiceODTONoID;
 import com.swisscom.tasks.task3.exception.ServiceOServiceException;
 import com.swisscom.tasks.task3.model.HttpResponse;
@@ -11,7 +11,7 @@ import com.swisscom.tasks.task3.model.ServiceO;
 import com.swisscom.tasks.task3.service.ServiceOService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,13 +23,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import static java.time.LocalDateTime.now;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import static java.time.LocalDateTime.now;
 
 /**
  * Controller for {@link ServiceO} entity. It exposes all CRUD operations on {@link ServiceO} entity.
@@ -54,15 +55,14 @@ public class ServiceOController {
     @Operation(
             description = "Create a new service",
             summary = "New Service",
-            parameters = {
-                    @Parameter(
-                            name = "serviceODTO",
-                            description = "Service to be registered",
-                            required = true,
-                            in = ParameterIn.PATH,
-                            schema = @Schema(implementation = ServiceODTODefault.class)
-                    )
-            },
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                description = "Service to be registered",
+                required = true,
+                content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ServiceODTONoID.class)
+                )
+            ),
             responses = {
                     @ApiResponse(
                             description = "Created",
@@ -144,6 +144,7 @@ public class ServiceOController {
                     )
             }
     )
+    @PreAuthorize("hasAuthority('SCOPE_SUPERUSER')")
     @GetMapping("all")
     public ResponseEntity<HttpResponse> getAllServicesDetailed(
             @RequestParam(value = "page", required = false) @Min(0) Integer page,
@@ -268,15 +269,16 @@ public class ServiceOController {
                             description = "Service ID",
                             required = true,
                             schema = @Schema(type = "string")
-                    ),
-                    @Parameter(
-                            name = "serviceODTO",
-                            description = "Service to be updated",
-                            required = true,
-                            in = ParameterIn.PATH,
-                            schema = @Schema(implementation = ServiceODTODefault.class)
                     )
             },
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Service to be updated",
+                    required = true,
+                    content = @Content(
+                        mediaType = "application/json",
+                        schema =  @Schema(implementation = ServiceODTODefault.class)
+                    )
+            ),
             responses = {
                     @ApiResponse(
                             description = "Success",
@@ -301,7 +303,8 @@ public class ServiceOController {
                                                           @NotNull @RequestBody ServiceODTONoID serviceODTO) {
         ServiceO serviceO = dtoMapper.map(serviceODTO, ServiceO.class);
         try {
-            ServiceODTODefault newServiceODTO = dtoMapper.map(serviceOService.updateById(id, serviceO), ServiceODTODefault.class);
+            ServiceODTODefault newServiceODTO = dtoMapper.map(
+                    serviceOService.updateById(id, serviceO), ServiceODTODefault.class);
             return ResponseEntity.ok().body(
                     HttpResponse.builder()
                             .message("Updated")
