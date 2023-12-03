@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.swisscom.tasks.task3.dto.service.ServiceODTODefault;
 import com.swisscom.tasks.task3.dto.mapper.DTOMapper;
 import com.swisscom.tasks.task3.dto.service.ServiceODTONoID;
-import com.swisscom.tasks.task3.model.auth.HttpResponse;
+import com.swisscom.tasks.task3.model.HttpResponse;
 import com.swisscom.tasks.task3.model.Owner;
 import com.swisscom.tasks.task3.model.Resource;
 import com.swisscom.tasks.task3.model.ServiceO;

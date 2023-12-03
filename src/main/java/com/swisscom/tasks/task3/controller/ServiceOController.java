@@ -6,7 +6,7 @@ import com.swisscom.tasks.task3.dto.service.ServiceODTODefault;
 import com.swisscom.tasks.task3.dto.mapper.DTOMapper;
 import com.swisscom.tasks.task3.dto.service.ServiceODTONoID;
 import com.swisscom.tasks.task3.exception.ServiceOServiceException;
-import com.swisscom.tasks.task3.model.auth.HttpResponse;
+import com.swisscom.tasks.task3.model.HttpResponse;
 import com.swisscom.tasks.task3.model.ServiceO;
 import com.swisscom.tasks.task3.service.ServiceOService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,11 +24,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import static java.time.LocalDate.now;
+import static java.time.LocalDateTime.now;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
