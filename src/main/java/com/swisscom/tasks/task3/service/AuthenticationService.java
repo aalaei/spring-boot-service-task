@@ -1,9 +1,12 @@
 package com.swisscom.tasks.task3.service;
 
+import com.swisscom.tasks.task3.dto.user.UserDTO;
+import com.swisscom.tasks.task3.dto.user.UserDTOMapper;
 import com.swisscom.tasks.task3.exception.AuthenticationServiceException;
-import com.swisscom.tasks.task3.model.LoginResponseDTO;
-import com.swisscom.tasks.task3.model.Role;
-import com.swisscom.tasks.task3.model.User;
+import com.swisscom.tasks.task3.model.auth.LoginRequest;
+import com.swisscom.tasks.task3.model.auth.LoginResponseDTO;
+import com.swisscom.tasks.task3.model.auth.Role;
+import com.swisscom.tasks.task3.model.auth.User;
 import com.swisscom.tasks.task3.repository.RoleRepository;
 import com.swisscom.tasks.task3.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +32,7 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     private final TokenService tokenService;
+    private final UserDTOMapper userDTOMapper;
 
     public User getUser(String username){
         return userRepository.findByUsername(username).orElseThrow(
@@ -45,16 +49,19 @@ public class AuthenticationService {
         return userRepository.save(new User(username, encodedPassword, List.of(userRole)));
     }
 
-    public LoginResponseDTO loginUser(String username, String password){
+    public LoginResponseDTO loginUser(LoginRequest loginRequest){
         Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(username, password)
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getUsername(),
+                        loginRequest.getPassword()
+                )
         );
 
+//        User user = (User) auth.getPrincipal();
+        User user = userRepository.findByUsername(loginRequest.getUsername()).orElseThrow(
+                () -> new AuthenticationServiceException("User not found: "+ loginRequest.getUsername())
+        );
         String token = tokenService.generateToken(auth);
-
-        return new LoginResponseDTO(userRepository.findByUsername(username).orElseThrow(
-                () -> new AuthenticationServiceException("User not found: "+ username)
-        )
-                , token);
+        return new LoginResponseDTO(userDTOMapper.apply(user), token);
     }
 }
