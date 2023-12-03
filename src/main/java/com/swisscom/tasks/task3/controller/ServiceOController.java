@@ -4,18 +4,19 @@ import com.swisscom.tasks.task3.dto.service.ServiceIdDTO;
 import com.swisscom.tasks.task3.dto.service.ServiceODTO;
 import com.swisscom.tasks.task3.dto.service.ServiceODTODefault;
 import com.swisscom.tasks.task3.dto.mapper.DTOMapper;
+import com.swisscom.tasks.task3.dto.service.ServiceODTONoID;
 import com.swisscom.tasks.task3.exception.ServiceOServiceException;
-import com.swisscom.tasks.task3.model.HttpResponse;
+import com.swisscom.tasks.task3.model.auth.HttpResponse;
 import com.swisscom.tasks.task3.model.ServiceO;
 import com.swisscom.tasks.task3.service.ServiceOService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -46,27 +47,28 @@ public class ServiceOController {
     private final DTOMapper dtoMapper;
 
     /**
-     * Saves a given service.
+     * Create a new service.
      *
      * @param serviceODTO must not be {@literal null}. It is {@link ServiceODTO} object.
      * @return the saved service will never be {@literal null}. It returns {@link HttpResponse} object.
      * @throws ServiceOServiceException if service with same id already exists.
      */
     @Operation(
-            description = "Register a new service",
+            description = "Create a new service",
             summary = "New Service",
             parameters = {
                     @Parameter(
                             name = "serviceODTO",
                             description = "Service to be registered",
                             required = true,
+                            in = ParameterIn.PATH,
                             schema = @Schema(implementation = ServiceODTODefault.class)
                     )
             },
             responses = {
                     @ApiResponse(
-                            description = "Success",
-                            responseCode = "200"
+                            description = "Created",
+                            responseCode = "201"
                     ),
                     @ApiResponse(
                             description = "Unauthorized. Invalid token",
@@ -78,12 +80,13 @@ public class ServiceOController {
                     )
             }
     )
-    @PostMapping
-    public ResponseEntity<HttpResponse> createService(@RequestBody @NotNull ServiceODTODefault serviceODTO) {
+    @PostMapping(produces = "application/json", consumes = "application/json")
+    public ResponseEntity<HttpResponse> createService(
+            @RequestBody @NotNull ServiceODTODefault serviceODTO) {
         ServiceO serviceO = dtoMapper.map(serviceODTO, ServiceO.class);
         try {
             ServiceO serviceONew = serviceOService.create(serviceO);
-            return ResponseEntity.created(getUri()).body(
+            return ResponseEntity.status(HttpStatus.CREATED).body(
                     HttpResponse.builder()
                             .timeStamp(now().toString())
                             .message("OK")
@@ -145,7 +148,8 @@ public class ServiceOController {
     )
     @GetMapping("all")
     public ResponseEntity<HttpResponse> getAllServicesDetailed(
-            @PathParam("page") @Min(0) Integer page, @PathParam("size") @Min(1) Integer size
+            @RequestParam(value = "page", required = false) @Min(0) Integer page,
+            @RequestParam(value = "size", required = false) @Min(1) Integer size
     ) {
         if(page!=null && size!=null){
             PageRequest pr= PageRequest.of(page, size);
@@ -212,7 +216,7 @@ public class ServiceOController {
             }
     )
     @GetMapping
-    public ResponseEntity<HttpResponse> getByIdOrAllIds(@PathParam("id") String id) {
+    public ResponseEntity<HttpResponse> getByIdOrAllIds(@RequestParam(value = "id", required = false) String id) {
         if (id == null || id.isEmpty()) {
             List<ServiceIdDTO> serviceObjects = serviceOService.getAllIds();
             return ResponseEntity.ok().body(
@@ -271,6 +275,7 @@ public class ServiceOController {
                             name = "serviceODTO",
                             description = "Service to be updated",
                             required = true,
+                            in = ParameterIn.PATH,
                             schema = @Schema(implementation = ServiceODTODefault.class)
                     )
             },
@@ -294,8 +299,8 @@ public class ServiceOController {
             }
     )
     @PutMapping
-    public ResponseEntity<HttpResponse> updateServiceById(@NotNull @PathParam("ID") String id,
-                                                          @NotNull @RequestBody ServiceODTODefault serviceODTO) {
+    public ResponseEntity<HttpResponse> updateServiceById(@NotNull @RequestParam("id") String id,
+                                                          @NotNull @RequestBody ServiceODTONoID serviceODTO) {
         ServiceO serviceO = dtoMapper.map(serviceODTO, ServiceO.class);
         try {
             ServiceODTODefault newServiceODTO = dtoMapper.map(serviceOService.updateById(id, serviceO), ServiceODTODefault.class);
@@ -369,7 +374,7 @@ public class ServiceOController {
             }
     )
     @DeleteMapping()
-    public ResponseEntity<HttpResponse> deleteServiceById(@NotNull @PathParam("ID") String id) {
+    public ResponseEntity<HttpResponse> deleteServiceById(@NotNull @RequestParam("id") String id) {
         try {
             boolean is_deleted = serviceOService.deleteById(id);
             if (is_deleted) {
@@ -400,9 +405,5 @@ public class ServiceOController {
                             .build()
             );
         }
-    }
-
-    private URI getUri() {
-        return URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/user/get/<userid>").toUriString());
     }
 }
