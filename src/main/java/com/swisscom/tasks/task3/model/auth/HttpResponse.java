@@ -1,4 +1,4 @@
-package com.swisscom.tasks.task3.model;
+package com.swisscom.tasks.task3.model.auth;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;

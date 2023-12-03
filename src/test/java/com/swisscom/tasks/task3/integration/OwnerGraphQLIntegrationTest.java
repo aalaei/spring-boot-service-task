@@ -1,7 +1,7 @@
 package com.swisscom.tasks.task3.integration;
 
 import com.swisscom.tasks.task3.configuration.DTOMapperBean;
-import com.swisscom.tasks.task3.dto.OwnerDTO;
+import com.swisscom.tasks.task3.dto.owner.OwnerDTO;
 import com.swisscom.tasks.task3.dto.mapper.DTOMapper;
 import com.swisscom.tasks.task3.dto.resource.ResourceDTONoID;
 import com.swisscom.tasks.task3.dto.service.ServiceODTONoID;

@@ -1,6 +1,5 @@
-package com.swisscom.tasks.task3.dto.mapper;
+package com.swisscom.tasks.task3.dto.service;
 
-import com.swisscom.tasks.task3.dto.service.ServiceODTODefault;
 import com.swisscom.tasks.task3.model.ServiceO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;

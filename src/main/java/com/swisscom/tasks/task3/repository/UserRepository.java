@@ -1,6 +1,6 @@
 package com.swisscom.tasks.task3.repository;
 
-import com.swisscom.tasks.task3.model.User;
+import com.swisscom.tasks.task3.model.auth.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

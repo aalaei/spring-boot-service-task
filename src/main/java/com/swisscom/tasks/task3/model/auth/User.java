@@ -1,7 +1,6 @@
-package com.swisscom.tasks.task3.model;
+package com.swisscom.tasks.task3.model.auth;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-
+import com.swisscom.tasks.task3.model.auth.Role;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;

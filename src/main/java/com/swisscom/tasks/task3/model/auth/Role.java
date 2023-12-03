@@ -1,4 +1,4 @@
-package com.swisscom.tasks.task3.model;
+package com.swisscom.tasks.task3.model.auth;
 
 
 import lombok.*;
