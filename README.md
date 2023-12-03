@@ -55,11 +55,11 @@ Before running the application, make sure you have the following installed:
 
 ## API Endpoints
 The API provides the following endpoints for CRUD operations on the "Service" object:
-* `POST /api/v1/services`: Create a new service.
+* `POST /api/v1/services`: Create a new service, with the required service information provided in the request body.
 * `GET /api/v1/services?id=ID`: Retrieve a service by ID.
 * `GET /api/v1/services`: Retrieve a list of services(only Ids).
 * `GET /api/v1/services/all`: Retrieve a list of services(All Details).
-* `PUT /api/v1/services?id=ID`: Update an existing service by ID.
+* `PUT /api/v1/services?id=ID`: Update an existing service by ID, with the required service information provided in the request body.
 * `DELETE /api/v1/services?id=ID`: Delete a service by ID.
 
 The API provides a single endpoint for health status checking:

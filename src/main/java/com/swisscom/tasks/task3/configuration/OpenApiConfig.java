@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.info.License;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import io.swagger.v3.oas.annotations.security.SecuritySchemes;
 import io.swagger.v3.oas.annotations.servers.Server;
 
 @OpenAPIDefinition(
@@ -32,21 +33,25 @@ import io.swagger.v3.oas.annotations.servers.Server;
                         url = "http://localhost:8080"
                 ),
                 @Server(
-                        description = "Test ENV",
-                        url = "http://localhost:8081"
+                        description = "Prod ENV",
+                        url = "http://localhost:3000"
                 )
         },
         security = {
                 @SecurityRequirement(name = "bearerAuth")
         }
 )
-@SecurityScheme(
-        name = "bearerAuth",
-        description = "JWT auth description",
-        scheme = "bearer",
-        type = SecuritySchemeType.HTTP,
-        bearerFormat = "JWT",
-        in = SecuritySchemeIn.HEADER
+@SecuritySchemes(
+    {
+            @SecurityScheme(
+                    name = "bearerAuth",
+                    description = "JWT auth description",
+                    scheme = "bearer",
+                    type = SecuritySchemeType.HTTP,
+                    bearerFormat = "JWT",
+                    in = SecuritySchemeIn.HEADER
+            )
+    }
 )
 public class OpenApiConfig {
 }

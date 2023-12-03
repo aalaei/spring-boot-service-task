@@ -4,3 +4,8 @@ spring:
       uri: ${DATABASE_URL}
     redis:
       url: ${REDIS_URL}
+cors:
+  allowed-origins: ""
+  allowed-methods: ""
+  allowed-headers: ""
+  exposed-headers: ""

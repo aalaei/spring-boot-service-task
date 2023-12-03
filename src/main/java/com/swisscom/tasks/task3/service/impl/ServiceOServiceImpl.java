@@ -175,6 +175,7 @@ public class ServiceOServiceImpl implements ServiceOService {
      * @throws IllegalArgumentException in case the given {@code id} is {@literal null}.
      */
     @Override
+    @CachePut(key = "#id")
     public ServiceO updateById(String id, ServiceO serviceO) {
         return updateById(id, serviceO, true);
     }
@@ -189,7 +190,6 @@ public class ServiceOServiceImpl implements ServiceOService {
      * @throws IllegalArgumentException in case the given {@code id} is {@literal null}.
      */
     @Override
-    @CachePut(key = "#id")
     public ServiceO updateById(String id, ServiceO serviceO, boolean cascade) {
         log.info("Updating service with id {}", id);
         if (serviceORepository.existsById(id)) {
