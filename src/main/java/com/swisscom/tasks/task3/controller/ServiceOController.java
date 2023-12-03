@@ -26,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -79,8 +80,7 @@ public class ServiceOController {
             }
     )
     @PostMapping(produces = "application/json", consumes = "application/json")
-    public ResponseEntity<HttpResponse> createService(
-            @RequestBody @NotNull ServiceODTODefault serviceODTO) {
+    public ResponseEntity<HttpResponse> createService(@RequestBody @NotNull ServiceODTODefault serviceODTO) {
         ServiceO serviceO = dtoMapper.map(serviceODTO, ServiceO.class);
         try {
             ServiceO serviceONew = serviceOService.create(serviceO);
