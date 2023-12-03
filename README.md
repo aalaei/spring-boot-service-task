@@ -83,6 +83,49 @@ The application utilizes Redis caching for improved performance. New objects are
 ### Encryption Decryption
     Certain text fields are encrypted for added security. Refer to the encryption service for details.
 ### GraphQL
+This GraphQL API provides access to a system managing services, resources, and owners. It supports various queries and mutations to interact with the underlying data. The main entities in the system are Service, Resource, and Owner, each having specific attributes and relationships.
+#### Queries
+- servicesPaged(page: Int, size: Int): [Service]
+- services: [Service]
+- service(id: ID!): Service
+- resources: [Resource]
+- resource(id: ID!): Resource
+- owners: [Owner]
+- owner(id: ID!): Owner
+
+#### Mutations
+- createService(service: ServiceInput!): Service
+- createResource(resource: ResourceInput!, serviceId: ID!): Resource
+- createOwner(owner: OwnerInput!, resourceId: ID!): Owner
+- updateService(id: ID!, service: ServiceInput!): Service
+- updateResource(id: ID!, resource: ResourceInput!): Resource
+- updateOwner(id: ID!, owner: OwnerInput!): Owner
+- deleteService(id: ID!): Service
+- deleteResource(id: ID!): Resource
+- deleteOwner(id: ID!): Owner
+
+#### Input Types
+- ServiceInput
+- ResourceInput
+- OwnerInput
+
+#### Object Types
+* **Service**
+    * id: ID!
+    * criticalText: String
+    * resources: [Resource]
+
+* **Resource**
+    * id: ID!
+    * criticalText: String
+    * owners: [Owner]
+
+* **Owner**
+    * id: ID!
+    * criticalText: String
+    * name: String
+    * accountNumber: String
+    * level: Int
 
 ## Git Version Control
 This project uses Git for version control. Commits are structured to reflect development steps. Make sure to follow a similar convention in your contributions.
