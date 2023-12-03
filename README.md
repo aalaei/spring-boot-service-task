@@ -117,7 +117,7 @@ chmod +x run.sh
 - [x] Use `@RestController` and map endpoints for Create, Read, Update, and Delete operations.
 - [x] Implement validation and exception handling.
 - [x] Implement GraphQL API.
-- [ ] Authentication and Authorization using JWT.
+- [x] Authentication and Authorization using JWT.
 
 - [x] Create two profiles, e.g., `dev` and `prod`.
 - [x] Configure profile-specific properties in `application.properties` or `application.yml`.
