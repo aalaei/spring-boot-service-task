@@ -2,14 +2,16 @@ package com.swisscom.tasks.task3.integration;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.swisscom.tasks.task3.dto.service.ServiceODTODefault;
 import com.swisscom.tasks.task3.dto.mapper.DTOMapper;
+import com.swisscom.tasks.task3.dto.service.ServiceODTODefault;
 import com.swisscom.tasks.task3.dto.service.ServiceODTONoID;
 import com.swisscom.tasks.task3.model.HttpResponse;
 import com.swisscom.tasks.task3.model.Owner;
 import com.swisscom.tasks.task3.model.Resource;
 import com.swisscom.tasks.task3.model.ServiceO;
+import com.swisscom.tasks.task3.model.auth.LoginRequest;
 import com.swisscom.tasks.task3.repository.ServiceORepository;
+import com.swisscom.tasks.task3.service.AuthenticationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 public class ServiceIntegrationTest {
+
+    @Autowired
+    private AuthenticationService authenticationService;
     private final String serviceEndpoint = "/api/v1/services";
 
     @Autowired
@@ -60,6 +65,7 @@ public class ServiceIntegrationTest {
         // then
         resultActions.andExpect(status().isOk())
                 .andExpect(content().string("Healthy"));
+        authenticationService.loginUser(new LoginRequest("admin", "admin"));
     }
 
     @Test

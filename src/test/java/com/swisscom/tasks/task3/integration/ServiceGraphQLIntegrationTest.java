@@ -4,6 +4,9 @@ import com.swisscom.tasks.task3.configuration.DTOMapperBean;
 import com.swisscom.tasks.task3.dto.mapper.DTOMapper;
 import com.swisscom.tasks.task3.dto.service.ServiceODTONoID;
 import com.swisscom.tasks.task3.model.ServiceO;
+import com.swisscom.tasks.task3.model.auth.LoginRequest;
+import com.swisscom.tasks.task3.model.auth.LoginResponseDTO;
+import com.swisscom.tasks.task3.service.AuthenticationService;
 import com.swisscom.tasks.task3.service.ServiceOService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,6 +25,8 @@ public class ServiceGraphQLIntegrationTest {
     private HttpGraphQlTester graphQlTester;
     @Autowired
     private DTOMapper dtoMapper;
+    @Autowired
+    private AuthenticationService authenticationService;
 
     @LocalServerPort
     int port;
@@ -30,8 +35,12 @@ public class ServiceGraphQLIntegrationTest {
     void setUp() {
         serviceOService.deleteAll();
         dtoMapper = new DTOMapper(new DTOMapperBean().modelMapper());
+        LoginResponseDTO loginResponseDTO = authenticationService.loginUser(
+                new LoginRequest("admin", "admin")
+        );
         WebTestClient client = WebTestClient.bindToServer()
                 .baseUrl(String.format("http://localhost:%s/graphql", port))
+                .defaultHeader("Authorization", "Bearer " + loginResponseDTO.getJwt())
                 .build();
 
         graphQlTester = HttpGraphQlTester.create(client);
