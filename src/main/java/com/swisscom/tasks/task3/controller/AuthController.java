@@ -1,10 +1,12 @@
 package com.swisscom.tasks.task3.controller;
 
-import com.swisscom.tasks.task3.model.LoginRequest;
-import com.swisscom.tasks.task3.model.LoginResponseDTO;
-import com.swisscom.tasks.task3.model.User;
+import com.swisscom.tasks.task3.model.auth.LoginRequest;
+import com.swisscom.tasks.task3.model.auth.LoginResponseDTO;
+import com.swisscom.tasks.task3.model.auth.User;
 import com.swisscom.tasks.task3.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +23,10 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public LoginResponseDTO loginUser(@RequestBody LoginRequest body){
-        return authenticationService.loginUser(body.getUsername(), body.getPassword());
+    public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest){
+        LoginResponseDTO loginResponseDTO = authenticationService.loginUser(loginRequest);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.AUTHORIZATION, loginResponseDTO.getJwt())
+                .body(loginResponseDTO);
     }
 }
