@@ -7,6 +7,9 @@ import org.springframework.data.domain.PageRequest;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service for {@link Owner} entity.
+ */
 public interface OwnerService {
     Owner create(Owner owner, String resourceID);
 

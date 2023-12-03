@@ -10,13 +10,18 @@ import com.swisscom.tasks.task3.service.AuthenticationService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
+
+/**
+ * This class is used to execute some code after the application has started.
+ * It creates some users and roles in the database.
+ * In the development environment it also prints the url to the GraphQL console.
+ */
 @Slf4j
 @Component
 @AllArgsConstructor

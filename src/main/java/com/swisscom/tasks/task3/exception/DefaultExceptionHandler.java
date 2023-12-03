@@ -10,6 +10,16 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.LocalDateTime;
 
+/**
+ * This class is used to handle exceptions in the application.
+ * It is used to return a custom error message to the client.
+ * The error message is returned as a json object.
+ * The json object contains the following fields:
+ * - path - The path of the request.
+ * - message - The error message.
+ * - statusCode - The status code of the error.
+ * - localDateTime - The date and time when the error occurred.
+ */
 @ControllerAdvice
 public class DefaultExceptionHandler {
 

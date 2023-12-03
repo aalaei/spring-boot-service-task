@@ -7,6 +7,9 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 
+/**
+ * Role class. It is used to represent a role in the application.
+ */
 @Data
 @Document
 @NoArgsConstructor

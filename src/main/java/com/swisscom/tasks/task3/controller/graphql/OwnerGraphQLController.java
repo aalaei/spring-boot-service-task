@@ -1,4 +1,4 @@
-package com.swisscom.tasks.task3.controller;
+package com.swisscom.tasks.task3.controller.graphql;
 
 import com.swisscom.tasks.task3.dto.mapper.DTOMapper;
 import com.swisscom.tasks.task3.model.Owner;
@@ -12,6 +12,9 @@ import org.springframework.stereotype.Controller;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * GraphQL controller for Owner.
+ */
 @Controller
 @RequiredArgsConstructor
 public class OwnerGraphQLController {

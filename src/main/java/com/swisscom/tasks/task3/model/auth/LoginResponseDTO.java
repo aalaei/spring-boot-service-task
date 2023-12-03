@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Login response DTO. It contains the user and the generated JWT.
+ */
 @NoArgsConstructor
 @AllArgsConstructor
 @Data

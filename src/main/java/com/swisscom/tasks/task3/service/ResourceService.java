@@ -7,6 +7,9 @@ import org.springframework.data.domain.PageRequest;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * A service for {@link Resource} entity.
+ */
 public interface ResourceService {
     Resource create(Resource resource, String serviceID);
 

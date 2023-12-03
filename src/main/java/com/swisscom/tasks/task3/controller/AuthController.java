@@ -1,5 +1,6 @@
 package com.swisscom.tasks.task3.controller;
 
+import com.swisscom.tasks.task3.dto.user.UserDTO;
 import com.swisscom.tasks.task3.model.auth.LoginRequest;
 import com.swisscom.tasks.task3.model.auth.LoginResponseDTO;
 import com.swisscom.tasks.task3.model.auth.User;
@@ -12,13 +13,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Auth controller.
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/auth")
 public class AuthController {
     private final AuthenticationService authenticationService;
     @PostMapping("/register")
-    public User registerUser(@RequestBody LoginRequest body){
+    public UserDTO registerUser(@RequestBody LoginRequest body){
         return authenticationService.registerUser(body.getUsername(), body.getPassword());
     }
 
@@ -29,4 +33,5 @@ public class AuthController {
                 .header(HttpHeaders.AUTHORIZATION, loginResponseDTO.getJwt())
                 .body(loginResponseDTO);
     }
+    
 }

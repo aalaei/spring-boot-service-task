@@ -11,10 +11,18 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.stream.Collectors;
 
+/**
+ * This class is used to generate a JWT token.
+ */
 @Service
 @RequiredArgsConstructor
 public class TokenService {
     private final JwtEncoder encoder;
+    /**
+     * This method generates a JWT token.
+     * @param authentication The authentication object.
+     * @return The generated JWT token.
+     */
     public String generateToken(Authentication authentication){
         Instant now = Instant.now();
         String scope = authentication.getAuthorities().stream()

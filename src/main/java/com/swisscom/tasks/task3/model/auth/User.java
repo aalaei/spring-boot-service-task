@@ -14,6 +14,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * User class. It is used to represent a user in the application for Authentication and Authorization.
+ */
 @Data
 @NoArgsConstructor
 @Document

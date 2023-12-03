@@ -7,6 +7,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+/**
+ * MongoUserDetailsService it implements data persistence for the UserDetailsService interface
+ */
 @Service
 @RequiredArgsConstructor
 public class MongoUserDetailsService implements UserDetailsService {
