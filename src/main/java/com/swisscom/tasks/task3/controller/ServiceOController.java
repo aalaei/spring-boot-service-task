@@ -144,7 +144,7 @@ public class ServiceOController {
                     )
             }
     )
-    @PreAuthorize("hasAuthority('SCOPE_SUPERUSER')")
+    @PreAuthorize("hasAuthority('SCOPE_SUPER_USER')")
     @GetMapping("all")
     public ResponseEntity<HttpResponse> getAllServicesDetailed(
             @RequestParam(value = "page", required = false) @Min(0) Integer page,

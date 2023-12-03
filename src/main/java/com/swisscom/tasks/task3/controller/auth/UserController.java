@@ -22,7 +22,7 @@ import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
-@Tag(name="Authentication", description = "Authentication API")
+@Tag(name="User", description = "User API")
 @RequestMapping("/api/v1/users")
 public class UserController {
 

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -104,6 +105,8 @@ public class AuthenticationService {
      */
     public UserDTO getUserDTO(String self, String username){
         User selfUser = getUser(self);
+        if(Objects.equals(username, "me"))
+            return userDTOMapper.apply(selfUser);
         if(selfUser.getRoles().stream().anyMatch(role ->
                 role.getAuthority().equals(Role.RoleType.ADMIN.name())) || self.equals(username))
             return userDTOMapper.apply(getUser(username));
