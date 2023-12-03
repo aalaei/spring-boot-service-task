@@ -121,6 +121,12 @@ public class ServiceIntegrationTest {
                 .andExpect(jsonPath("$.data.service.resources[0].owners[0].criticalText")
                         .value(serviceO.getResources().get(0).getOwners().get(0).getCriticalText()));
     }
+    @Test
+    void shouldNotBeAllowedToReturnServices() throws Exception {
+        mockMvc.perform(get(serviceEndpoint + "/all")
+                        .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isUnauthorized());
+    }
 
     @Test
     void canAddNewService() throws Exception {
