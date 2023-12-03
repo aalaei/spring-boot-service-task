@@ -42,16 +42,25 @@ public class Application {
     ){
         return args -> {
             if(userRepository.findByUsername("admin").isEmpty()) {
-                Role userRole = new Role("USER");
-                Role adminRole = new Role("ADMIN");
+                Role userRole = new Role(Role.RoleType.USER);
+                Role adminRole = new Role(Role.RoleType.ADMIN);
+                Role superUser = new Role(Role.RoleType.SUPER_USER);
                 roleRepository.save(userRole);
                 roleRepository.save(adminRole);
-                User user = new User("user", passwordEncoder.encode("user"), List.of(userRole));
-                userRepository.save(user);
+                roleRepository.save(superUser);
+
+                userRepository.save(
+                        new User("user", passwordEncoder.encode("user"), List.of(userRole))
+                );
+
+                userRepository.save(
+                        new User("super", passwordEncoder.encode("super"),
+                                List.of(userRole, superUser))
+                );
 
                 userRepository.save(
                         new User("admin", passwordEncoder.encode("admin"),
-                                List.of(adminRole, userRole)
+                                List.of(adminRole, userRole, superUser)
                         )
                 );
             }
@@ -64,5 +73,4 @@ public class Application {
             }
         };
     }
-
 }
