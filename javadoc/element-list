@@ -1,6 +1,7 @@
 com.swisscom.tasks.task3
 com.swisscom.tasks.task3.configuration
 com.swisscom.tasks.task3.controller
+com.swisscom.tasks.task3.controller.graphql
 com.swisscom.tasks.task3.dto.mapper
 com.swisscom.tasks.task3.dto.owner
 com.swisscom.tasks.task3.dto.resource
