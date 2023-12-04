@@ -1,0 +1,143 @@
+### Find All Services
+GET http://127.0.0.1:8090/services
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+### Create Service
+POST http://localhost:8090/services
+Content-Type: application/json
+
+{
+  "criticalText": "criticInfoOfService",
+  "resources": [
+    {
+      "criticalText": "criticInfoOfResource",
+      "owners": [
+        {
+          "criticalText": "criticInfoOfOwner",
+          "name": "ownerName",
+          "accountNumber": "AC001",
+          "level": 1
+        },
+        {
+          "criticalText": "criticInfoOfOwner2",
+          "name": "ownerName2",
+          "accountNumber": "AC002",
+          "level": 2
+        }
+      ]
+    },
+    {
+      "criticalText": "criticInfoOfResource2",
+      "owners": [
+        {
+          "criticalText": "criticInfoOfOwner3",
+          "name": "ownerName3",
+          "accountNumber": "AC003",
+          "level": 3
+        },
+        {
+          "criticalText": "criticInfoOfOwner4",
+          "name": "ownerName4",
+          "accountNumber": "AC004",
+          "level": 4
+        }
+      ]
+    }
+  ]
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 201");
+    });
+    client.global.set("test_id", response.body.id);
+%}
+
+### Get Service By Id
+GET http://localhost:8090/services?id={{test_id}}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### Update existing Service
+PUT http://localhost:8090/services?id={{test_id}}
+Content-Type: application/json
+
+{
+  "criticalText": "criticNewInfoOfService",
+  "resources": [
+    {
+      "criticalText": "criticNewInfoOfResource",
+      "owners": [
+        {
+          "criticalText": "criticNewInfoOfOwner",
+          "name": "ownerNameNew",
+          "accountNumber": "AC001New",
+          "level": 8
+        },
+        {
+          "criticalText": "criticNewInfoOfOwner2",
+          "name": "ownerName2New",
+          "accountNumber": "AC002New",
+          "level": 9
+        }
+      ]
+    },
+    {
+      "criticalText": "criticNewInfoOfResource2",
+      "owners": [
+        {
+          "criticalText": "criticNewInfoOfOwner3",
+          "name": "ownerName3New",
+          "accountNumber": "AC003New",
+          "level": 10
+        },
+        {
+          "criticalText": "criticNewInfoOfOwner4",
+          "name": "ownerName4New",
+          "accountNumber": "AC004New",
+          "level": 11
+        }
+      ]
+    }
+  ]
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### Get The Service
+GET http://localhost:8090/services?id={{test_id}}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+        client.assert(response.body.criticalText==='criticNewInfoOfService')
+        client.assert(response.body.resources[0].criticalText==='criticNewInfoOfResource')
+        client.assert(response.body.resources[1].criticalText==='criticNewInfoOfResource2')
+        client.assert(response.body.resources[0].owners[0].level===8)
+        client.assert(response.body.resources[0].owners[1].level===9)
+        client.assert(response.body.resources[1].owners[0].level===10)
+        client.assert(response.body.resources[1].owners[1].level===11)
+    });
+%}
+
+### Delete Service
+DELETE http://localhost:8090/services?id={{test_id}}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
