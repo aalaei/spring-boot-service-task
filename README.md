@@ -83,10 +83,10 @@ The application supports two Spring profiles: `dev` and `prod`. Configure profil
 
 To activate a profile, set the `spring.profiles.active` property in `application.yml` or choose the profile in `pom.xml` file.
 
-## Redis Caching(To be implemented)
-The application utilizes Redis caching for improved performance. New objects are cached, and reads check the cache first. The Caching configuration is in the `CacheConfig` class.
+## Redis Caching
+The application utilizes Redis caching for improved performance. New objects are cached, and reads check the cache first. The Caching configuration is in the `RedisCacheConfig` class.
 
-## Optional Features(To be implemented)
+## Optional Features
 ### Encryption Decryption
     Certain text fields are encrypted for added security. Refer to the encryption service for details.
 ### GraphQL
