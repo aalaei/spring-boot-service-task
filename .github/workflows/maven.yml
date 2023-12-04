@@ -53,8 +53,8 @@ jobs:
 
     - name: Rename Artifacts
       run: mkdir artifacts &&
-            mv target/*App.jar artifacts/*App.jar &&
-            mv client/target/*App.jar artifacts/*App.jar
+            mv target/*App.jar artifacts/ &&
+            mv client/target/*App.jar artifacts/
 
     # Upload the build artifact for deployment later in the workflow
     - name: Upload a Build Artifact
