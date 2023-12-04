@@ -3,10 +3,6 @@ server:
 application:
   connection:
     url: http://localhost:8080
-    security:
-      auth:
-        user: ${default_user}
-        pass: ${default_pass}
 spring:
   config:
     import: optional:secrets.yml
