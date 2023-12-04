@@ -38,5 +38,10 @@ services:
       - "8081:8081"
     environment:
       ME_CONFIG_MONGODB_URL: mongodb://root:letmein@task3-mongo:27017/
+  zipkin:
+    image: openzipkin/zipkin:latest
+    ports:
+      - "9411:9411"
+
 volumes:
   task3_mongo:
