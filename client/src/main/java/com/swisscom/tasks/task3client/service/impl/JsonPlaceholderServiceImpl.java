@@ -5,22 +5,24 @@ import com.swisscom.tasks.task3client.dto.auth.LoginResponseDTO;
 import com.swisscom.tasks.task3client.dto.service.ServiceIdDTO;
 import com.swisscom.tasks.task3client.dto.service.ServiceODTODefault;
 import com.swisscom.tasks.task3client.exception.HttpCallException;
-import com.swisscom.tasks.task3client.model.http.*;
 import com.swisscom.tasks.task3client.model.ServiceO;
+import com.swisscom.tasks.task3client.model.http.HttpResponseServiceDTODefault;
+import com.swisscom.tasks.task3client.model.http.HttpResponseServiceO;
+import com.swisscom.tasks.task3client.model.http.httpResponseIds;
 import com.swisscom.tasks.task3client.service.JsonPlaceholderService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class JsonPlaceholderServiceImpl implements JsonPlaceholderService {
     private final RestClient restClient;
     public JsonPlaceholderServiceImpl(Environment environment) {
@@ -39,6 +41,7 @@ public class JsonPlaceholderServiceImpl implements JsonPlaceholderService {
                     .body(LoginResponseDTO.class)).getJwt();
             restBuilder = restBuilder
                     .defaultHeader("Authorization", "Bearer "+jwtToken);
+            log.info("Logged in successfully as "+ username);
         }
         restClient =restBuilder.build();
     }
