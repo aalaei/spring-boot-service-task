@@ -12,8 +12,6 @@ application:
   title: Service API
   version: 1.0
   security:
-    jwt:
-       secret-key: ${jwt-secret-key}
     admin:
       pass: ${admin-pass}
 info:
