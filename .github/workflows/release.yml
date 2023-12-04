@@ -50,17 +50,21 @@ jobs:
     - name: Test with Maven
       run: mvn -B test --file pom.xml
     
-    - name: Build with Maven
+    - name: Build Server App with Maven
       run: mvn -B package --file pom.xml
-    
-    # Rename
-    - name: Rename
-      run: mv target/*.jar target/webapp.jar
+
+    - name: Build Client App with Maven
+      run: mvn -B package --file client/pom.xml
+
+    - name: Rename Artifacts
+      run: mkdir artifacts &&
+            mv target/*App.jar artifacts/*App.jar &&
+            mv client/target/*App.jar artifacts/*App.jar
     # package and upload to GitHub Releases
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
-        files: target/webapp.jar
+        files: artifacts/*.jar
       
     # package and upload to GitHub Container Registery
     - name: Log in to the Container registry

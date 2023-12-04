@@ -51,12 +51,16 @@ jobs:
     - name: Build Client App with Maven
       run: mvn -B package --file client/pom.xml
 
+    - name: Rename Artifacts
+      run: mkdir artifacts &&
+            mv target/*App.jar artifacts/*App.jar &&
+            mv client/target/*App.jar artifacts/*App.jar
+
     # Upload the build artifact for deployment later in the workflow
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v3.1.3
       with:
         name: webapp
         path: |
-          target/*App.jar
-          client/target/*App.jar
+          artifacts/*.jar
 
