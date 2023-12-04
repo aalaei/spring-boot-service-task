@@ -36,7 +36,7 @@ public class ServiceGraphQLIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        String defaultPassword=environment.getProperty("application.security.admin.pass", "admin");
+        String defaultPassword=environment.getProperty("admin-pass", "admin");
         serviceOService.deleteAll();
         dtoMapper = new DTOMapper(new DTOMapperBean().modelMapper());
         LoginResponseDTO loginResponseDTO = authenticationService.loginUser(

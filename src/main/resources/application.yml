@@ -11,9 +11,6 @@ spring:
 application:
   title: Service API
   version: 1.0
-  security:
-    admin:
-      pass: ${admin-pass}
 info:
     app:
       name: ${application.title}

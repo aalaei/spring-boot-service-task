@@ -42,7 +42,7 @@ public class CommandLineTaskExecutor implements CommandLineRunner {
     }
     @Override
     public void run(String... args) throws Exception {
-        String password = environment.getProperty("application.security.admin.pass", "admin");
+        String password = environment.getProperty("admin-pass", "admin");
         // Create Roles If not exists in the database.
         List.of(Role.RoleType.values()).forEach(this::createRoleIfNotExists);
         if(!userRepository.existsByUsername("admin")) {

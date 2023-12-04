@@ -22,7 +22,7 @@ import javax.crypto.spec.SecretKeySpec;
 @EnableMethodSecurity
 @EnableWebSecurity
 public class SecurityConfig {
-    @Value("${${jwt-secret-key}:9aae401561d4d70a65529615cef26f3794da2ffdebe0304f846b1e72f79b64b7}")
+    @Value("${jwt-secret-key:9aae401561d4d70a65529615cef26f3794da2ffdebe0304f846b1e72f79b64b7}")
     private String jwtKey;
 
     @Bean
