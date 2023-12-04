@@ -14,7 +14,7 @@ RUN apk update &&\
 
 WORKDIR /app
 RUN addgroup --system javauser && adduser -S -s /bin/false -G javauser javauser
-COPY --from=build /project/target/*.jar /app/java-application.jar
+COPY --from=build /project/target/*App.jar /app/java-application-server.jar
 RUN chown -R javauser:javauser /app
 USER javauser
-CMD "dumb-init" "java" "-jar" "java-application.jar"
+CMD "dumb-init" "java" "-jar" "java-application-server.jar"
