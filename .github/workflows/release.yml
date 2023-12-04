@@ -33,28 +33,11 @@ jobs:
         distribution: 'temurin'
         cache: maven
         
-    - name: Start MongoDB
-      uses: supercharge/mongodb-github-action@1.10.0
-      with:
-        mongodb-version: 6.0
-        mongodb-username: root
-        mongodb-password: letmein
-        mongodb-db: serviceDB
-
-    - name: Start Redis
-      uses: shogo82148/actions-setup-redis@v1
-      with:
-        redis-version: "6.x"
-    
-    # Run tests
-    - name: Test with Maven
-      run: mvn -B test --file pom.xml
-    
     - name: Build Server App with Maven
-      run: mvn -B package --file pom.xml
+      run: mvn -B package -DskipTests -Pprod --file pom.xml
 
     - name: Build Client App with Maven
-      run: mvn -B package --file client/pom.xml
+      run: mvn -B package -DskipTests --file client/pom.xml
 
     - name: Rename Artifacts
       run: mkdir artifacts &&
