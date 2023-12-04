@@ -38,4 +38,6 @@ SwisscomTask3.pdf
 
 # Ignore logs
 *.log
+Application.log.*
+
 secrets.yml
