@@ -42,17 +42,16 @@ public class CommandLineTaskExecutor implements CommandLineRunner {
     }
     @Override
     public void run(String... args) throws Exception {
+        String password = environment.getProperty("application.security.admin.pass", "admin");
         // Create Roles If not exists in the database.
         List.of(Role.RoleType.values()).forEach(this::createRoleIfNotExists);
         if(!userRepository.existsByUsername("admin")) {
             List<Role> adminRoles = roleRepository.findAll();
-            userRepository.save(new User("admin", passwordEncoder.encode(
-                    environment.getProperty("application.security.admin.pass", "admin")
-            ), adminRoles));
+            userRepository.save(new User("admin", passwordEncoder.encode(password), adminRoles));
         }
         if(Arrays.stream(environment.getActiveProfiles()).anyMatch(env-> env.contains("dev"))) {
             LoginResponseDTO loginResponseDTO = authenticationService.loginUser(
-                    new LoginRequestDTO("admin", "admin")
+                    new LoginRequestDTO("admin", password)
             );
             String graphQLConsole = "http://localhost:8080/graphiql#Authorization=Bearer%20" + loginResponseDTO.getJwt();
             log.info("GraphQLConsole: {}", graphQLConsole);
