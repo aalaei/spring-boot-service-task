@@ -8,13 +8,14 @@ import com.swisscom.tasks.task3client.exception.HttpCallException;
 import com.swisscom.tasks.task3client.model.http.*;
 import com.swisscom.tasks.task3client.model.ServiceO;
 import com.swisscom.tasks.task3client.service.JsonPlaceholderService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.client.support.RestClientAdapter;
-import org.springframework.web.service.invoker.HttpServiceProxyFactory;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -22,20 +23,24 @@ import java.util.Optional;
 @Service
 public class JsonPlaceholderServiceImpl implements JsonPlaceholderService {
     private final RestClient restClient;
-    public JsonPlaceholderServiceImpl() {
-        RestClient client = RestClient.builder()
-                .baseUrl("http://localhost:8080/api/v1/auth")
-                .build();
-        LoginRequestDTO loginRequestDTO=new LoginRequestDTO("admin", "admin");
-        String jwtToken= Objects.requireNonNull(client.post()
-                .uri("/login")
-                .body(loginRequestDTO)
-                .retrieve()
-                .body(LoginResponseDTO.class)).getJwt();
-        restClient = RestClient.builder()
-                .baseUrl("http://localhost:8080/api/v1")
-                .defaultHeader("Authorization", "Bearer "+jwtToken)
-                .build();
+    public JsonPlaceholderServiceImpl(Environment environment) {
+        String username=environment.getProperty("application.connection.security.auth.user", "");
+        String password=environment.getProperty("application.connection.security.auth.pass", "");
+        String url=environment.getProperty("application.connection.url", "http://localhost:8080");
+        RestClient.Builder restBuilder= RestClient.builder()
+                .baseUrl(url+"/api/v1");
+        if(!username.isEmpty()){
+            LoginRequestDTO loginRequestDTO=new LoginRequestDTO(username, password);
+            String jwtToken = Objects.requireNonNull(RestClient.builder()
+                    .baseUrl(url + "/api/v1/auth/login")
+                    .build()
+                    .post().body(loginRequestDTO)
+                    .retrieve()
+                    .body(LoginResponseDTO.class)).getJwt();
+            restBuilder = restBuilder
+                    .defaultHeader("Authorization", "Bearer "+jwtToken);
+        }
+        restClient =restBuilder.build();
     }
     @Override
     public List<String> findAllIds() {
