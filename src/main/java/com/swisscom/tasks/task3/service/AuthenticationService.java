@@ -4,14 +4,10 @@ import com.swisscom.tasks.task3.dto.auth.*;
 import com.swisscom.tasks.task3.exception.AuthenticationServiceException;
 import com.swisscom.tasks.task3.model.auth.Role;
 import com.swisscom.tasks.task3.model.auth.User;
-import com.swisscom.tasks.task3.repository.RoleRepository;
-import com.swisscom.tasks.task3.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +24,7 @@ public class AuthenticationService {
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
+    private final UserDTOMapper userDTOMapper;
 
     /**
      * This method returns a user by username.
@@ -35,7 +32,7 @@ public class AuthenticationService {
      * @return - {@link User} object.
      */
     public UserDTO getUserDTO(String username){
-        return userService.getUserDTO(username);
+        return userDTOMapper.apply(userService.getUser(username));
     }
 
     /**
@@ -44,11 +41,11 @@ public class AuthenticationService {
      * @return - {@link List} of {@link User} objects.
      */
     public List<UserDTO> getAllUserDTOs(String self){
-        UserDTO selfUser = userService.getUserDTO(self);
-        List<UserDTO> users = userService.getAllUserDTOs();
+        UserDTO selfUser = getUserDTO(self);
+        List<User> users = userService.getAllUserDTOs();
         if (selfUser.getRoles().stream().anyMatch(role -> role.equals(Role.RoleType.ADMIN.name())))
-            return users;
-        return users.stream().filter(user -> user.getUsername().equals(self)).toList();
+            return users.stream().map(userDTOMapper).toList();
+        return users.stream().filter(user -> user.getUsername().equals(self)).map(userDTOMapper).toList();
     }
 
     /**
@@ -58,7 +55,7 @@ public class AuthenticationService {
      * @return - {@link User} object.
      */
     public UserDTO registerUser(String username, String password){
-       return userService.registerUser(username, password);
+       return userDTOMapper.apply(userService.registerUser(username, password));
     }
 
     /**
@@ -73,7 +70,7 @@ public class AuthenticationService {
                         loginRequestDTO.getPassword()
                 )
         );
-        UserDTO userDTO = userService.getUserDTO(loginRequestDTO.getUsername());
+        UserDTO userDTO = getUserDTO(loginRequestDTO.getUsername());
         String token = tokenService.generateToken(auth);
         return new LoginResponseDTO(userDTO, token);
     }
@@ -85,12 +82,12 @@ public class AuthenticationService {
      * @return - {@link UserDTO} object.
      */
     public UserDTO getUserDTO(String self, String username){
-        UserDTO selfUser = userService.getUserDTO(self);
+        UserDTO selfUser = getUserDTO(self);
         if(Objects.equals(username, "me"))
             return selfUser;
         if(selfUser.getRoles().stream().anyMatch(role ->
                 role.equals(Role.RoleType.ADMIN.name())) || self.equals(username))
-            return userService.getUserDTO(username);
+            return getUserDTO(username);
         throw new AuthenticationServiceException("You are not authorized to view this user");
     }
 
@@ -102,11 +99,11 @@ public class AuthenticationService {
      * @return - {@link UserDTO} object of the updated user.
      */
     public UserDTO editUser(String self, String username, UserEditDTO user){
-        UserDTO selfUser = userService.getUserDTO(self);
+        UserDTO selfUser = getUserDTO(self);
         if(selfUser.getRoles().stream().noneMatch(role ->
                 role.equals(Role.RoleType.ADMIN.name())) && !self.equals(username))
             throw new AuthenticationServiceException("You are not authorized to edit this user");
-        return userService.updateUser(username, user);
+        return userDTOMapper.apply(userService.updateUser(username, user));
     }
 
     /**
@@ -115,7 +112,7 @@ public class AuthenticationService {
      * @param username - username({@link String}) of the user to be deleted.
      */
     public void deleteUser(String self, String username){
-        UserDTO selfUser = userService.getUserDTO(self);
+        UserDTO selfUser = getUserDTO(self);
         if(selfUser.getRoles().stream().noneMatch(role ->
                 role.equals(Role.RoleType.ADMIN.name())) && !self.equals(username))
             throw new AuthenticationServiceException("You are not authorized to delete this user");

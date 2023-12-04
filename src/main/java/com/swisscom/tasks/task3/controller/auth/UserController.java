@@ -143,10 +143,10 @@ public class UserController {
     public ResponseEntity<?> deleteUsers(Principal principal, @RequestParam(value = "username") String username){
         try {
             authenticationService.deleteUser(principal.getName(), username);
-            return ResponseEntity.ok().body(username + " is deleted");
-        }catch (AuthenticationServiceException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            return ResponseEntity.ok().body("User '"+ username + "' is deleted");
         }catch (UserServiceException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }catch (AuthenticationServiceException e){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
     }

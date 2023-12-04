@@ -9,29 +9,22 @@ import com.swisscom.tasks.task3.model.auth.User;
 import com.swisscom.tasks.task3.repository.RoleRepository;
 import com.swisscom.tasks.task3.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
+@CacheConfig(cacheNames = "user")
 public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final UserDTOMapper userDTOMapper;
     private final PasswordEncoder passwordEncoder;
-
-    /**
-     * This method returns a user by username.
-     * @param username - The username({@link String}) of the user.
-     * @return - {@link User} object.
-     */
-    Optional<User> findByUsername(String username){
-        return userRepository.findByUsername(username);
-    }
 
     /**
      * This method returns all users.
@@ -47,14 +40,14 @@ public class UserService {
      * @param password - password({@link String}) of the user.
      * @return - {@link User} object.
      */
-    public UserDTO registerUser(String username, String password){
+    public User registerUser(String username, String password){
         String encodedPassword = passwordEncoder.encode(password);
         Role userRole = roleRepository.findByAuthority(Role.RoleType.USER.name()).orElseThrow(
                 () -> new UserServiceException("Role not found: USER")
         );
         if(userRepository.findByUsername(username).isPresent())
             throw new UserServiceException("User already exists: "+ username);
-        return userDTOMapper.apply(userRepository.save(new User(username, encodedPassword, List.of(userRole))));
+        return userRepository.save(new User(username, encodedPassword, List.of(userRole)));
     }
 
     /**
@@ -63,7 +56,8 @@ public class UserService {
      * @param user - {@link UserEditDTO} object.
      * @return - {@link User} object.
      */
-    public UserDTO updateUser(String username, UserEditDTO user) {
+    @CachePut(key = "#username")
+    public User updateUser(String username, UserEditDTO user) {
 
         User userToEdit = getUser(username);
         userToEdit.setFirstName(user.getFirstName());
@@ -79,23 +73,19 @@ public class UserService {
                         )
                 ).collect(Collectors.toList())
         );
-        return userDTOMapper.apply(userRepository.save(userToEdit));
+        return userRepository.save(userToEdit);
     }
 
-    /**
-     * This method deletes a user by id.
-     * @param id - id({@link String}) of the user.
-     */
-    public void deleteById(String id) {
-        userRepository.deleteById(id);
-    }
 
     /**
      * This method deletes a user by username.
      * @param username - username({@link String}) of the user.
      */
+    @CacheEvict(key = "#username")
     public void deleteByUsername(String username) {
-        this.deleteById(getUser(username).getId());
+        if(!userRepository.existsByUsername(username))
+            throw new UserServiceException("User not found: "+ username);
+        userRepository.deleteByUsername(username);
     }
 
     /**
@@ -103,26 +93,18 @@ public class UserService {
      * @param username - username({@link String}) of the user.
      * @return - {@link User} object.
      */
-    private User getUser(String username){
+    @Cacheable(key = "#username")
+    public User getUser(String username){
         return userRepository.findByUsername(username).orElseThrow(
                 () ->  new UserServiceException("User not found: "+ username)
         );
     }
 
     /**
-     * This method returns a {@link UserDTO} object given a username.
-     * @param username - username({@link String}) of the user.
-     * @return - {@link UserDTO} object.
-     */
-    public UserDTO getUserDTO(String username){
-        return userDTOMapper.apply(getUser(username));
-    }
-
-    /**
      * This method returns all {@link UserDTO} objects.
      * @return - {@link List} of {@link UserDTO} objects.
      */
-    public List<UserDTO> getAllUserDTOs(){
-        return userRepository.findAll().stream().map(userDTOMapper).toList();
+    public List<User> getAllUserDTOs(){
+        return userRepository.findAll();
     }
 }

@@ -1,6 +1,6 @@
 package com.swisscom.tasks.task3.service;
 
-import com.swisscom.tasks.task3.repository.UserRepository;
+import com.swisscom.tasks.task3.exception.UserServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,8 +16,10 @@ public class MongoUserDetailsService implements UserDetailsService {
     private final UserService userService;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userService.findByUsername(username).orElseThrow(
-                () -> new UsernameNotFoundException("User not found: "+ username)
-        );
+        try {
+            return userService.getUser(username);
+        }catch (UserServiceException e){
+            throw new UsernameNotFoundException("User not found: "+ username);
+        }
     }
 }
