@@ -3,6 +3,7 @@ com.swisscom.tasks.task3.configuration
 com.swisscom.tasks.task3.controller
 com.swisscom.tasks.task3.controller.auth
 com.swisscom.tasks.task3.controller.graphql
+com.swisscom.tasks.task3.crypto
 com.swisscom.tasks.task3.dto.auth
 com.swisscom.tasks.task3.dto.mapper
 com.swisscom.tasks.task3.dto.owner
