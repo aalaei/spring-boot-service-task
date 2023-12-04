@@ -20,9 +20,9 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityFilterChainConfig {
     private final PasswordEncoder passwordEncoder;
     private final MongoUserDetailsService mongoUserDetailsService;
-
-    private static final String[] WHITE_LIST_URL = {
-            "/health",
+    private static final String[] WHITE_LIST_URL = {1
+//            "/actuator/**",
+            "/actuator/health",
             "/api/v1/auth/login",
             "/v3/api-docs",
             "/v3/api-docs/**",
