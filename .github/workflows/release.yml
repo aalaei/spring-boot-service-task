@@ -58,8 +58,9 @@ jobs:
 
     - name: Rename Artifacts
       run: mkdir artifacts &&
-            mv target/*App.jar artifacts/*App.jar &&
-            mv client/target/*App.jar artifacts/*App.jar
+            mv target/*App.jar artifacts/ &&
+            mv client/target/*App.jar artifacts/
+    
     # package and upload to GitHub Releases
     - name: Release
       uses: softprops/action-gh-release@v1
