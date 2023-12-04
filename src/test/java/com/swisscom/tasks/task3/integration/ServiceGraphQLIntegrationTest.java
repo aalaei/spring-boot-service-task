@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.core.env.Environment;
 import org.springframework.graphql.test.tester.HttpGraphQlTester;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -27,16 +28,19 @@ public class ServiceGraphQLIntegrationTest {
     private DTOMapper dtoMapper;
     @Autowired
     private AuthenticationService authenticationService;
+    @Autowired
+    private Environment environment;
 
     @LocalServerPort
     int port;
 
     @BeforeEach
     void setUp() {
+        String defaultPassword=environment.getProperty("application.security.admin.pass", "admin");
         serviceOService.deleteAll();
         dtoMapper = new DTOMapper(new DTOMapperBean().modelMapper());
         LoginResponseDTO loginResponseDTO = authenticationService.loginUser(
-                new LoginRequestDTO("admin", "admin")
+                new LoginRequestDTO("admin", defaultPassword)
         );
         WebTestClient client = WebTestClient.bindToServer()
                 .baseUrl(String.format("http://localhost:%s/graphql", port))

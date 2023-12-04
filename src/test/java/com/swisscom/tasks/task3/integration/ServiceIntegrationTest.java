@@ -58,13 +58,13 @@ public class ServiceIntegrationTest {
     @Test
     void isHealthy() throws Exception {
         // when
-        String healthEndpoint = "/health";
+        String healthEndpoint = "/actuator/health";
         ResultActions resultActions = mockMvc
                 .perform(get(healthEndpoint)
                         .contentType(MediaType.APPLICATION_JSON));
         // then
         resultActions.andExpect(status().isOk())
-                .andExpect(content().string("Healthy"));
+                .andExpect(jsonPath("$.status").value("UP"));
     }
 
     @Test
