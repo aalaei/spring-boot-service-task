@@ -13,10 +13,10 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class MongoUserDetailsService implements UserDetailsService {
-    private final UserRepository userRepository;
+    private final UserService userService;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username).orElseThrow(
+        return userService.findByUsername(username).orElseThrow(
                 () -> new UsernameNotFoundException("User not found: "+ username)
         );
     }

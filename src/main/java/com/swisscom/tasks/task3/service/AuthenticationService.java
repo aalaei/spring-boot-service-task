@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * This class is used to authenticate a user.
@@ -26,26 +25,17 @@ import java.util.stream.Collectors;
 @Transactional
 @RequiredArgsConstructor
 public class AuthenticationService {
-    private final UserRepository userRepository;
-
-    private final RoleRepository roleRepository;
-
-    private final PasswordEncoder passwordEncoder;
-
+    private final UserService userService;
     private final AuthenticationManager authenticationManager;
-
     private final TokenService tokenService;
-    private final UserDTOMapper userDTOMapper;
 
     /**
      * This method returns a user by username.
      * @param username - The username({@link String}) of the user.
      * @return - {@link User} object.
      */
-    public User getUser(String username){
-        return userRepository.findByUsername(username).orElseThrow(
-                () ->  new AuthenticationServiceException("User not found: "+ username)
-        );
+    public UserDTO getUserDTO(String username){
+        return userService.getUserDTO(username);
     }
 
     /**
@@ -54,11 +44,11 @@ public class AuthenticationService {
      * @return - {@link List} of {@link User} objects.
      */
     public List<UserDTO> getAllUserDTOs(String self){
-        User selfUser = getUser(self);
-        List<User> users = userRepository.findAll();
-        if (selfUser.getRoles().stream().anyMatch(role -> role.getAuthority().equals(Role.RoleType.ADMIN.name())))
-            return users.stream().map(userDTOMapper).toList();
-        return users.stream().filter(user -> user.getUsername().equals(self)).map(userDTOMapper).toList();
+        UserDTO selfUser = userService.getUserDTO(self);
+        List<UserDTO> users = userService.getAllUserDTOs();
+        if (selfUser.getRoles().stream().anyMatch(role -> role.equals(Role.RoleType.ADMIN.name())))
+            return users;
+        return users.stream().filter(user -> user.getUsername().equals(self)).toList();
     }
 
     /**
@@ -68,14 +58,7 @@ public class AuthenticationService {
      * @return - {@link User} object.
      */
     public UserDTO registerUser(String username, String password){
-
-        String encodedPassword = passwordEncoder.encode(password);
-        Role userRole = roleRepository.findByAuthority(Role.RoleType.USER.name()).orElseThrow(
-                () -> new AuthenticationServiceException("Role not found: USER")
-        );
-        if(userRepository.findByUsername(username).isPresent())
-            throw new AuthenticationServiceException("User already exists: "+ username);
-        return userDTOMapper.apply(userRepository.save(new User(username, encodedPassword, List.of(userRole))));
+       return userService.registerUser(username, password);
     }
 
     /**
@@ -90,11 +73,9 @@ public class AuthenticationService {
                         loginRequestDTO.getPassword()
                 )
         );
-
-//        User user = (User) auth.getPrincipal();
-        User user = getUser(loginRequestDTO.getUsername());
+        UserDTO userDTO = userService.getUserDTO(loginRequestDTO.getUsername());
         String token = tokenService.generateToken(auth);
-        return new LoginResponseDTO(userDTOMapper.apply(user), token);
+        return new LoginResponseDTO(userDTO, token);
     }
 
     /**
@@ -104,12 +85,12 @@ public class AuthenticationService {
      * @return - {@link UserDTO} object.
      */
     public UserDTO getUserDTO(String self, String username){
-        User selfUser = getUser(self);
+        UserDTO selfUser = userService.getUserDTO(self);
         if(Objects.equals(username, "me"))
-            return userDTOMapper.apply(selfUser);
+            return selfUser;
         if(selfUser.getRoles().stream().anyMatch(role ->
-                role.getAuthority().equals(Role.RoleType.ADMIN.name())) || self.equals(username))
-            return userDTOMapper.apply(getUser(username));
+                role.equals(Role.RoleType.ADMIN.name())) || self.equals(username))
+            return userService.getUserDTO(username);
         throw new AuthenticationServiceException("You are not authorized to view this user");
     }
 
@@ -121,25 +102,11 @@ public class AuthenticationService {
      * @return - {@link UserDTO} object of the updated user.
      */
     public UserDTO editUser(String self, String username, UserEditDTO user){
-        User selfUser = getUser(self);
+        UserDTO selfUser = userService.getUserDTO(self);
         if(selfUser.getRoles().stream().noneMatch(role ->
-                role.getAuthority().equals(Role.RoleType.ADMIN.name())) && !self.equals(username))
+                role.equals(Role.RoleType.ADMIN.name())) && !self.equals(username))
             throw new AuthenticationServiceException("You are not authorized to edit this user");
-        User userToEdit = getUser(username);
-        userToEdit.setFirstName(user.getFirstName());
-        userToEdit.setLastName(user.getLastName());
-        userToEdit.setTitle(user.getTitle());
-        userToEdit.setPassword(passwordEncoder.encode(user.getPassword()));
-        if(user.getRoles()==null)
-            throw  new AuthenticationServiceException("Roles cannot be null");
-        userToEdit.setRoles(
-                user.getRoles().stream().map(role ->
-                        roleRepository.findByAuthority(role).orElseThrow(
-                                () -> new AuthenticationServiceException("Role not found: "+ role)
-                        )
-                ).collect(Collectors.toList())
-        );
-        return userDTOMapper.apply(userRepository.save(userToEdit));
+        return userService.updateUser(username, user);
     }
 
     /**
@@ -148,10 +115,10 @@ public class AuthenticationService {
      * @param username - username({@link String}) of the user to be deleted.
      */
     public void deleteUser(String self, String username){
-        User selfUser = getUser(self);
+        UserDTO selfUser = userService.getUserDTO(self);
         if(selfUser.getRoles().stream().noneMatch(role ->
-                role.getAuthority().equals(Role.RoleType.ADMIN.name())) && !self.equals(username))
+                role.equals(Role.RoleType.ADMIN.name())) && !self.equals(username))
             throw new AuthenticationServiceException("You are not authorized to delete this user");
-        userRepository.delete(getUser(username));
+        userService.deleteByUsername(username);
     }
 }

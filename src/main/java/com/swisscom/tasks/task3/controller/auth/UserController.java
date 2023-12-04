@@ -3,6 +3,7 @@ package com.swisscom.tasks.task3.controller.auth;
 import com.swisscom.tasks.task3.dto.auth.UserDTO;
 import com.swisscom.tasks.task3.dto.auth.UserEditDTO;
 import com.swisscom.tasks.task3.exception.AuthenticationServiceException;
+import com.swisscom.tasks.task3.exception.UserServiceException;
 import com.swisscom.tasks.task3.model.auth.User;
 import com.swisscom.tasks.task3.service.AuthenticationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -70,9 +71,9 @@ public class UserController {
                 return ResponseEntity.ok(authenticationService.getAllUserDTOs(principal.getName()));
             return ResponseEntity.ok(authenticationService.getUserDTO(principal.getName(), username));
         }catch (AuthenticationServiceException e){
-            HttpStatus httpStatus = e.getMessage().startsWith("User not found") ?
-                    HttpStatus.NOT_FOUND : HttpStatus.UNAUTHORIZED;
-                return ResponseEntity.status(httpStatus).body(e.getMessage());
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        }catch (UserServiceException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
@@ -129,14 +130,12 @@ public class UserController {
                                         @RequestBody UserEditDTO user){
         try {
             return ResponseEntity.ok(authenticationService.editUser(principal.getName(), username, user));
-        }catch (AuthenticationServiceException e){
-
-            HttpStatus httpStatus = HttpStatus.UNAUTHORIZED;
-            if(e.getMessage().startsWith("User not found"))
-                httpStatus= HttpStatus.NOT_FOUND;
-            else if(e.getMessage().startsWith("Roles cannot be null"))
-                httpStatus= HttpStatus.BAD_REQUEST;
+        }catch (UserServiceException e){
+            HttpStatus httpStatus = e.getMessage().contains("not found") ?
+                    HttpStatus.NOT_FOUND: HttpStatus.BAD_REQUEST;;
             return ResponseEntity.status(httpStatus).body(e.getMessage());
+        }catch (AuthenticationServiceException e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
     }
     @PreAuthorize("hasAuthority('SCOPE_USER')")
@@ -146,9 +145,9 @@ public class UserController {
             authenticationService.deleteUser(principal.getName(), username);
             return ResponseEntity.ok().body(username + " is deleted");
         }catch (AuthenticationServiceException e){
-            HttpStatus httpStatus = e.getMessage().startsWith("User not found") ?
-                    HttpStatus.NOT_FOUND : HttpStatus.UNAUTHORIZED;
-            return ResponseEntity.status(httpStatus).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }catch (UserServiceException e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
     }
 
