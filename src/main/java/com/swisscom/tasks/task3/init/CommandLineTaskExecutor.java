@@ -8,7 +8,9 @@ import com.swisscom.tasks.task3.repository.RoleRepository;
 import com.swisscom.tasks.task3.repository.UserRepository;
 import com.swisscom.tasks.task3.service.AuthenticationService;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,30 +33,22 @@ public class CommandLineTaskExecutor implements CommandLineRunner {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final Environment environment;
+
+    private void createRoleIfNotExists(Role.RoleType roleType) {
+        if(roleRepository.findByAuthority(roleType.name()).isEmpty()) {
+            Role role = new Role(roleType);
+            roleRepository.save(role);
+        }
+    }
     @Override
     public void run(String... args) throws Exception {
-        if(userRepository.findByUsername("admin").isEmpty()) {
-            Role userRole = new Role(Role.RoleType.USER);
-            Role adminRole = new Role(Role.RoleType.ADMIN);
-            Role superUser = new Role(Role.RoleType.SUPER_USER);
-            roleRepository.save(userRole);
-            roleRepository.save(adminRole);
-            roleRepository.save(superUser);
-
-            userRepository.save(
-                    new User("user", passwordEncoder.encode("user"), List.of(userRole))
-            );
-
-            userRepository.save(
-                    new User("super", passwordEncoder.encode("super"),
-                            List.of(userRole, superUser))
-            );
-
-            userRepository.save(
-                    new User("admin", passwordEncoder.encode("admin"),
-                            List.of(adminRole, userRole, superUser)
-                    )
-            );
+        // Create Roles If not exists in the database.
+        List.of(Role.RoleType.values()).forEach(this::createRoleIfNotExists);
+        if(!userRepository.existsByUsername("admin")) {
+            List<Role> adminRoles = roleRepository.findAll();
+            userRepository.save(new User("admin", passwordEncoder.encode(
+                    environment.getProperty("application.security.admin.pass", "admin")
+            ), adminRoles));
         }
         if(Arrays.stream(environment.getActiveProfiles()).anyMatch(env-> env.contains("dev"))) {
             LoginResponseDTO loginResponseDTO = authenticationService.loginUser(
