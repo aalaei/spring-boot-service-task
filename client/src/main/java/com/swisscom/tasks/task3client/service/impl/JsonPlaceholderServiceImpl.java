@@ -1,5 +1,7 @@
 package com.swisscom.tasks.task3client.service.impl;
 
+import com.swisscom.tasks.task3client.dto.auth.LoginRequestDTO;
+import com.swisscom.tasks.task3client.dto.auth.LoginResponseDTO;
 import com.swisscom.tasks.task3client.dto.service.ServiceIdDTO;
 import com.swisscom.tasks.task3client.dto.service.ServiceODTODefault;
 import com.swisscom.tasks.task3client.exception.HttpCallException;
@@ -10,27 +12,45 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.support.RestClientAdapter;
+import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
 public class JsonPlaceholderServiceImpl implements JsonPlaceholderService {
     private final RestClient restClient;
     public JsonPlaceholderServiceImpl() {
+        RestClient client = RestClient.builder()
+                .baseUrl("http://localhost:8080/api/v1/auth")
+                .build();
+        LoginRequestDTO loginRequestDTO=new LoginRequestDTO("admin", "admin");
+        String jwtToken= Objects.requireNonNull(client.post()
+                .uri("/login")
+                .body(loginRequestDTO)
+                .retrieve()
+                .body(LoginResponseDTO.class)).getJwt();
         restClient = RestClient.builder()
                 .baseUrl("http://localhost:8080/api/v1")
+                .defaultHeader("Authorization", "Bearer "+jwtToken)
                 .build();
     }
     @Override
     public List<String> findAllIds() {
-        ResponseEntity<httpResponseIds> httpResponse= restClient.get()
-                .uri("/services")
-                .retrieve()
-                .toEntity(httpResponseIds.class);
-        if(httpResponse.getStatusCode().isError() || httpResponse.getBody()==null)
-            throw new HttpCallException("Error while fetching all ids", httpResponse);
-        return httpResponse.getBody().getData().get("services").stream().map(ServiceIdDTO::getId).toList();
+        try {
+            ResponseEntity<httpResponseIds> httpResponse = restClient.get()
+                    .uri("/services")
+                    .retrieve()
+                    .toEntity(httpResponseIds.class);
+            if(httpResponse.getStatusCode().isError() || httpResponse.getBody()==null)
+                throw new HttpCallException("Error while fetching all ids", httpResponse);
+            return httpResponse.getBody().getData().get("services").stream().map(ServiceIdDTO::getId).toList();
+        }catch (Exception e)
+        {
+            throw new HttpCallException("Error while fetching all ids", ResponseEntity.status(500).build());
+        }
     }
 
     @Override

@@ -6,7 +6,7 @@ import org.springframework.web.service.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-
+// Disabling Auto Implementation and using FeignClient
 public interface JsonPlaceholderService {
 //    @GetExchange("/api/v1/services")
     List<String> findAllIds();
