@@ -22,6 +22,7 @@ public class SecurityFilterChainConfig {
     private final MongoUserDetailsService mongoUserDetailsService;
     private static final String[] WHITE_LIST_URL = {
 //            "/actuator/**",
+            "/actuator/info",
             "/actuator/health",
             "/api/v1/auth/login",
             "/v3/api-docs",

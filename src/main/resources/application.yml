@@ -16,3 +16,17 @@ application:
        secret-key: ${jwt-secret-key}
     admin:
       pass: ${admin-pass}
+info:
+    app:
+      name: ${application.title}
+      description: Service API
+      version: ${application.version}
+      title: ${application.title}
+      author: Ali Alaei
+      docs: https://aalaei.github.io/spring-boot-service-task/javadoc/
+      apiDocs: /swagger-ui.html
+      repo: https://github.com/aalaei/spring-boot-service-task
+management:
+  info:
+    env:
+      enabled: true

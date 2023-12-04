@@ -69,8 +69,9 @@ The API provides the following endpoints for User Management and Authentication:
 * `PUT /api/v1/services?username=<username>`: Update an existing user by username, with the required user information provided in the request body.
 * `DELETE /api/v1/users?username=<username>`: Delete the specified user.
 
-The API provides a single endpoint for health status checking:
+The API provides the following endpoints for actuator:
 * `GET /actuator/health`: Check the application's health status.
+* `GET /actuator/info`: Get into of the application.
 
 The API provides the following paths for API documentation and Swagger UI:
 * `/swagger-ui.html`: Swagger UI
