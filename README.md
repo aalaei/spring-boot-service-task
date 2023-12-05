@@ -53,7 +53,7 @@ This guide explains how to run the Java Spring Boot application in two ways: usi
 To run the application along with MongoDB and Redis using Docker Compose, execute the following command:
 
 ```bash
-docker-compose up
+docker compose up -d
 ```
 
 This command will orchestrate the setup defined in the `docker-compose.yml` file, including building and running the Spring Boot application, MongoDB, and Redis within separate Docker containers. Access the application in your browser by navigating to http://localhost:3000.
