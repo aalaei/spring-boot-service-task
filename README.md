@@ -2,6 +2,7 @@
 [![Javadoc](https://img.shields.io/badge/JavaDoc-Online-green)](https://aalaei.github.io/spring-boot-service-task/javadoc/)
 ![Tests Workflow](https://github.com/aalaei/spring-boot-service-task/actions/workflows/maven.yml/badge.svg)
 ![Release Workflow](https://github.com/aalaei/spring-boot-service-task/actions/workflows/release.yml/badge.svg)
+[![MIT licensed](https://img.shields.io/badge/license-MIT-green)](https://github.com/aalaei/spring-boot-service-task/blob/master/LICENSE)
 
 This repository contains a Java Spring Boot web application that provides a REST API for managing a "Service" object with nested "Resource" and "Owner" objects. The application persists data in MongoDB, implements Redis caching, and includes optional features like encryption of critical text fields.
 
