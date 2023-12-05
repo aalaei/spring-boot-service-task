@@ -20,18 +20,18 @@ public class EncryptionUtil {
 
     public String encrypt(String value) {
         try {
-            return Base64.encodeBase64String(getCipher().doFinal(value.getBytes()));
+            return Base64.encodeBase64String(getCipher(Cipher.ENCRYPT_MODE).doFinal(value.getBytes()));
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new EncryptionException("Error while encrypting the message");
         }
     }
-    private Cipher getCipher(){
+    private Cipher getCipher(int mode){
         try {
             IvParameterSpec iv = new IvParameterSpec(Base64.decodeBase64(initVector));
             SecretKeySpec sKeySpec = new SecretKeySpec(Base64.decodeBase64(key), algo.split("/")[0]);
             Cipher cipher = Cipher.getInstance(algo);
-            cipher.init(Cipher.DECRYPT_MODE, sKeySpec, iv);
+            cipher.init(mode, sKeySpec, iv);
             return cipher;
         } catch (Exception e) {
             e.printStackTrace();
@@ -41,7 +41,7 @@ public class EncryptionUtil {
 
     public String decrypt(String encrypted) {
         try {
-            return new String(getCipher().doFinal(Base64.decodeBase64(encrypted)));
+            return new String(getCipher(Cipher.DECRYPT_MODE).doFinal(Base64.decodeBase64(encrypted)));
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new EncryptionException("Error while decrypting the message");
