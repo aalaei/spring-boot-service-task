@@ -86,6 +86,8 @@ public class ServiceOServiceImpl implements ServiceOService {
      */
     @Override
     public ServiceO create(ServiceO serviceO) {
+        if(serviceO.getResources()==null)
+            serviceO.setResources(List.of());
         if (serviceO.getId() != null && serviceORepository.existsById(serviceO.getId()))
             throw new ServiceOServiceException("Another service with id " + serviceO.getId() + " exists before");
         log.info("Saving a new service");

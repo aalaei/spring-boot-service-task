@@ -35,6 +35,8 @@ public class ResourceServiceImpl implements ResourceService {
      */
     @Override
     public Resource create(Resource resource, String serviceID){
+        if(resource.getOwners()==null)
+            resource.setOwners(List.of());
         ServiceO parentService= serviceORepository
                 .findById(serviceID).orElseThrow(()->
                         new ResourceServiceException("Service with id "+serviceID+" not found"));
