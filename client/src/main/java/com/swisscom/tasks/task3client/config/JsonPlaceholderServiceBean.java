@@ -2,7 +2,7 @@ package com.swisscom.tasks.task3client.config;
 
 import com.swisscom.tasks.task3client.dto.auth.LoginRequestDTO;
 import com.swisscom.tasks.task3client.dto.auth.LoginResponseDTO;
-import com.swisscom.tasks.task3client.service.JsonPlaceholderService;
+import com.swisscom.tasks.task3client.service.JsonPaceHolderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -21,7 +21,7 @@ public class JsonPlaceholderServiceBean {
     private final Environment environment;
 
     @Bean
-    JsonPlaceholderService jsonPlaceholderService() {
+    JsonPaceHolderService jsonPlaceholderService() {
         String username = environment.getProperty("application.connection.security.auth.user", "");
         String password = environment.getProperty("application.connection.security.auth.pass", "");
         String url = environment.getProperty("application.connection.url", "http://localhost:8080");
@@ -41,7 +41,7 @@ public class JsonPlaceholderServiceBean {
         RestClient client = restBuilder.build();
         HttpServiceProxyFactory factory = HttpServiceProxyFactory
                 .builderFor(RestClientAdapter.create(client)).build();
-        return factory.createClient(JsonPlaceholderService.class);
+        return factory.createClient(JsonPaceHolderService.class);
     }
 }
 

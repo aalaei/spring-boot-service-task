@@ -2,6 +2,9 @@ package com.swisscom.tasks.task3client.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.swisscom.tasks.task3client.crypto.EncryptionUtil;
+import com.swisscom.tasks.task3client.crypto.service.ServiceOEncryptor;
+import com.swisscom.tasks.task3client.dto.mapper.DTOMapper;
 import com.swisscom.tasks.task3client.dto.service.ServiceIdDTO;
 import com.swisscom.tasks.task3client.dto.service.ServiceODTODefault;
 import com.swisscom.tasks.task3client.exception.HttpCallException;
@@ -20,8 +23,10 @@ import java.util.Optional;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class ParsedJsonService {
-    private final JsonPlaceholderService client;
+public class ServiceApiService {
+    private final JsonPaceHolderService apiService;
+    private final ServiceOEncryptor serviceOEncryptor;
+    private final DTOMapper dtoMapper;
 
     public <T> T parseResponse(ResponseEntity<?> response, String path, String errorMessage, Class<T> type) {
         try {
@@ -50,7 +55,7 @@ public class ParsedJsonService {
 
     public List<String> findAllIds() {
         try {
-            ResponseEntity<?> response = client.findAllIds();
+            ResponseEntity<?> response = apiService.findAllIds();
             List<?> rawServices = parseResponse(response, "services",
                     "Error while fetching all ids");
             ObjectMapper mapper = new ObjectMapper();
@@ -65,14 +70,16 @@ public class ParsedJsonService {
         }
     }
 
-    //    @Override
     public Optional<ServiceODTODefault> getByID(String id) {
         try {
-            ResponseEntity<?> response = client.getByID(id);
-            var a = parseResponse(response, "service", "Error while getting the service",
-                    ServiceODTODefault.class
+            ResponseEntity<?> response = apiService.getByID(id);
+            var encryptedService=parseResponse(response, "service", "Error while getting the service",
+                    ServiceO.class
             );
-            return a == null ? Optional.empty() : Optional.of(a);
+            if(encryptedService==null)
+                return Optional.empty();
+            var service = serviceOEncryptor.decrypt(encryptedService);
+            return Optional.of(dtoMapper.map(service, ServiceODTODefault.class));
         } catch (RestClientResponseException exception) {
             ResponseEntity<?> response = ResponseEntity.status(exception.getStatusCode())
                     .contentType(MediaType.APPLICATION_JSON)
@@ -82,12 +89,18 @@ public class ParsedJsonService {
         }
     }
 
-    //    @Override
     public ServiceO createService(ServiceODTODefault serviceODTO) {
         try {
-            ResponseEntity<?> response = client.createService(serviceODTO);
-            return parseResponse(response, "service", "Error while creating the service",
-                    ServiceO.class
+            ServiceO service=dtoMapper.map(serviceODTO, ServiceO.class);
+            serviceOEncryptor.encrypt(service);
+            serviceODTO=dtoMapper.map(service, ServiceODTODefault.class);
+            ResponseEntity<?> response = apiService.createService(serviceODTO);
+            return serviceOEncryptor.decrypt(
+                    parseResponse(response,
+                            "service",
+                            "Error while creating the service",
+                            ServiceO.class
+                    )
             );
         } catch (RestClientResponseException exception) {
             ResponseEntity<?> response = ResponseEntity.status(exception.getStatusCode())
@@ -98,33 +111,35 @@ public class ParsedJsonService {
         }
     }
 
-    //    @Override
     public ServiceODTODefault updateService(String id, ServiceODTODefault serviceODTO) {
         try {
-            ResponseEntity<?> response = client.updateService(id, serviceODTO);
-            return parseResponse(response, "service", "Error while updating the service",
+            ServiceO service=dtoMapper.map(serviceODTO, ServiceO.class);
+            serviceOEncryptor.encrypt(service);
+            serviceODTO=dtoMapper.map(service, ServiceODTODefault.class);
+            ResponseEntity<?> response = apiService.updateService(id, serviceODTO);
+            ServiceODTODefault encryptedUpdatedServiceDTO= parseResponse(response, "service", "Error while updating the service",
                     ServiceODTODefault.class
             );
+            ServiceO updatedService = dtoMapper.map(encryptedUpdatedServiceDTO, ServiceO.class);
+            serviceOEncryptor.decrypt(updatedService);
+            return dtoMapper.map(updatedService, ServiceODTODefault.class);
         } catch (RestClientResponseException exception) {
             ResponseEntity<?> response = ResponseEntity.status(exception.getStatusCode())
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(exception.getResponseBodyAsString());
             throw new HttpCallException("Error while updating the service", response);
-
         }
     }
 
-    //    @Override
     public void deleteService(String id) {
         try {
-            ResponseEntity<?> response = client.deleteService(id);
-//                parseResponse(response, "service", "Error while deleting the service");
+            ResponseEntity<?> response = apiService.deleteService(id);
+            parseResponse(response, "service", "Error while deleting the service");
         } catch (RestClientResponseException exception) {
             ResponseEntity<?> response = ResponseEntity.status(exception.getStatusCode())
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(exception.getResponseBodyAsString());
             throw new HttpCallException("Error while deleting the service", response);
-
         }
     }
 
