@@ -82,6 +82,32 @@ Refer to the API documentation or Swagger UI for detailed information on request
 ## Spring Profiles
 The application supports two Spring profiles: `dev` and `prod`. Configure profile-specific properties in `application-dev.yml` and `application-prod.yml`.
 
+In addition to the properties specified in the above profiles, security properties can be set in `secrets.yml` as shown below(This is the default security config):
+
+```yml
+jwt-secret-key: 9aae401561d4d70a65529615cef26f3794da2ffdebe0304f846b1e72f79b64b7
+admin-pass: admin
+dto:
+  encryption:
+    enabled: true
+    key: NGHJJjWm+gp/lmJ4lX3JOA==
+    initVector: K869pc8rp6oSPQwJVGvM/Q==
+    algo: "AES/CBC/PKCS5PADDING"
+db:
+  encryption:
+    enabled: true
+    key: rYUwouQ16kswUnNYkdNDig==
+    initVector: 0srIh8CGYrPESYZxZO9v1A==
+    algo: "AES/CBC/PKCS5PADDING"
+
+```
+Before making changes to this configuration, please consider the following:
+* Ensure DTO security settings match between the client and server.
+* Understand the need to clean the cache after modifying encryption configurations.
+* Exercise caution when altering database encryption settings to avoid unintended data corruption.
+* Keep the security configuration private, as the overall system security relies on it.
+
+
 To activate a profile, set the `spring.profiles.active` property in `application.yml` or choose the profile in `pom.xml` file.
 
 ## Redis Caching
@@ -178,7 +204,7 @@ chmod +x run.sh
 - [x] Use `@Cacheable` and `@CachePut` annotations in service methods.
 - [x] Implement caching and updating data in Redis.
 
-- [ ] Implement encryption/decryption for critical text fields.
+- [x] Implement encryption/decryption for critical text fields.
 
 - [ ] Create scripts to dump MongoDB and Redis data locally.
 
@@ -188,7 +214,7 @@ chmod +x run.sh
 - [x] CI/CD Github workflow.
 - [x] Dockerize Application.
 - [x] API documentation and Swagger UI.
-- [ ] Implement Java Client App.
+- [x] Implement Java Client App.
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](https://opensource.org/licenses/MIT) file for details.
