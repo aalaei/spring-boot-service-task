@@ -47,7 +47,7 @@ Before running the application, make sure you have the following installed:
 3. Configure MongoDB and Redis connection details in `application.properties` or [`application.yml`](./src/main/resources/application.yml).
 
 ### Running the Application
-This guide explains how to run the Java Spring Boot application in two ways: using Docker and locally.
+This guide explains how to run the Java Spring Boot application in two ways: using Docker and locally. You may want to restore dump files into redis and mongo by running `./backup_restore.sh restore`, but it is not necessary.
 
 #### Docker Compose
 To run the application along with MongoDB and Redis using Docker Compose, execute the following command:
@@ -244,7 +244,7 @@ Feel free to explore and adapt the client code based on your specific use case.
 
 - [x] Implement encryption/decryption for critical text fields.
 
-- [ ] Create scripts to dump MongoDB and Redis data locally.
+- [x] Create scripts to dump MongoDB and Redis data locally.
 
 - [x] Mapping between DTOs and entities.
 - [x] Write unit tests for controllers, services, and repositories.
