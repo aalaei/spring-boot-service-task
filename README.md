@@ -182,7 +182,8 @@ To run the Java client, Navigate to the client directory, then Build and run the
 
 ```bash
 cd client
-./run.sh
+mvn clean package
+java -jar target/clientApp.jar
 ```
 
 This client application demonstrates various API calls and serves as a reference for integrating your project programmatically.

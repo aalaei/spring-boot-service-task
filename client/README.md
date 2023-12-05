@@ -40,7 +40,8 @@ To run the Java client, Navigate to the client directory, then Build and run the
 
 ```bash
 cd client
-./run.sh
+mvn clean package
+java -jar target/clientApp.jar
 ```
 
 ### Configurations
