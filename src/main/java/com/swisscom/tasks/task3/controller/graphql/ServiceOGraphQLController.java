@@ -31,7 +31,6 @@ public class ServiceOGraphQLController {
     @QueryMapping
     List<ServiceO> services() {
         List<ServiceO> serviceOIterable = serviceOService.getAllDetailed();
-//        return serviceOIterable.stream().map(s -> dtoMapper.map(s, ServiceODTODefault.class)).collect(Collectors.toList());
         return serviceOIterable;
     }
 

@@ -9,7 +9,6 @@ import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.PostExchange;
 import org.springframework.web.service.annotation.PutExchange;
 
-// Disabling Auto Implementation and using FeignClient
 public interface JsonPaceHolderService {
     @GetExchange("/services")
     ResponseEntity<?> findAllIds();
