@@ -21,6 +21,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
+/**
+ * User controller.
+ */
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "User", description = "User API")

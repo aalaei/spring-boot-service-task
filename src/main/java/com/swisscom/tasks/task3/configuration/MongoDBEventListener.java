@@ -9,6 +9,11 @@ import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventLis
 import org.springframework.data.mongodb.core.mapping.event.AfterLoadEvent;
 import org.springframework.data.mongodb.core.mapping.event.BeforeSaveEvent;
 
+/**
+ * MongoDBEventListener is a Configuration class for database.
+ * It watches every data move and adds a protective layer by encrypting and decrypting,
+ * keeping secret information safe and sound in MongoDB.
+ */
 @RequiredArgsConstructor
 @Configuration
 public class MongoDBEventListener extends AbstractMongoEventListener<Object> {

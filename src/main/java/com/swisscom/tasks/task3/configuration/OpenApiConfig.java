@@ -11,6 +11,9 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.security.SecuritySchemes;
 import io.swagger.v3.oas.annotations.servers.Server;
 
+/**
+ * OpenApiConfig is the configuration class for OpenApi.
+ */
 @OpenAPIDefinition(
         info = @Info(
                 contact = @Contact(

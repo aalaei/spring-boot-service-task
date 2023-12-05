@@ -10,6 +10,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+/**
+ * Configuration for CORS.
+ */
 @Configuration
 public class CorsConfig {
 

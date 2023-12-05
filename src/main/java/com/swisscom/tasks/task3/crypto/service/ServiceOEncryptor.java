@@ -5,6 +5,9 @@ import com.swisscom.tasks.task3.model.ServiceO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+/**
+ * Encrypts and decrypts ServiceO.
+ */
 @RequiredArgsConstructor
 @Service
 public class ServiceOEncryptor {

@@ -5,6 +5,9 @@ import com.swisscom.tasks.task3.model.Owner;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+/**
+ * Encrypts and decrypts Owner.
+ */
 @RequiredArgsConstructor
 @Service
 public class OwnerEncryptor {

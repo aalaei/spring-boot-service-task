@@ -22,6 +22,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementation of {@link OwnerService} interface.
+ */
 @Service
 @Slf4j
 @CacheConfig(cacheNames = "owner")

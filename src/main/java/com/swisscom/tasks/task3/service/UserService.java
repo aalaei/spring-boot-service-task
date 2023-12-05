@@ -18,6 +18,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * This class is used for managing users.
+ */
 @Service
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = "user")

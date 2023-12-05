@@ -3,6 +3,9 @@ package com.swisscom.tasks.task3.crypto;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+/**
+ * Provides encryption and decryption for DTO mappers.
+ */
 @Component
 public class MessageEncryptor {
     private final EncryptionUtil encryptionUtil;

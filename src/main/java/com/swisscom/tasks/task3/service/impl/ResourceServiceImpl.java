@@ -23,6 +23,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementation of {@link ResourceService} interface.
+ */
 @Service
 @Slf4j
 @CacheConfig(cacheNames = "resource")

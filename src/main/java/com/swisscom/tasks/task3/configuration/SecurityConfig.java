@@ -17,6 +17,9 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 
 import javax.crypto.spec.SecretKeySpec;
 
+/**
+ * SecurityConfig is a Configuration class for security.
+ */
 @Configuration
 @RequiredArgsConstructor
 @EnableMethodSecurity

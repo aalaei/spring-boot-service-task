@@ -1,8 +1,12 @@
 package com.swisscom.tasks.task3.crypto;
 
+import com.swisscom.tasks.task3.configuration.MongoDBEventListener;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+/**
+ * Provides encryption and decryption of data as a service to be used in {@link MongoDBEventListener}.
+ */
 @Component
 public class DataBaseEncryptor {
     private final EncryptionUtil encryptionUtil;

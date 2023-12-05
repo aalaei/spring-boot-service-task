@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * This class is used to authenticate a user.
+ * This class is used for authenticating users.
  */
 @Service
 @Transactional

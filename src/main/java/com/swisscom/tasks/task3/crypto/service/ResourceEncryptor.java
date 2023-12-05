@@ -5,6 +5,9 @@ import com.swisscom.tasks.task3.model.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+/**
+ * Encrypts and decrypts Resource.
+ */
 @RequiredArgsConstructor
 @Service
 public class ResourceEncryptor {
