@@ -19,7 +19,8 @@ This repository contains a Java Spring Boot web application that provides a REST
   - [GraphQL](#graphql)
 - [Git Version Control](#git-version-control)
 - [Bash Script](#bash-script)
-- [TODO](#project-roadmap-todo-checklist)
+- [Java Client Application](#java-client-application)
+- [Project Milestones and Progress](#project-milestones-and-progress)
 - [License](#license)
 
 ## Prerequisites
@@ -42,7 +43,7 @@ Before running the application, make sure you have the following installed:
    ```
 2. Open the project in your preferred IDE.
 
-3. Configure MongoDB and Redis connection details in `application.properties` or `application.yml`.
+3. Configure MongoDB and Redis connection details in `application.properties` or [`application.yml`](./src/main/resources/application.yml).
 
 ### Running the Application
 
@@ -80,7 +81,7 @@ The API provides the following paths for API documentation and Swagger UI:
 Refer to the API documentation or Swagger UI for detailed information on request and response structures.
 
 ## Spring Profiles
-The application supports two Spring profiles: `dev` and `prod`. Configure profile-specific properties in `application-dev.yml` and `application-prod.yml`.
+The application supports two Spring profiles: `dev` and `prod`. Configure profile-specific properties in [`application-dev.yml`](./src/main/resources/application-dev.yml) and [`application-prod.yml`](./src/main/resources/application-prod.yml).
 
 In addition to the properties specified in the above profiles, security properties can be set in `secrets.yml` as shown below(This is the default security config):
 
@@ -108,7 +109,7 @@ Before making changes to this configuration, please consider the following:
 * Keep the security configuration private, as the overall system security relies on it.
 
 
-To activate a profile, set the `spring.profiles.active` property in `application.yml` or choose the profile in `pom.xml` file.
+To activate a profile, set the `spring.profiles.active` property in [`application.yml`](./src/main/resources/application.yml) or choose the profile in [`pom.xml`](./pom.xml) file.
 
 ## Redis Caching
 The application utilizes Redis caching for improved performance. New objects are cached, and reads check the cache first. The Caching configuration is in the `RedisCacheConfig` class.
@@ -171,7 +172,22 @@ The `run.sh` script simplifies the process of building and running the applicati
 chmod +x run.sh
 ```
 
-# Project Roadmap Todo Checklist
+# Java Client Application
+
+An example Java client application is provided in the client directory of this repository. This client showcases how to interact with the API programmatically using Java. It authenticates using a username and password and holds a JWT token for authentication as a bearer token. It encrypts services and sends them to the server, retrieves encrypted information from the server, and then decrypts it. Any malicious entity cannot eavesdrop on critical texts. For more information, you can refer to the [Client Documentation](./client/README.md).
+
+To run the Java client, Navigate to the client directory, then Build and run the Java client:
+
+```bash
+cd client
+./run.sh
+```
+
+This client application demonstrates various API calls and serves as a reference for integrating your project programmatically.
+
+Feel free to explore and adapt the client code based on your specific use case.
+
+# Project Milestones and Progress
 
 - [x] Initialize a Git repository in the project.
 - [x] Commit regularly with clear commit messages.
@@ -197,7 +213,7 @@ chmod +x run.sh
 - [x] Authentication and Authorization using JWT.
 
 - [x] Create two profiles, e.g., `dev` and `prod`.
-- [x] Configure profile-specific properties in `application.properties` or `application.yml`.
+- [x] Configure profile-specific properties in `application.properties` or [`application.yml`](./src/main/resources/application.yml).
 - [x] Include database connection details for each profile.
 
 - [x] Configure Redis caching by adding `@EnableCaching` to the main application class.
