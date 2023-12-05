@@ -96,7 +96,7 @@ public class ServiceOController {
             return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(
                     HttpResponse.builder()
                             .timeStamp(now().toString())
-                            .message("Exists Before")
+                            .message(serviceOServiceException.getMessage())
                             .status(HttpStatus.METHOD_NOT_ALLOWED)
                             .statusCode(HttpStatus.METHOD_NOT_ALLOWED.value())
                             .build()
@@ -317,7 +317,7 @@ public class ServiceOController {
         } catch (ServiceOServiceException serviceOServiceException) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     HttpResponse.builder()
-                            .message("Not Found")
+                            .message(serviceOServiceException.getMessage())
                             .timeStamp(now().toString())
                             .statusCode(HttpStatus.NOT_FOUND.value())
                             .status(HttpStatus.NOT_FOUND)
@@ -399,7 +399,7 @@ public class ServiceOController {
         } catch (ServiceOServiceException serviceOServiceException) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     HttpResponse.builder()
-                            .message("Not Found")
+                            .message(serviceOServiceException.getMessage())
                             .status(HttpStatus.NOT_FOUND)
                             .statusCode(HttpStatus.NOT_FOUND.value())
                             .timeStamp(now().toString())
