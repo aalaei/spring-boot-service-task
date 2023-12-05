@@ -4,5 +4,5 @@ import com.swisscom.tasks.task3client.dto.service.ServiceIdDTO;
 
 import java.util.List;
 
-public class httpResponseIds extends HttpResponseGeneric<List<ServiceIdDTO>>{
+public class httpResponseIds extends HttpResponseGeneric<List<ServiceIdDTO>> {
 }

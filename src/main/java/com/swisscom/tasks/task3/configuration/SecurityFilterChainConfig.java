@@ -32,6 +32,7 @@ public class SecurityFilterChainConfig {
             "/swagger-ui/**",
             "/swagger-ui.html",
             "/graphiql"};
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
@@ -42,7 +43,7 @@ public class SecurityFilterChainConfig {
                 )
                 .userDetailsService(mongoUserDetailsService)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .oauth2ResourceServer(o->o.jwt(Customizer.withDefaults()))
+                .oauth2ResourceServer(o -> o.jwt(Customizer.withDefaults()))
                 .build();
     }
 

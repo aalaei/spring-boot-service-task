@@ -26,23 +26,23 @@ public class SecurityConfig {
     private String jwtKey;
 
     @Bean
-    PasswordEncoder passwordEncoder(){
+    PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
 
     @Bean
-    JwtEncoder jwtEncoder(){
+    JwtEncoder jwtEncoder() {
         return new NimbusJwtEncoder(new ImmutableSecret<>(getKeyBytes()));
     }
 
     @Bean
-    public JwtDecoder jwtDecoder(){
-        SecretKeySpec originalKey= new SecretKeySpec(getKeyBytes(), 0, getKeyBytes().length, "RSA");
+    public JwtDecoder jwtDecoder() {
+        SecretKeySpec originalKey = new SecretKeySpec(getKeyBytes(), 0, getKeyBytes().length, "RSA");
         return NimbusJwtDecoder.withSecretKey(originalKey).macAlgorithm(MacAlgorithm.HS512).build();
     }
 
-    private byte[] getKeyBytes(){
+    private byte[] getKeyBytes() {
         return jwtKey.getBytes();
     }
 }

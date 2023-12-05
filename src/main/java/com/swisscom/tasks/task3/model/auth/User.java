@@ -1,6 +1,5 @@
 package com.swisscom.tasks.task3.model.auth;
 
-import com.swisscom.tasks.task3.model.auth.Role;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -36,12 +35,12 @@ public class User implements UserDetails {
     private List<Role> roles;
 
     public User(String username, String password, List<Role> roles) {
-        if(username.equals("me"))
+        if (username.equals("me"))
             throw new IllegalStateException("Username cannot be 'me'.");
         this.username = username;
         this.password = password;
         this.roles = roles;
-        this.email= username+"@example.com";
+        this.email = username + "@example.com";
     }
 
     public User(String id, String password) {

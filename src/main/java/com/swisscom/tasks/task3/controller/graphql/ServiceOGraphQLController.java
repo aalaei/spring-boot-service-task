@@ -22,6 +22,7 @@ import java.util.Optional;
 public class ServiceOGraphQLController {
     private final ServiceOService serviceOService;
     private final DTOMapper dtoMapper;
+
     /**
      * Returns all services.
      *
@@ -33,19 +34,21 @@ public class ServiceOGraphQLController {
 //        return serviceOIterable.stream().map(s -> dtoMapper.map(s, ServiceODTODefault.class)).collect(Collectors.toList());
         return serviceOIterable;
     }
+
     /**
      * Returns all services Page by Page.
      *
      * @return all services in Pages.
      */
     @QueryMapping
-    Page<ServiceO> servicesPaged(@Argument int page, @Argument int size){
-        PageRequest pr= PageRequest.of(page, size);
+    Page<ServiceO> servicesPaged(@Argument int page, @Argument int size) {
+        PageRequest pr = PageRequest.of(page, size);
         return serviceOService.getAllPaged(pr);
     }
 
     /**
      * Returns a service by id.
+     *
      * @param id - id of the service.
      * @return a service by id.
      */
@@ -56,6 +59,7 @@ public class ServiceOGraphQLController {
 
     /**
      * Created and Returns a service
+     *
      * @param service - service Input object.
      * @return Created service.
      */
@@ -65,31 +69,41 @@ public class ServiceOGraphQLController {
         serviceOService.create(serviceO);
         return serviceO;
     }
+
     /**
      * Updates a service
-     * @param id - id of the service.
+     *
+     * @param id      - id of the service.
      * @param service - service Input object.
      * @return updated version of the service.
      */
     @MutationMapping
-    ServiceO updateService(@Argument String id,  @Argument ServiceInput service) {
+    ServiceO updateService(@Argument String id, @Argument ServiceInput service) {
         ServiceO serviceO = dtoMapper.map(service, ServiceO.class);
         serviceOService.updateById(id, serviceO);
         return serviceO;
     }
+
     /**
      * Deletes a service by id.
+     *
      * @param id - id of the service.
      * @return deleted service.
      */
     @MutationMapping
     Optional<ServiceO> deleteService(@Argument String id) {
-        Optional<ServiceO> oldService= serviceOService.getById(id);
+        Optional<ServiceO> oldService = serviceOService.getById(id);
         serviceOService.deleteById(id);
         return oldService;
     }
-    record ServiceInput(String criticalText, List<ResourceInput> resources){}
-    record ResourceInput(String criticalText, List<OwnerInput> owners){}
-    record OwnerInput(String criticalText, String name, String accountNumber, Integer level){}
+
+    record ServiceInput(String criticalText, List<ResourceInput> resources) {
+    }
+
+    record ResourceInput(String criticalText, List<OwnerInput> owners) {
+    }
+
+    record OwnerInput(String criticalText, String name, String accountNumber, Integer level) {
+    }
 
 }

@@ -2,6 +2,7 @@ package com.swisscom.tasks.task3client.model.auth;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.util.List;
 
 /**
@@ -20,12 +21,12 @@ public class User {
     private List<Role> roles;
 
     public User(String username, String password, List<Role> roles) {
-        if(username.equals("me"))
+        if (username.equals("me"))
             throw new IllegalStateException("Username cannot be 'me'.");
         this.username = username;
         this.password = password;
         this.roles = roles;
-        this.email= username+"@example.com";
+        this.email = username + "@example.com";
     }
 
     public User(String id, String password) {

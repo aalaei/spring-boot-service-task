@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 
 import java.io.Serializable;
 import java.util.Map;
+
 @Data
 public class HttpResponseGeneric<T> implements Serializable {
     protected String timeStamp;

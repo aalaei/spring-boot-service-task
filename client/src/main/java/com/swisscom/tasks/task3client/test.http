@@ -2,9 +2,9 @@
 GET http://127.0.0.1:8090/services
 
 > {%
-client.test("Request executed successfully", function() {
-  client.assert(response.status === 200, "Response status is not 200");
-});
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
 %}
 
 ### Create Service
@@ -52,7 +52,7 @@ Content-Type: application/json
 }
 
 > {%
-    client.test("Request executed successfully", function() {
+    client.test("Request executed successfully", function () {
         client.assert(response.status === 200, "Response status is not 201");
     });
     client.global.set("test_id", response.body.id);
@@ -62,7 +62,7 @@ Content-Type: application/json
 GET http://localhost:8090/services?id={{test_id}}
 
 > {%
-    client.test("Request executed successfully", function() {
+    client.test("Request executed successfully", function () {
         client.assert(response.status === 200, "Response status is not 200");
     });
 %}
@@ -112,7 +112,7 @@ Content-Type: application/json
 }
 
 > {%
-    client.test("Request executed successfully", function() {
+    client.test("Request executed successfully", function () {
         client.assert(response.status === 200, "Response status is not 200");
     });
 %}
@@ -121,15 +121,15 @@ Content-Type: application/json
 GET http://localhost:8090/services?id={{test_id}}
 
 > {%
-    client.test("Request executed successfully", function() {
+    client.test("Request executed successfully", function () {
         client.assert(response.status === 200, "Response status is not 200");
-        client.assert(response.body.criticalText==='criticNewInfoOfService')
-        client.assert(response.body.resources[0].criticalText==='criticNewInfoOfResource')
-        client.assert(response.body.resources[1].criticalText==='criticNewInfoOfResource2')
-        client.assert(response.body.resources[0].owners[0].level===8)
-        client.assert(response.body.resources[0].owners[1].level===9)
-        client.assert(response.body.resources[1].owners[0].level===10)
-        client.assert(response.body.resources[1].owners[1].level===11)
+        client.assert(response.body.criticalText === 'criticNewInfoOfService')
+        client.assert(response.body.resources[0].criticalText === 'criticNewInfoOfResource')
+        client.assert(response.body.resources[1].criticalText === 'criticNewInfoOfResource2')
+        client.assert(response.body.resources[0].owners[0].level === 8)
+        client.assert(response.body.resources[0].owners[1].level === 9)
+        client.assert(response.body.resources[1].owners[0].level === 10)
+        client.assert(response.body.resources[1].owners[1].level === 11)
     });
 %}
 
@@ -137,7 +137,7 @@ GET http://localhost:8090/services?id={{test_id}}
 DELETE http://localhost:8090/services?id={{test_id}}
 
 > {%
-    client.test("Request executed successfully", function() {
+    client.test("Request executed successfully", function () {
         client.assert(response.status === 200, "Response status is not 200");
     });
 %}

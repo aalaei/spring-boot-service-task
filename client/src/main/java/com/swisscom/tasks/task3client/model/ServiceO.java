@@ -1,4 +1,5 @@
 package com.swisscom.tasks.task3client.model;
+
 import lombok.Data;
 
 import java.io.Serializable;

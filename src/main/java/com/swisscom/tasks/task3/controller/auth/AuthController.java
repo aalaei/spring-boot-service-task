@@ -1,8 +1,8 @@
 package com.swisscom.tasks.task3.controller.auth;
 
-import com.swisscom.tasks.task3.dto.auth.UserDTO;
 import com.swisscom.tasks.task3.dto.auth.LoginRequestDTO;
 import com.swisscom.tasks.task3.dto.auth.LoginResponseDTO;
+import com.swisscom.tasks.task3.dto.auth.UserDTO;
 import com.swisscom.tasks.task3.exception.AuthenticationServiceException;
 import com.swisscom.tasks.task3.service.AuthenticationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Auth controller.
  */
 @RestController
-@Tag(name="Authentication", description = "Authentication API")
+@Tag(name = "Authentication", description = "Authentication API")
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
@@ -33,6 +33,7 @@ public class AuthController {
 
     /**
      * Registers a user.
+     *
      * @param body - {@link LoginRequestDTO} of the user.
      * @return - {@link UserDTO} of new created user.
      */
@@ -64,15 +65,15 @@ public class AuthController {
             }
     )
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody LoginRequestDTO body){
+    public ResponseEntity<?> registerUser(@RequestBody LoginRequestDTO body) {
         try {
             return ResponseEntity.ok(
                     authenticationService.registerUser(body.getUsername(), body.getPassword())
             );
-        }catch (AuthenticationServiceException e){
-            if(e.getMessage().startsWith("Role")){
+        } catch (AuthenticationServiceException e) {
+            if (e.getMessage().startsWith("Role")) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-            }else{
+            } else {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
             }
         }
@@ -80,6 +81,7 @@ public class AuthController {
 
     /**
      * Login a user.
+     *
      * @param loginRequestDTO - {@link LoginRequestDTO} of the user. It contains username and password.
      * @return - {@link LoginResponseDTO} of the user. It contains the user and the generated JWT.
      */
@@ -107,13 +109,13 @@ public class AuthController {
             }
     )
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody LoginRequestDTO loginRequestDTO){
+    public ResponseEntity<?> loginUser(@RequestBody LoginRequestDTO loginRequestDTO) {
         try {
             LoginResponseDTO loginResponseDTO = authenticationService.loginUser(loginRequestDTO);
             return ResponseEntity.ok()
                     .header(HttpHeaders.AUTHORIZATION, loginResponseDTO.getJwt())
                     .body(loginResponseDTO);
-        }catch (AuthenticationServiceException e){
+        } catch (AuthenticationServiceException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
     }

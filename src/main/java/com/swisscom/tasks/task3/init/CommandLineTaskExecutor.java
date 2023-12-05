@@ -8,9 +8,7 @@ import com.swisscom.tasks.task3.repository.RoleRepository;
 import com.swisscom.tasks.task3.repository.UserRepository;
 import com.swisscom.tasks.task3.service.AuthenticationService;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,21 +33,22 @@ public class CommandLineTaskExecutor implements CommandLineRunner {
     private final Environment environment;
 
     private void createRoleIfNotExists(Role.RoleType roleType) {
-        if(roleRepository.findByAuthority(roleType.name()).isEmpty()) {
+        if (roleRepository.findByAuthority(roleType.name()).isEmpty()) {
             Role role = new Role(roleType);
             roleRepository.save(role);
         }
     }
+
     @Override
     public void run(String... args) throws Exception {
         String password = environment.getProperty("admin-pass", "admin");
         // Create Roles If not exists in the database.
         List.of(Role.RoleType.values()).forEach(this::createRoleIfNotExists);
-        if(!userRepository.existsByUsername("admin")) {
+        if (!userRepository.existsByUsername("admin")) {
             List<Role> adminRoles = roleRepository.findAll();
             userRepository.save(new User("admin", passwordEncoder.encode(password), adminRoles));
         }
-        if(Arrays.stream(environment.getActiveProfiles()).anyMatch(env-> env.contains("dev"))) {
+        if (Arrays.stream(environment.getActiveProfiles()).anyMatch(env -> env.contains("dev"))) {
             LoginResponseDTO loginResponseDTO = authenticationService.loginUser(
                     new LoginRequestDTO("admin", password)
             );

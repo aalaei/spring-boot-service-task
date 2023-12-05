@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+
 @Service
 @Slf4j
 @CacheConfig(cacheNames = "resource")
@@ -30,25 +31,26 @@ public class ResourceServiceImpl implements ResourceService {
     private final ServiceORepository serviceORepository;
     private final OwnerRepository ownerRepository;
     private final ResourceEncryptor resourceEncryptor;
+
     /**
      * Saves a given resource. It also adds the resource to the parent service.
      *
-     * @param resource - must not be {@literal null}.
+     * @param resource  - must not be {@literal null}.
      * @param serviceID - id of the parent service.
      */
     @Override
-    public Resource create(Resource resource, String serviceID){
+    public Resource create(Resource resource, String serviceID) {
         resource = resourceEncryptor.decrypt(resource);
-        if(resource.getOwners()==null)
+        if (resource.getOwners() == null)
             resource.setOwners(List.of());
-        ServiceO parentService= serviceORepository
-                .findById(serviceID).orElseThrow(()->
-                        new ResourceServiceException("Service with id "+serviceID+" not found"));
-        Resource newResource= resourceRepository.save(resource);
+        ServiceO parentService = serviceORepository
+                .findById(serviceID).orElseThrow(() ->
+                        new ResourceServiceException("Service with id " + serviceID + " not found"));
+        Resource newResource = resourceRepository.save(resource);
         saveCascade(newResource);
-        if(parentService.getResources()==null){
+        if (parentService.getResources() == null) {
             parentService.setResources(List.of(newResource));
-        }else{
+        } else {
             parentService.getResources().add(newResource);
         }
         serviceORepository.save(parentService);
@@ -57,6 +59,7 @@ public class ResourceServiceImpl implements ResourceService {
 
     /**
      * Returns all resources.
+     *
      * @return - all resources.
      */
     @Override
@@ -66,6 +69,7 @@ public class ResourceServiceImpl implements ResourceService {
 
     /**
      * Returns a resource by id.
+     *
      * @param id - id of the resource.
      * @return - a resource by id.
      */
@@ -83,9 +87,9 @@ public class ResourceServiceImpl implements ResourceService {
     private void deleteCascade(Resource resource) {
         if (resource.getOwners() != null) {
             resource.getOwners().forEach(o -> {
-                if (o != null)
+                        if (o != null)
                             ownerRepository.deleteById(o.getId());
-            }
+                    }
             );
         }
     }
@@ -107,6 +111,7 @@ public class ResourceServiceImpl implements ResourceService {
 
     /**
      * Deletes a resource by id. It also deletes all owners of this resource.
+     *
      * @param id - id of the resource to be deleted.
      * @return - true if deleted successfully.
      */
@@ -122,6 +127,7 @@ public class ResourceServiceImpl implements ResourceService {
 
     /**
      * Deletes all resources. It also deletes all owners.
+     *
      * @return - true if deleted successfully.
      */
     @Override
@@ -134,16 +140,17 @@ public class ResourceServiceImpl implements ResourceService {
 
     /**
      * Updates a resource by id.
-     * @param id - id of the resource to be updated.
+     *
+     * @param id       - id of the resource to be updated.
      * @param resource - updated version of the resource.
-     * @param cascade - if true, it also updates all owners of this resource.
+     * @param cascade  - if true, it also updates all owners of this resource.
      * @return - updated version of the resource.
      */
     @Override
     @CachePut(key = "#id")
     public Resource updateById(String id, Resource resource, boolean cascade) {
         resource = resourceEncryptor.decrypt(resource);
-        if(!resourceRepository.existsById(id))
+        if (!resourceRepository.existsById(id))
             throw new ResourceServiceException("Resource with id " + id + " not found");
         resource.setId(id);
         if (cascade)
@@ -153,6 +160,7 @@ public class ResourceServiceImpl implements ResourceService {
 
     /**
      * Returns all resources in pages.
+     *
      * @param pr - page request of type {@link PageRequest}.
      * @return - all resources in pages.
      */

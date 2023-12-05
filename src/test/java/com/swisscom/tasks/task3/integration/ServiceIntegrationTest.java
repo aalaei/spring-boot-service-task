@@ -30,7 +30,8 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = true)
@@ -127,17 +128,18 @@ public class ServiceIntegrationTest {
                 .andExpect(jsonPath("$.data.service.resources[0].owners[0].criticalText")
                         .value(serviceO.getResources().get(0).getOwners().get(0).getCriticalText()));
     }
+
     @Test
     void shouldNotBeAllowedToReturnServices() throws Exception {
         mockMvc.perform(get(serviceEndpoint + "/all")
                         .contentType(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
     void canAddNewService() throws Exception {
         // given
-        ServiceO updateService=
+        ServiceO updateService =
                 new ServiceO(
                         null,
                         "criticalText",

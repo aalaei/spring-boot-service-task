@@ -2,11 +2,11 @@ package com.swisscom.tasks.task3.integration;
 
 import com.swisscom.tasks.task3.configuration.DTOMapperBean;
 import com.swisscom.tasks.task3.crypto.service.ServiceOEncryptor;
+import com.swisscom.tasks.task3.dto.auth.LoginRequestDTO;
+import com.swisscom.tasks.task3.dto.auth.LoginResponseDTO;
 import com.swisscom.tasks.task3.dto.mapper.DTOMapper;
 import com.swisscom.tasks.task3.dto.service.ServiceODTONoID;
 import com.swisscom.tasks.task3.model.ServiceO;
-import com.swisscom.tasks.task3.dto.auth.LoginRequestDTO;
-import com.swisscom.tasks.task3.dto.auth.LoginResponseDTO;
 import com.swisscom.tasks.task3.service.AuthenticationService;
 import com.swisscom.tasks.task3.service.ServiceOService;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,7 +42,7 @@ public class ServiceGraphQLIntegrationTest {
         isDTOEncrypted = Boolean.parseBoolean(
                 environment.getProperty("dto.encryption.enabled", "true")
         );
-        String defaultPassword=environment.getProperty("admin-pass", "admin");
+        String defaultPassword = environment.getProperty("admin-pass", "admin");
         serviceOService.deleteAll();
         dtoMapper = new DTOMapper(new DTOMapperBean().modelMapper());
         LoginResponseDTO loginResponseDTO = authenticationService.loginUser(
@@ -55,33 +55,35 @@ public class ServiceGraphQLIntegrationTest {
 
         graphQlTester = HttpGraphQlTester.create(client);
     }
+
     @Test
     void contextLoads() {
         assertNotNull(graphQlTester);
     }
+
     @Test
-    void shouldReturnService(){
+    void shouldReturnService() {
         //given
         // language=GraphQL
         String mutation = """
-            mutation createService($service: ServiceInput!) {
-                createService(service: $service){
-                    id
-                    criticalText
-                    resources{
-                        id
-                        criticalText
-                        owners{
+                    mutation createService($service: ServiceInput!) {
+                        createService(service: $service){
                             id
                             criticalText
-                            name
-                            level
-                            accountNumber
-                        }
+                            resources{
+                                id
+                                criticalText
+                                owners{
+                                    id
+                                    criticalText
+                                    name
+                                    level
+                                    accountNumber
+                                }
+                            }
+                         }
                     }
-                 }
-            }
-        """;
+                """;
         ServiceO service = ServiceO.builder()
                 .criticalText("criticalText")
                 .build();
@@ -97,24 +99,24 @@ public class ServiceGraphQLIntegrationTest {
                 .get();
         // language=GraphQL
         String document = """
-            query($id: ID!) {
-              service(id: $id){
-                id
-                criticalText
-                resources{
-                    id
-                    criticalText
-                    owners{
+                    query($id: ID!) {
+                      service(id: $id){
                         id
                         criticalText
-                        name
-                        level
-                        accountNumber
+                        resources{
+                            id
+                            criticalText
+                            owners{
+                                id
+                                criticalText
+                                name
+                                level
+                                accountNumber
+                            }
+                        }
+                      }
                     }
-                }
-              }
-            }
-        """;
+                """;
         //when
         graphQlTester.document(document)
                 .variable("id", savedService.getId())
@@ -127,45 +129,46 @@ public class ServiceGraphQLIntegrationTest {
     }
 
     @Test
-    void findAllShouldNotReturnAllServices(){
+    void findAllShouldNotReturnAllServices() {
         // language=GraphQL
         String document = """
-            query {
-                services{
-                    id
-                    criticalText
-                }
-            }
-        """;
+                    query {
+                        services{
+                            id
+                            criticalText
+                        }
+                    }
+                """;
         graphQlTester.document(document)
                 .execute()
                 .path("services")
                 .entityList(ServiceO.class)
                 .hasSize(0);
     }
+
     @Test
-    void findAllShouldReturnAllServices(){
+    void findAllShouldReturnAllServices() {
         //given
         // language=GraphQL
         String mutation = """
-            mutation createService($service: ServiceInput!) {
-                createService(service: $service){
-                    id
-                    criticalText
-                    resources{
-                        id
-                        criticalText
-                        owners{
+                    mutation createService($service: ServiceInput!) {
+                        createService(service: $service){
                             id
                             criticalText
-                            name
-                            level
-                            accountNumber
-                        }
+                            resources{
+                                id
+                                criticalText
+                                owners{
+                                    id
+                                    criticalText
+                                    name
+                                    level
+                                    accountNumber
+                                }
+                            }
+                         }
                     }
-                 }
-            }
-        """;
+                """;
         ServiceO service = ServiceO.builder()
                 .criticalText("criticalText")
                 .build();
@@ -180,19 +183,20 @@ public class ServiceGraphQLIntegrationTest {
                 });
         // language=GraphQL
         String document = """
-            query {
-                services{
-                    id
-                    criticalText
-                }
-            }
-        """;
+                    query {
+                        services{
+                            id
+                            criticalText
+                        }
+                    }
+                """;
         graphQlTester.document(document)
                 .execute()
                 .path("services")
                 .entityList(ServiceO.class)
                 .hasSize(1);
     }
+
     @Test
     void shouldUpdateService() {
         //given
@@ -290,11 +294,12 @@ public class ServiceGraphQLIntegrationTest {
                 .path("service")
                 .entity(ServiceO.class)
                 .satisfies(s -> {
-                    if(isDTOEncrypted)
+                    if (isDTOEncrypted)
                         assertNotEquals("updatedCriticalText", s.getCriticalText());
                     assertEquals(updatedService.getCriticalText(), s.getCriticalText());
                 });
     }
+
     @Test
     void shouldDeleteService() {
         //given

@@ -8,9 +8,7 @@ import com.swisscom.tasks.task3.model.ServiceO;
 import com.swisscom.tasks.task3.repository.OwnerRepository;
 import com.swisscom.tasks.task3.repository.ResourceRepository;
 import com.swisscom.tasks.task3.repository.ServiceORepository;
-
 import org.junit.jupiter.api.BeforeEach;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -21,11 +19,11 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-import static org.mockito.ArgumentMatchers.any;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class ServiceOServiceImplTest {
@@ -39,6 +37,7 @@ class ServiceOServiceImplTest {
     private ServiceOServiceImpl underTest;
     @Mock
     private ServiceOEncryptor serviceOEncryptor;
+
     @BeforeEach
     void setUp() {
         underTest = new ServiceOServiceImpl(serviceORepository, resourceRepository, ownerRepository, serviceOEncryptor);
@@ -50,7 +49,7 @@ class ServiceOServiceImplTest {
         given(serviceORepository.findAll())
                 .willReturn(
                         List.of(
-                            ServiceO.builder().criticalText("test").build()
+                                ServiceO.builder().criticalText("test").build()
                         )
                 );
         // when

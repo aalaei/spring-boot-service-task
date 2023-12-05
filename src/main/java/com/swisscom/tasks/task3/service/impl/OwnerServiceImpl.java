@@ -32,21 +32,21 @@ public class OwnerServiceImpl implements OwnerService {
 
     /**
      * Saves a given owner. It also adds the owner to the parent resource.
-     * @param owner - must not be {@literal null}.
+     *
+     * @param owner      - must not be {@literal null}.
      * @param resourceID - id of the parent resource.
      * @return - created owner.
      */
     @Override
-    public Owner create(Owner owner, String resourceID)
-    {
-        owner= ownerEncryptor.decrypt(owner);
-        Resource parentResource= resourceRepository
-                .findById(resourceID).orElseThrow(()->
-                        new OwnerServiceException("Resource with id "+resourceID+" not found"));
-        Owner newOwner= ownerRepository.save(owner);
-        if(parentResource.getOwners()==null){
+    public Owner create(Owner owner, String resourceID) {
+        owner = ownerEncryptor.decrypt(owner);
+        Resource parentResource = resourceRepository
+                .findById(resourceID).orElseThrow(() ->
+                        new OwnerServiceException("Resource with id " + resourceID + " not found"));
+        Owner newOwner = ownerRepository.save(owner);
+        if (parentResource.getOwners() == null) {
             parentResource.setOwners(List.of(newOwner));
-        }else{
+        } else {
             parentResource.getOwners().add(newOwner);
         }
         resourceRepository.save(parentResource);
@@ -55,6 +55,7 @@ public class OwnerServiceImpl implements OwnerService {
 
     /**
      * Returns all owners.
+     *
      * @return - all owners.
      */
     @Override
@@ -64,6 +65,7 @@ public class OwnerServiceImpl implements OwnerService {
 
     /**
      * Returns an owner by id.
+     *
      * @param id - id of the owner.
      * @return - an owner by id.
      */
@@ -75,20 +77,23 @@ public class OwnerServiceImpl implements OwnerService {
 
     /**
      * Deletes an owner by id.
+     *
      * @param id - id of the owner.
      * @return - true if deleted, false if not found.
      */
     @Override
     @CacheEvict(key = "#id")
     public boolean deleteById(String id) {
-        if(!ownerRepository.existsById(id))
-            return false;;
+        if (!ownerRepository.existsById(id))
+            return false;
+        ;
         ownerRepository.deleteById(id);
         return true;
     }
 
     /**
      * Deletes all owners.
+     *
      * @return - true if deleted, false if not found.
      */
     @Override
@@ -100,15 +105,16 @@ public class OwnerServiceImpl implements OwnerService {
 
     /**
      * Updates an owner by id.
-     * @param id - id of the owner.
+     *
+     * @param id    - id of the owner.
      * @param owner - owner object.
      * @return - updated owner.
      */
     @Override
     @CachePut(key = "#id")
     public Owner updateById(String id, Owner owner) {
-        owner= ownerEncryptor.decrypt(owner);
-        if(!ownerRepository.existsById(id))
+        owner = ownerEncryptor.decrypt(owner);
+        if (!ownerRepository.existsById(id))
             return null;
         owner.setId(id);
         return ownerEncryptor.encrypt(ownerRepository.save(owner));
@@ -116,6 +122,7 @@ public class OwnerServiceImpl implements OwnerService {
 
     /**
      * Returns all owners in Pages.
+     *
      * @param pr - {@link  PageRequest} object.
      * @return - all owners in Pages of {@link Owner}.
      */

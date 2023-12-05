@@ -1,19 +1,18 @@
 package com.swisscom.tasks.task3.integration;
 
 import com.swisscom.tasks.task3.configuration.DTOMapperBean;
-import com.swisscom.tasks.task3.crypto.MessageEncryptor;
 import com.swisscom.tasks.task3.crypto.service.OwnerEncryptor;
 import com.swisscom.tasks.task3.crypto.service.ResourceEncryptor;
 import com.swisscom.tasks.task3.crypto.service.ServiceOEncryptor;
-import com.swisscom.tasks.task3.dto.owner.OwnerDTO;
+import com.swisscom.tasks.task3.dto.auth.LoginRequestDTO;
+import com.swisscom.tasks.task3.dto.auth.LoginResponseDTO;
 import com.swisscom.tasks.task3.dto.mapper.DTOMapper;
+import com.swisscom.tasks.task3.dto.owner.OwnerDTO;
 import com.swisscom.tasks.task3.dto.resource.ResourceDTONoID;
 import com.swisscom.tasks.task3.dto.service.ServiceODTONoID;
 import com.swisscom.tasks.task3.model.Owner;
 import com.swisscom.tasks.task3.model.Resource;
 import com.swisscom.tasks.task3.model.ServiceO;
-import com.swisscom.tasks.task3.dto.auth.LoginRequestDTO;
-import com.swisscom.tasks.task3.dto.auth.LoginResponseDTO;
 import com.swisscom.tasks.task3.service.AuthenticationService;
 import com.swisscom.tasks.task3.service.OwnerService;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,7 +57,7 @@ public class OwnerGraphQLIntegrationTest {
         isDTOEncrypted = Boolean.parseBoolean(
                 environment.getProperty("dto.encryption.enabled", "true")
         );
-        String defaultPassword=environment.getProperty("admin-pass", "admin");
+        String defaultPassword = environment.getProperty("admin-pass", "admin");
         ownerService.deleteAll();
         dtoMapper = new DTOMapper(new DTOMapperBean().modelMapper());
         LoginResponseDTO loginResponseDTO = authenticationService.loginUser(
@@ -72,22 +71,24 @@ public class OwnerGraphQLIntegrationTest {
         graphQlTester = HttpGraphQlTester.create(client);
 
     }
+
     @Test
     void contextLoads() {
         assertNotNull(graphQlTester);
     }
+
     @Test
-    void shouldReturnOwner(){
+    void shouldReturnOwner() {
         //given
         // language=GraphQL
         String mutation1 = """
-            mutation createService($service: ServiceInput!) {
-                createService(service: $service){
-                    id
-                    criticalText
-                 }
-            }
-        """;
+                    mutation createService($service: ServiceInput!) {
+                        createService(service: $service){
+                            id
+                            criticalText
+                         }
+                    }
+                """;
         ServiceO service = ServiceO.builder()
                 .criticalText("criticalText")
                 .build();
@@ -104,15 +105,15 @@ public class OwnerGraphQLIntegrationTest {
         assertNotNull(savedService.getId());
         // language=GraphQL
         String mutation = """
-            mutation createResource($resource: ResourceInput!, $id: ID!) {
-                createResource(resource: $resource, serviceId: $id){
-                    id
-                    criticalText
-                 }
-            }
-        """;
+                    mutation createResource($resource: ResourceInput!, $id: ID!) {
+                        createResource(resource: $resource, serviceId: $id){
+                            id
+                            criticalText
+                         }
+                    }
+                """;
         //when
-        Resource resource= Resource.builder().criticalText("resourceCriticalText")
+        Resource resource = Resource.builder().criticalText("resourceCriticalText")
                 .owners(List.of())
                 .build();
         Resource encryptedResource = resourceEncryptor.encrypt(resource);
@@ -127,14 +128,14 @@ public class OwnerGraphQLIntegrationTest {
                     assertEquals(encryptedResource.getCriticalText(), s.getCriticalText());
                 }).get();
         // language=GraphQL
-        String mutation2= """
-            mutation createOwner($owner: OwnerInput!, $id: ID!) {
-                createOwner(owner: $owner, resourceId: $id){
-                    id
-                    criticalText
-                 }
-            }
-        """;
+        String mutation2 = """
+                    mutation createOwner($owner: OwnerInput!, $id: ID!) {
+                        createOwner(owner: $owner, resourceId: $id){
+                            id
+                            criticalText
+                         }
+                    }
+                """;
         Owner owner = Owner.builder()
                 .criticalText("ownerCriticalText")
                 .name("ownerName")
@@ -151,20 +152,20 @@ public class OwnerGraphQLIntegrationTest {
                 .entity(Owner.class)
                 .satisfies(s -> {
                     assertEquals(owner.getCriticalText(), s.getCriticalText());
-                    if(isDTOEncrypted)
+                    if (isDTOEncrypted)
                         assertNotEquals(plainCriticalText, s.getCriticalText());
                 }).get();
 
 
         // language=GraphQL
         String document = """
-            query($id: ID!) {
-              owner(id: $id){
-                id
-                criticalText
-              }
-            }
-        """;
+                    query($id: ID!) {
+                      owner(id: $id){
+                        id
+                        criticalText
+                      }
+                    }
+                """;
         //when
         graphQlTester.document(document)
                 .variable("id", owner1.getId())
@@ -175,58 +176,59 @@ public class OwnerGraphQLIntegrationTest {
     }
 
     @Test
-    void findAllShouldNotReturnAllOwners(){
+    void findAllShouldNotReturnAllOwners() {
         // language=GraphQL
         String document = """
-            query {
-                owners{
-                    id
-                    criticalText
-                }
-            }
-        """;
+                    query {
+                        owners{
+                            id
+                            criticalText
+                        }
+                    }
+                """;
         graphQlTester.document(document)
                 .execute()
                 .path("owners")
                 .entityList(Owner.class)
                 .hasSize(0);
     }
+
     @Test
-    void findAllShouldReturnAllOwners(){
+    void findAllShouldReturnAllOwners() {
         //given
         // language=GraphQL
         String mutation = """
-            mutation createService($service: ServiceInput!) {
-                createService(service: $service){
-                    id
-                    criticalText
-                    resources{
-                        id
-                        criticalText
-                        owners{
+                    mutation createService($service: ServiceInput!) {
+                        createService(service: $service){
                             id
                             criticalText
-                            name
-                            level
-                            accountNumber
-                        }
+                            resources{
+                                id
+                                criticalText
+                                owners{
+                                    id
+                                    criticalText
+                                    name
+                                    level
+                                    accountNumber
+                                }
+                            }
+                         }
                     }
-                 }
-            }
-        """;
-        ServiceO service=ServiceO.builder()
-                        .criticalText("criticalText")
-                        .resources(List.of(
-                                Resource.builder()
-                                    .criticalText("resourceCriticalText")
-                                    .owners(List.of(
-                                            Owner.builder()
+                """;
+        ServiceO service = ServiceO.builder()
+                .criticalText("criticalText")
+                .resources(List.of(
+                        Resource.builder()
+                                .criticalText("resourceCriticalText")
+                                .owners(List.of(
+                                        Owner.builder()
                                                 .criticalText("ownerCriticalText")
                                                 .name("ownerName")
                                                 .accountNumber("ownerAccountNumber")
                                                 .level(1)
-                                            .build()
-                                    ))
+                                                .build()
+                                ))
                                 .build()))
                 .build();
         serviceOEncryptor.encrypt(service);
@@ -240,13 +242,13 @@ public class OwnerGraphQLIntegrationTest {
                 });
         // language=GraphQL
         String document = """
-            query {
-                owners{
-                    id
-                    criticalText
-                }
-            }
-        """;
+                    query {
+                        owners{
+                            id
+                            criticalText
+                        }
+                    }
+                """;
         graphQlTester.document(document)
                 .execute()
                 .path("owners")
@@ -257,6 +259,7 @@ public class OwnerGraphQLIntegrationTest {
                             s.get(0).getCriticalText());
                 });
     }
+
     @Test
     void shouldUpdateOwner() {
         //given
@@ -356,6 +359,7 @@ public class OwnerGraphQLIntegrationTest {
                     assertEquals(updatedOwner.getCriticalText(), s.getCriticalText());
                 });
     }
+
     @Test
     void shouldDeleteOwner() {
         //given

@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Implementation of {@link ServiceOService} interface.
@@ -90,8 +89,8 @@ public class ServiceOServiceImpl implements ServiceOService {
      */
     @Override
     public ServiceO create(ServiceO serviceO) {
-        serviceO=serviceOEncryptor.decrypt(serviceO);
-        if(serviceO.getResources()==null)
+        serviceO = serviceOEncryptor.decrypt(serviceO);
+        if (serviceO.getResources() == null)
             serviceO.setResources(List.of());
         if (serviceO.getId() != null && serviceORepository.existsById(serviceO.getId()))
             throw new ServiceOServiceException("Another service with id " + serviceO.getId() + " exists before");
@@ -162,6 +161,7 @@ public class ServiceOServiceImpl implements ServiceOService {
 
     /**
      * Deletes all services. It also deletes all resources and owners.
+     *
      * @return {@literal true} if all services were deleted, {@literal false} otherwise.
      */
     @Override
@@ -199,7 +199,7 @@ public class ServiceOServiceImpl implements ServiceOService {
      */
     @Override
     public ServiceO updateById(String id, ServiceO serviceO, boolean cascade) {
-        serviceO=serviceOEncryptor.decrypt(serviceO);
+        serviceO = serviceOEncryptor.decrypt(serviceO);
         log.info("Updating service with id {}", id);
         if (serviceORepository.existsById(id)) {
             serviceO.setId(id);

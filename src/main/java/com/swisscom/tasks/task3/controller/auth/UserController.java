@@ -23,7 +23,7 @@ import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
-@Tag(name="User", description = "User API")
+@Tag(name = "User", description = "User API")
 @RequestMapping("/api/v1/users")
 public class UserController {
 
@@ -31,8 +31,9 @@ public class UserController {
 
     /**
      * Registers a user.
+     *
      * @param principal - {@link Principal} of the user.
-     * @param username - {@link String} of the user. if username is not specified then all users are returned.
+     * @param username  - {@link String} of the user. if username is not specified then all users are returned.
      * @return - {@link ResponseEntity} containing the new created user of type {@link User}.
      */
     @Operation(
@@ -65,14 +66,14 @@ public class UserController {
     @PreAuthorize("hasAuthority('SCOPE_USER')")
     @GetMapping
     public ResponseEntity<?> getUser(Principal principal,
-                                     @RequestParam(value = "username", required = false) String username){
+                                     @RequestParam(value = "username", required = false) String username) {
         try {
-            if (username==null || username.isEmpty())
+            if (username == null || username.isEmpty())
                 return ResponseEntity.ok(authenticationService.getAllUserDTOs(principal.getName()));
             return ResponseEntity.ok(authenticationService.getUserDTO(principal.getName(), username));
-        }catch (AuthenticationServiceException e){
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-        }catch (UserServiceException e){
+        } catch (AuthenticationServiceException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (UserServiceException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
@@ -80,9 +81,10 @@ public class UserController {
 
     /**
      * Update a user.
+     *
      * @param principal - {@link Principal} of the user.
-     * @param username - {@link String} of the user.
-     * @param user - {@link UserEditDTO} of the user.
+     * @param username  - {@link String} of the user.
+     * @param user      - {@link UserEditDTO} of the user.
      * @return {@link ResponseEntity} of {@link UserDTO}
      */
     @Operation(
@@ -127,26 +129,28 @@ public class UserController {
     @PreAuthorize("hasAuthority('SCOPE_USER')")
     @PutMapping
     public ResponseEntity<?> updateUser(Principal principal, @RequestParam("username") String username,
-                                        @RequestBody UserEditDTO user){
+                                        @RequestBody UserEditDTO user) {
         try {
             return ResponseEntity.ok(authenticationService.editUser(principal.getName(), username, user));
-        }catch (UserServiceException e){
+        } catch (UserServiceException e) {
             HttpStatus httpStatus = e.getMessage().contains("not found") ?
-                    HttpStatus.NOT_FOUND: HttpStatus.BAD_REQUEST;;
+                    HttpStatus.NOT_FOUND : HttpStatus.BAD_REQUEST;
+            ;
             return ResponseEntity.status(httpStatus).body(e.getMessage());
-        }catch (AuthenticationServiceException e){
+        } catch (AuthenticationServiceException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
     }
+
     @PreAuthorize("hasAuthority('SCOPE_USER')")
     @DeleteMapping()
-    public ResponseEntity<?> deleteUsers(Principal principal, @RequestParam(value = "username") String username){
+    public ResponseEntity<?> deleteUsers(Principal principal, @RequestParam(value = "username") String username) {
         try {
             authenticationService.deleteUser(principal.getName(), username);
-            return ResponseEntity.ok().body("User '"+ username + "' is deleted");
-        }catch (UserServiceException e){
+            return ResponseEntity.ok().body("User '" + username + "' is deleted");
+        } catch (UserServiceException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }catch (AuthenticationServiceException e){
+        } catch (AuthenticationServiceException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
     }

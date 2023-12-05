@@ -26,7 +26,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -57,12 +56,12 @@ public class ServiceOController {
             description = "Create a new service",
             summary = "New Service",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                description = "Service to be registered",
-                required = true,
-                content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = ServiceODTONoID.class)
-                )
+                    description = "Service to be registered",
+                    required = true,
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ServiceODTONoID.class)
+                    )
             ),
             responses = {
                     @ApiResponse(
@@ -108,6 +107,7 @@ public class ServiceOController {
     /**
      * Retrieves all services(All the Details). page and size are optional.
      * It returns {@link HttpResponse} object. Each service is {@link ServiceO}
+     *
      * @return all services. It returns {@link HttpResponse} object. Each service is {@link ServiceO}
      */
     @Operation(
@@ -150,8 +150,8 @@ public class ServiceOController {
             @RequestParam(value = "page", required = false) @Min(0) Integer page,
             @RequestParam(value = "size", required = false) @Min(1) Integer size
     ) {
-        if(page!=null && size!=null){
-            PageRequest pr= PageRequest.of(page, size);
+        if (page != null && size != null) {
+            PageRequest pr = PageRequest.of(page, size);
             Page<ServiceO> serviceObjectsPages = serviceOService.getAllPaged(pr);
             return ResponseEntity.ok().body(
                     HttpResponse.builder()
@@ -275,8 +275,8 @@ public class ServiceOController {
                     description = "Service to be updated",
                     required = true,
                     content = @Content(
-                        mediaType = "application/json",
-                        schema =  @Schema(implementation = ServiceODTODefault.class)
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ServiceODTODefault.class)
                     )
             ),
             responses = {

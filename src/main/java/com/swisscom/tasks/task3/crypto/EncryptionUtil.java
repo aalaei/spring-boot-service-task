@@ -2,15 +2,18 @@ package com.swisscom.tasks.task3.crypto;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.codec.binary.Base64;
+
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+
 @RequiredArgsConstructor
 public class EncryptionUtil {
 
     private final String key;
     private final String initVector;
     private final String algo;
+
     public String encrypt(String value) {
         try {
             IvParameterSpec iv = new IvParameterSpec(Base64.decodeBase64(initVector));

@@ -1,7 +1,8 @@
 package com.swisscom.tasks.task3.model.auth;
 
 
-import lombok.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -14,11 +15,12 @@ import org.springframework.security.core.GrantedAuthority;
 @Document
 @NoArgsConstructor
 public class Role implements GrantedAuthority {
-    public enum RoleType{
+    public enum RoleType {
         USER,
         ADMIN,
         SUPER_USER,
     }
+
     @Id
     private String id;
     @Indexed(unique = true)

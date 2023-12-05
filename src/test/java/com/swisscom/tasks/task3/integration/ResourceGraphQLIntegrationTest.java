@@ -3,13 +3,13 @@ package com.swisscom.tasks.task3.integration;
 import com.swisscom.tasks.task3.configuration.DTOMapperBean;
 import com.swisscom.tasks.task3.crypto.service.ResourceEncryptor;
 import com.swisscom.tasks.task3.crypto.service.ServiceOEncryptor;
+import com.swisscom.tasks.task3.dto.auth.LoginRequestDTO;
+import com.swisscom.tasks.task3.dto.auth.LoginResponseDTO;
 import com.swisscom.tasks.task3.dto.mapper.DTOMapper;
 import com.swisscom.tasks.task3.dto.resource.ResourceDTONoID;
 import com.swisscom.tasks.task3.dto.service.ServiceODTONoID;
 import com.swisscom.tasks.task3.model.Resource;
 import com.swisscom.tasks.task3.model.ServiceO;
-import com.swisscom.tasks.task3.dto.auth.LoginRequestDTO;
-import com.swisscom.tasks.task3.dto.auth.LoginResponseDTO;
 import com.swisscom.tasks.task3.service.AuthenticationService;
 import com.swisscom.tasks.task3.service.ResourceService;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,7 +47,7 @@ public class ResourceGraphQLIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        String defaultPassword=environment.getProperty("admin-pass", "admin");
+        String defaultPassword = environment.getProperty("admin-pass", "admin");
         isDTOEncrypted = Boolean.parseBoolean(
                 environment.getProperty("dto.encryption.enabled", "true")
         );
@@ -63,22 +63,24 @@ public class ResourceGraphQLIntegrationTest {
 
         graphQlTester = HttpGraphQlTester.create(client);
     }
+
     @Test
     void contextLoads() {
         assertNotNull(graphQlTester);
     }
+
     @Test
-    void shouldReturnResource(){
+    void shouldReturnResource() {
         //given
         // language=GraphQL
         String mutation1 = """
-            mutation createService($service: ServiceInput!) {
-                createService(service: $service){
-                    id
-                    criticalText
-                 }
-            }
-        """;
+                    mutation createService($service: ServiceInput!) {
+                        createService(service: $service){
+                            id
+                            criticalText
+                         }
+                    }
+                """;
         ServiceO service = ServiceO.builder()
                 .criticalText("criticalText")
                 .build();
@@ -94,15 +96,15 @@ public class ResourceGraphQLIntegrationTest {
         assertNotNull(savedService.getId());
         // language=GraphQL
         String mutation = """
-            mutation createResource($resource: ResourceInput!, $id: ID!) {
-                createResource(resource: $resource, serviceId: $id){
-                    id
-                    criticalText
-                 }
-            }
-        """;
+                    mutation createResource($resource: ResourceInput!, $id: ID!) {
+                        createResource(resource: $resource, serviceId: $id){
+                            id
+                            criticalText
+                         }
+                    }
+                """;
         //when
-        Resource resource= Resource.builder().criticalText("resourceCriticalText")
+        Resource resource = Resource.builder().criticalText("resourceCriticalText")
                 .owners(List.of())
                 .build();
         resourceEncryptor.encrypt(resource);
@@ -119,13 +121,13 @@ public class ResourceGraphQLIntegrationTest {
 
         // language=GraphQL
         String document = """
-            query($id: ID!) {
-              resource(id: $id){
-                id
-                criticalText
-              }
-            }
-        """;
+                    query($id: ID!) {
+                      resource(id: $id){
+                        id
+                        criticalText
+                      }
+                    }
+                """;
         //when
         graphQlTester.document(document)
                 .variable("id", resource1.getId())
@@ -136,46 +138,47 @@ public class ResourceGraphQLIntegrationTest {
     }
 
     @Test
-    void findAllShouldNotReturnAllResources(){
+    void findAllShouldNotReturnAllResources() {
         // language=GraphQL
         String document = """
-            query {
-                resources{
-                    id
-                    criticalText
-                }
-            }
-        """;
+                    query {
+                        resources{
+                            id
+                            criticalText
+                        }
+                    }
+                """;
         graphQlTester.document(document)
                 .execute()
                 .path("resources")
                 .entityList(Resource.class)
                 .hasSize(0);
     }
+
     @Test
-    void findAllShouldReturnAllResources(){
+    void findAllShouldReturnAllResources() {
         //given
         // language=GraphQL
         String mutation = """
-            mutation createService($service: ServiceInput!) {
-                createService(service: $service){
-                    id
-                    criticalText
-                    resources{
-                        id
-                        criticalText
-                        owners{
+                    mutation createService($service: ServiceInput!) {
+                        createService(service: $service){
                             id
                             criticalText
-                            name
-                            level
-                            accountNumber
-                        }
+                            resources{
+                                id
+                                criticalText
+                                owners{
+                                    id
+                                    criticalText
+                                    name
+                                    level
+                                    accountNumber
+                                }
+                            }
+                         }
                     }
-                 }
-            }
-        """;
-        ServiceO service=ServiceO.builder()
+                """;
+        ServiceO service = ServiceO.builder()
                 .criticalText("criticalText8541")
                 .resources(List.of(Resource.builder()
                         .criticalText("resourceCriticalText")
@@ -193,13 +196,13 @@ public class ResourceGraphQLIntegrationTest {
                 });
         // language=GraphQL
         String document = """
-            query {
-                resources{
-                    id
-                    criticalText
-                }
-            }
-        """;
+                    query {
+                        resources{
+                            id
+                            criticalText
+                        }
+                    }
+                """;
         graphQlTester.document(document)
                 .execute()
                 .path("resources")
@@ -207,11 +210,12 @@ public class ResourceGraphQLIntegrationTest {
                 .hasSize(1)
                 .satisfies(s -> {
                     assertEquals(service.getResources().get(0).getCriticalText(), s.get(0).getCriticalText());
-                    if(isDTOEncrypted)
+                    if (isDTOEncrypted)
                         assertNotEquals("resourceCriticalText", s.get(0).getCriticalText());
                 });
         ;
     }
+
     @Test
     void shouldUpdateResource() {
         //given
@@ -254,7 +258,7 @@ public class ResourceGraphQLIntegrationTest {
                 .entity(ServiceO.class)
                 .satisfies(s -> {
                     assertEquals(service.getCriticalText(), s.getCriticalText());
-                    if(isDTOEncrypted)
+                    if (isDTOEncrypted)
                         assertNotEquals("criticalText", s.getCriticalText());
                 })
                 .get();
@@ -314,6 +318,7 @@ public class ResourceGraphQLIntegrationTest {
                     assertEquals(updatedResource.getCriticalText(), s.getCriticalText());
                 });
     }
+
     @Test
     void shouldDeleteResource() {
         //given
