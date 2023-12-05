@@ -1,6 +1,6 @@
 # Java Client Application
 
-This is a straightforward Java client written to test encryption, decryption, and authentication security features. This client works like a wrapper. It exposes the `/services` endpoint and, in the background, uses encryption and authentication to communicate with the main server at `/api/v1/services` endpoint.
+This is a straightforward Java client written to test encryption, decryption, and authentication security features. This client works like a wrapper. It exposes the `:8090 /services` endpoint and, in the background, uses encryption and authentication to communicate with the main server at `/api/v1/services` endpoint.
 
 ## Client Documentation
 

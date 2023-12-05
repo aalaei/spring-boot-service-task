@@ -15,7 +15,7 @@ services:
     
   task3-app:
       container_name: task3_app
-      # image: ghcr.io/aalaei/spring-boot-service-task:latest
+      image: ghcr.io/aalaei/spring-boot-service-task:latest
       build: .
       restart: unless-stopped
       ports:

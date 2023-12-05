@@ -46,13 +46,31 @@ Before running the application, make sure you have the following installed:
 3. Configure MongoDB and Redis connection details in `application.properties` or [`application.yml`](./src/main/resources/application.yml).
 
 ### Running the Application
+This guide explains how to run the Java Spring Boot application in two ways: using Docker and locally.
 
-- Execute the following command to build and run the application:
+#### Docker Compose
+To run the application along with MongoDB and Redis using Docker Compose, execute the following command:
 
-    ```bash
-    ./run.sh
-    ```
-    This bash script handles the necessary steps for building, packaging, and running the Spring Boot application.
+```bash
+docker-compose up
+```
+
+This command will orchestrate the setup defined in the `docker-compose.yml` file, including building and running the Spring Boot application, MongoDB, and Redis within separate Docker containers. Access the application in your browser by navigating to http://localhost:3000.
+
+### Run Locally
+**Without Docker**
+If you choose to run the Spring Boot application locally without Docker, note that you must set up Redis and MongoDB manually. Ensure that Redis and MongoDB are running on your local machine with the necessary configurations.
+**With Docker**
+Alternatively, you can leverage Docker Compose for local development as well. When running locally as a Docker application, the Spring Boot app will listen on a different port, avoiding conflicts with your local setup. This allows you to run both Dockerized MongoDB and Redis containers alongside your Spring Boot application without any issues.
+
+
+Execute the following command to build and run the application:
+
+```bash
+./run.sh
+```
+This bash script handles the necessary steps for building, packaging, and running the Spring Boot application.
+Access the application in your browser by navigating to http://localhost:8080.
 
 ## API Endpoints
 The API provides the following endpoints for CRUD operations on the "Service" object:
