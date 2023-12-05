@@ -22,21 +22,25 @@ public class JsonPlaceholderServiceBean {
 
     @Bean
     JsonPaceHolderService jsonPlaceholderService() {
-        String username = environment.getProperty("application.connection.security.auth.user", "");
-        String password = environment.getProperty("application.connection.security.auth.pass", "");
+        String username = environment.getProperty("application.connection.security.auth.user", "admin");
+        String password = environment.getProperty("application.connection.security.auth.pass", "admin");
         String url = environment.getProperty("application.connection.url", "http://localhost:8080");
         RestClient.Builder restBuilder = RestClient.builder().baseUrl(url + "/api/v1");
         if (!username.isEmpty()) {
             LoginRequestDTO loginRequestDTO = new LoginRequestDTO(username, password);
-            String jwtToken = Objects.requireNonNull(RestClient.builder()
-                    .baseUrl(url + "/api/v1/auth/login")
-                    .build()
-                    .post().body(loginRequestDTO)
-                    .retrieve()
-                    .body(LoginResponseDTO.class)).getJwt();
-            restBuilder = restBuilder
-                    .defaultHeader("Authorization", "Bearer " + jwtToken);
-            log.info("Logged in successfully as " + username);
+            try {
+                String jwtToken = Objects.requireNonNull(RestClient.builder()
+                        .baseUrl(url + "/api/v1/auth/login")
+                        .build()
+                        .post().body(loginRequestDTO)
+                        .retrieve()
+                        .body(LoginResponseDTO.class)).getJwt();
+                restBuilder = restBuilder
+                        .defaultHeader("Authorization", "Bearer " + jwtToken);
+                log.info("Logged in successfully as " + username);
+            }catch (Exception e){
+                log.error("Failed to login as " + username+". Requesting as Anonymous User");
+            }
         }
         RestClient client = restBuilder.build();
         HttpServiceProxyFactory factory = HttpServiceProxyFactory
