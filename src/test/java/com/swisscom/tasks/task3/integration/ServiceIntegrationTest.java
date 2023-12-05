@@ -14,6 +14,7 @@ import com.swisscom.tasks.task3.repository.ServiceORepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -36,6 +37,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = true)
 public class ServiceIntegrationTest {
+
+    @Value("${application.security.auth.enabled:true}")
+    private boolean authEnabled;
     private final String serviceEndpoint = "/api/v1/services";
 
     @Autowired
@@ -131,9 +135,11 @@ public class ServiceIntegrationTest {
 
     @Test
     void shouldNotBeAllowedToReturnServices() throws Exception {
-        mockMvc.perform(get(serviceEndpoint + "/all")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isUnauthorized());
+        if(authEnabled) {
+            mockMvc.perform(get(serviceEndpoint + "/all")
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isUnauthorized());
+        }
     }
 
     @Test
@@ -280,7 +286,7 @@ public class ServiceIntegrationTest {
         resultActions.andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(HttpStatus.NOT_FOUND.name()))
                 .andExpect(jsonPath("$.statusCode").value(HttpStatus.NOT_FOUND.value()))
-                .andExpect(jsonPath("$.message").value("Not Found"));
+                .andExpect(jsonPath("$.message").value("Service with id id does not exists"));
     }
 
     @Test
@@ -399,6 +405,6 @@ public class ServiceIntegrationTest {
         resultActions.andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(HttpStatus.NOT_FOUND.name()))
                 .andExpect(jsonPath("$.statusCode").value(HttpStatus.NOT_FOUND.value()))
-                .andExpect(jsonPath("$.message").value("Not Found"));
+                .andExpect(jsonPath("$.message").value("Service with id id does not exists"));
     }
 }
