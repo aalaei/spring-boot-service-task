@@ -16,7 +16,6 @@ if [ "$1" == "backup" ]; then
     mongodump --uri=${mongp_url} --gzip --archive=${dump_prefix}/mongo.dump 
 else
     echo "Restore redis and mongo"
-    cat $dump_prefix/redis.txt | redis-cli
     docker cp ${dump_prefix}/dump.rdb task3_redis:/data/dump.rdb
     # redis-cli shutdown && redis-server --dbfilename dump.rdb --dir /data
     mongorestore --uri="$mongp_url" --gzip --archive=${dump_prefix}/mongo.dump --drop
