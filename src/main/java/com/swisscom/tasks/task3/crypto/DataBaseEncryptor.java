@@ -8,9 +8,9 @@ public class DataBaseEncryptor {
     private final EncryptionUtil encryptionUtil;
 
     public DataBaseEncryptor(Environment environment) {
-        String key  = environment.getProperty("db.encryption.key", "MTIzNDU2NzgK");
+        String key  = environment.getProperty("db.encryption.key", "rYUwouQ16kswUnNYkdNDig==");
         String initVector = environment.getProperty("db.encryption.initVector",
-                "MTIzNDU2NzgxMjM0NTY3OAo=");
+                "0srIh8CGYrPESYZxZO9v1A==");
         String algo = environment.getProperty("db.encryption.algo", "AES/CBC/PKCS5PADDING");
         this.encryptionUtil = new EncryptionUtil(key, initVector, algo);
     }

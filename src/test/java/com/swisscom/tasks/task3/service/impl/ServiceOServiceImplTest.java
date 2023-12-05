@@ -1,5 +1,6 @@
 package com.swisscom.tasks.task3.service.impl;
 
+import com.swisscom.tasks.task3.crypto.service.ServiceOEncryptor;
 import com.swisscom.tasks.task3.exception.ServiceOServiceException;
 import com.swisscom.tasks.task3.model.Owner;
 import com.swisscom.tasks.task3.model.Resource;
@@ -36,18 +37,29 @@ class ServiceOServiceImplTest {
     private OwnerRepository ownerRepository;
 
     private ServiceOServiceImpl underTest;
-
+    @Mock
+    private ServiceOEncryptor serviceOEncryptor;
     @BeforeEach
     void setUp() {
-        underTest = new ServiceOServiceImpl(serviceORepository, resourceRepository, ownerRepository);
+        underTest = new ServiceOServiceImpl(serviceORepository, resourceRepository, ownerRepository, serviceOEncryptor);
     }
 
     @Test
     void canGetAllServices() {
+        // given
+        given(serviceORepository.findAll())
+                .willReturn(
+                        List.of(
+                            ServiceO.builder().criticalText("test").build()
+                        )
+                );
         // when
         underTest.getAllDetailed();
         // then
+
         verify(serviceORepository).findAll();
+        verify(serviceOEncryptor).encrypt(any());
+
     }
 
     @Test
@@ -69,6 +81,11 @@ class ServiceOServiceImplTest {
                                         .build()
                         )
                 ).build();
+        given(serviceOEncryptor.encrypt(serviceO))
+                .willReturn(serviceO);
+        given(serviceOEncryptor.decrypt(serviceO))
+                .willReturn(serviceO);
+        serviceOEncryptor.encrypt(serviceO);
         // when
         underTest.create(serviceO);
         // then
@@ -77,6 +94,8 @@ class ServiceOServiceImplTest {
 
         verify(serviceORepository)
                 .save(serviceArgumentCaptor.capture());
+        verify(serviceOEncryptor)
+                .decrypt(serviceO);
 
         ServiceO capturedService = serviceArgumentCaptor.getValue();
 
@@ -90,6 +109,11 @@ class ServiceOServiceImplTest {
         ServiceO serviceO = ServiceO.builder().id(id).build();
         given(serviceORepository.existsById(id))
                 .willReturn(true);
+        given(serviceOEncryptor.encrypt(serviceO))
+                .willReturn(serviceO);
+        given(serviceOEncryptor.decrypt(serviceO))
+                .willReturn(serviceO);
+        serviceOEncryptor.encrypt(serviceO);
         // when
         // then
         assertThatThrownBy(() -> underTest.create(serviceO))
@@ -171,6 +195,11 @@ class ServiceOServiceImplTest {
                 .willReturn(newServiceO.getResources().get(0));
         given(ownerRepository.save(any()))
                 .willReturn(newServiceO.getResources().get(0).getOwners().get(0));
+        given(serviceOEncryptor.encrypt(newServiceO))
+                .willReturn(newServiceO);
+        given(serviceOEncryptor.decrypt(newServiceO))
+                .willReturn(newServiceO);
+        serviceOEncryptor.encrypt(newServiceO);
         // when
         underTest.updateById(id, newServiceO);
         // then

@@ -1,6 +1,7 @@
 package com.swisscom.tasks.task3.integration;
 
 import com.swisscom.tasks.task3.configuration.DTOMapperBean;
+import com.swisscom.tasks.task3.crypto.service.ServiceOEncryptor;
 import com.swisscom.tasks.task3.dto.mapper.DTOMapper;
 import com.swisscom.tasks.task3.dto.service.ServiceODTONoID;
 import com.swisscom.tasks.task3.model.ServiceO;
@@ -30,12 +31,17 @@ public class ServiceGraphQLIntegrationTest {
     private AuthenticationService authenticationService;
     @Autowired
     private Environment environment;
-
+    @Autowired
+    private ServiceOEncryptor serviceOEncryptor;
     @LocalServerPort
     int port;
+    private boolean isDTOEncrypted;
 
     @BeforeEach
     void setUp() {
+        isDTOEncrypted = Boolean.parseBoolean(
+                environment.getProperty("dto.encryption.enabled", "true")
+        );
         String defaultPassword=environment.getProperty("admin-pass", "admin");
         serviceOService.deleteAll();
         dtoMapper = new DTOMapper(new DTOMapperBean().modelMapper());
@@ -79,6 +85,7 @@ public class ServiceGraphQLIntegrationTest {
         ServiceO service = ServiceO.builder()
                 .criticalText("criticalText")
                 .build();
+        serviceOEncryptor.encrypt(service);
         ServiceO savedService = graphQlTester.document(mutation)
                 .variable("service", dtoMapper.map(service, ServiceODTONoID.class))
                 .execute()
@@ -115,7 +122,7 @@ public class ServiceGraphQLIntegrationTest {
                 .path("service")
                 .entity(ServiceO.class)
                 .satisfies(s -> {
-                    assertEquals("criticalText", s.getCriticalText());
+                    assertEquals(service.getCriticalText(), s.getCriticalText());
                 });
     }
 
@@ -159,15 +166,17 @@ public class ServiceGraphQLIntegrationTest {
                  }
             }
         """;
+        ServiceO service = ServiceO.builder()
+                .criticalText("criticalText")
+                .build();
+        serviceOEncryptor.encrypt(service);
         graphQlTester.document(mutation)
-                .variable("service", dtoMapper.map(ServiceO.builder()
-                        .criticalText("criticalText")
-                        .build(), ServiceODTONoID.class))
+                .variable("service", dtoMapper.map(service, ServiceODTONoID.class))
                 .execute()
                 .path("createService")
                 .entity(ServiceO.class)
                 .satisfies(s -> {
-                    assertEquals("criticalText", s.getCriticalText());
+                    assertEquals(service.getCriticalText(), s.getCriticalText());
                 });
         // language=GraphQL
         String document = """
@@ -210,6 +219,7 @@ public class ServiceGraphQLIntegrationTest {
         ServiceO service = ServiceO.builder()
                 .criticalText("criticalText")
                 .build();
+        serviceOEncryptor.encrypt(service);
         ServiceO savedService = graphQlTester.document(mutation)
                 .variable("service", dtoMapper.map(service, ServiceODTONoID.class))
                 .execute()
@@ -242,6 +252,7 @@ public class ServiceGraphQLIntegrationTest {
         ServiceO updatedService = ServiceO.builder()
                 .criticalText("updatedCriticalText")
                 .build();
+        serviceOEncryptor.encrypt(updatedService);
         ServiceO updatedSavedService = graphQlTester.document(updateMutation)
                 .variable("id", savedService.getId())
                 .variable("service", dtoMapper.map(updatedService, ServiceODTONoID.class))
@@ -279,7 +290,9 @@ public class ServiceGraphQLIntegrationTest {
                 .path("service")
                 .entity(ServiceO.class)
                 .satisfies(s -> {
-                    assertEquals("updatedCriticalText", s.getCriticalText());
+                    if(isDTOEncrypted)
+                        assertNotEquals("updatedCriticalText", s.getCriticalText());
+                    assertEquals(updatedService.getCriticalText(), s.getCriticalText());
                 });
     }
     @Test
@@ -308,6 +321,7 @@ public class ServiceGraphQLIntegrationTest {
         ServiceO service = ServiceO.builder()
                 .criticalText("criticalText")
                 .build();
+        serviceOEncryptor.encrypt(service);
         ServiceO savedService = graphQlTester.document(mutation)
                 .variable("service", dtoMapper.map(service, ServiceODTONoID.class))
                 .execute()

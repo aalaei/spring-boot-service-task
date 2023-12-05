@@ -1,5 +1,6 @@
 package com.swisscom.tasks.task3.service.impl;
 
+import com.swisscom.tasks.task3.crypto.service.ResourceEncryptor;
 import com.swisscom.tasks.task3.exception.ResourceServiceException;
 import com.swisscom.tasks.task3.model.Resource;
 import com.swisscom.tasks.task3.model.ServiceO;
@@ -14,6 +15,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +29,7 @@ public class ResourceServiceImpl implements ResourceService {
     private final ResourceRepository resourceRepository;
     private final ServiceORepository serviceORepository;
     private final OwnerRepository ownerRepository;
+    private final ResourceEncryptor resourceEncryptor;
     /**
      * Saves a given resource. It also adds the resource to the parent service.
      *
@@ -35,6 +38,7 @@ public class ResourceServiceImpl implements ResourceService {
      */
     @Override
     public Resource create(Resource resource, String serviceID){
+        resource = resourceEncryptor.decrypt(resource);
         if(resource.getOwners()==null)
             resource.setOwners(List.of());
         ServiceO parentService= serviceORepository
@@ -48,7 +52,7 @@ public class ResourceServiceImpl implements ResourceService {
             parentService.getResources().add(newResource);
         }
         serviceORepository.save(parentService);
-        return newResource;
+        return resourceEncryptor.encrypt(newResource);
     }
 
     /**
@@ -57,7 +61,7 @@ public class ResourceServiceImpl implements ResourceService {
      */
     @Override
     public List<Resource> getAll() {
-        return resourceRepository.findAll();
+        return resourceRepository.findAll().stream().map(resourceEncryptor::encrypt).toList();
     }
 
     /**
@@ -68,7 +72,7 @@ public class ResourceServiceImpl implements ResourceService {
     @Override
     @Cacheable(key = "#id")
     public Optional<Resource> getById(String id) {
-        return resourceRepository.findById(id);
+        return resourceRepository.findById(id).map(resourceEncryptor::encrypt);
     }
 
     /**
@@ -92,7 +96,6 @@ public class ResourceServiceImpl implements ResourceService {
      * @param resource - must not be {@literal null}.
      */
     private void saveCascade(Resource resource) {
-
         resource.setOwners(resource.getOwners() == null ? null :
                 resource.getOwners().stream().map(o -> {
                     if (o == null)
@@ -139,12 +142,13 @@ public class ResourceServiceImpl implements ResourceService {
     @Override
     @CachePut(key = "#id")
     public Resource updateById(String id, Resource resource, boolean cascade) {
+        resource = resourceEncryptor.decrypt(resource);
         if(!resourceRepository.existsById(id))
             throw new ResourceServiceException("Resource with id " + id + " not found");
         resource.setId(id);
         if (cascade)
             saveCascade(resource);
-        return resourceRepository.save(resource);
+        return resourceEncryptor.encrypt(resourceRepository.save(resource));
     }
 
     /**
@@ -154,6 +158,8 @@ public class ResourceServiceImpl implements ResourceService {
      */
     @Override
     public Page<Resource> getAllPaged(PageRequest pr) {
-        return resourceRepository.findAll(pr);
+        return new PageImpl<>(
+                resourceRepository.findAll(pr).stream().map(resourceEncryptor::encrypt).toList()
+        );
     }
 }

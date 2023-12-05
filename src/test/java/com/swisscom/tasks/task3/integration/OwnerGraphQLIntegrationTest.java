@@ -1,6 +1,10 @@
 package com.swisscom.tasks.task3.integration;
 
 import com.swisscom.tasks.task3.configuration.DTOMapperBean;
+import com.swisscom.tasks.task3.crypto.MessageEncryptor;
+import com.swisscom.tasks.task3.crypto.service.OwnerEncryptor;
+import com.swisscom.tasks.task3.crypto.service.ResourceEncryptor;
+import com.swisscom.tasks.task3.crypto.service.ServiceOEncryptor;
 import com.swisscom.tasks.task3.dto.owner.OwnerDTO;
 import com.swisscom.tasks.task3.dto.mapper.DTOMapper;
 import com.swisscom.tasks.task3.dto.resource.ResourceDTONoID;
@@ -23,8 +27,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class OwnerGraphQLIntegrationTest {
@@ -38,11 +41,23 @@ public class OwnerGraphQLIntegrationTest {
     @Autowired
     private Environment environment;
 
+    @Autowired
+    private OwnerEncryptor ownerEncryptor;
+    @Autowired
+    private ResourceEncryptor resourceEncryptor;
+    @Autowired
+    private ServiceOEncryptor serviceOEncryptor;
+
     @LocalServerPort
     int port;
 
+    private boolean isDTOEncrypted;
+
     @BeforeEach
     void setUp() {
+        isDTOEncrypted = Boolean.parseBoolean(
+                environment.getProperty("dto.encryption.enabled", "true")
+        );
         String defaultPassword=environment.getProperty("admin-pass", "admin");
         ownerService.deleteAll();
         dtoMapper = new DTOMapper(new DTOMapperBean().modelMapper());
@@ -76,13 +91,15 @@ public class OwnerGraphQLIntegrationTest {
         ServiceO service = ServiceO.builder()
                 .criticalText("criticalText")
                 .build();
+        ServiceO encryptedService = serviceOEncryptor.encrypt(service);
         ServiceO savedService = graphQlTester.document(mutation1)
-                .variable("service", dtoMapper.map(service, ServiceODTONoID.class))
+                .variable("service", dtoMapper.map(encryptedService,
+                        ServiceODTONoID.class))
                 .execute()
                 .path("createService")
                 .entity(ServiceO.class)
                 .satisfies(s -> {
-                    assertEquals(service.getCriticalText(), s.getCriticalText());
+                    assertEquals(encryptedService.getCriticalText(), s.getCriticalText());
                 }).get();
         assertNotNull(savedService.getId());
         // language=GraphQL
@@ -98,16 +115,16 @@ public class OwnerGraphQLIntegrationTest {
         Resource resource= Resource.builder().criticalText("resourceCriticalText")
                 .owners(List.of())
                 .build();
-
+        Resource encryptedResource = resourceEncryptor.encrypt(resource);
 
         Resource resource1 = graphQlTester.document(mutation)
-                .variable("resource", dtoMapper.map(resource, ResourceDTONoID.class))
+                .variable("resource", dtoMapper.map(encryptedResource, ResourceDTONoID.class))
                 .variable("id", savedService.getId())
                 .execute()
                 .path("createResource")
                 .entity(Resource.class)
                 .satisfies(s -> {
-                    assertEquals(resource.getCriticalText(), s.getCriticalText());
+                    assertEquals(encryptedResource.getCriticalText(), s.getCriticalText());
                 }).get();
         // language=GraphQL
         String mutation2= """
@@ -124,6 +141,8 @@ public class OwnerGraphQLIntegrationTest {
                 .accountNumber("ownerAccountNumber")
                 .level(1)
                 .build();
+        String plainCriticalText = owner.getCriticalText();
+        ownerEncryptor.encrypt(owner);
         Owner owner1 = graphQlTester.document(mutation2)
                 .variable("owner", dtoMapper.map(owner, OwnerDTO.class))
                 .variable("id", resource1.getId())
@@ -132,6 +151,8 @@ public class OwnerGraphQLIntegrationTest {
                 .entity(Owner.class)
                 .satisfies(s -> {
                     assertEquals(owner.getCriticalText(), s.getCriticalText());
+                    if(isDTOEncrypted)
+                        assertNotEquals(plainCriticalText, s.getCriticalText());
                 }).get();
 
 
@@ -193,26 +214,29 @@ public class OwnerGraphQLIntegrationTest {
                  }
             }
         """;
-        graphQlTester.document(mutation)
-                .variable("service", dtoMapper.map(ServiceO.builder()
+        ServiceO service=ServiceO.builder()
                         .criticalText("criticalText")
-                                .resources(List.of(Resource.builder()
-                                        .criticalText("resourceCriticalText")
-                                        .owners(List.of(
-                                                Owner.builder()
-                                                        .criticalText("ownerCriticalText")
-                                                        .name("ownerName")
-                                                        .accountNumber("ownerAccountNumber")
-                                                        .level(1)
-                                                        .build()
-                                        ))
-                                        .build()))
-                        .build(), ServiceODTONoID.class))
+                        .resources(List.of(
+                                Resource.builder()
+                                    .criticalText("resourceCriticalText")
+                                    .owners(List.of(
+                                            Owner.builder()
+                                                .criticalText("ownerCriticalText")
+                                                .name("ownerName")
+                                                .accountNumber("ownerAccountNumber")
+                                                .level(1)
+                                            .build()
+                                    ))
+                                .build()))
+                .build();
+        serviceOEncryptor.encrypt(service);
+        graphQlTester.document(mutation)
+                .variable("service", dtoMapper.map(service, ServiceODTONoID.class))
                 .execute()
                 .path("createService")
                 .entity(ServiceO.class)
                 .satisfies(s -> {
-                    assertEquals("criticalText", s.getCriticalText());
+                    assertEquals(service.getCriticalText(), s.getCriticalText());
                 });
         // language=GraphQL
         String document = """
@@ -229,7 +253,8 @@ public class OwnerGraphQLIntegrationTest {
                 .entityList(Owner.class)
                 .hasSize(1)
                 .satisfies(s -> {
-                    assertEquals("ownerCriticalText", s.get(0).getCriticalText());
+                    assertEquals(service.getResources().get(0).getOwners().get(0).getCriticalText(),
+                            s.get(0).getCriticalText());
                 });
     }
     @Test
@@ -273,6 +298,7 @@ public class OwnerGraphQLIntegrationTest {
                         )
                 )
                 .build();
+        serviceOEncryptor.encrypt(service);
         ServiceO savedService = graphQlTester.document(mutation)
                 .variable("service", dtoMapper.map(service, ServiceODTONoID.class))
                 .execute()
@@ -297,6 +323,7 @@ public class OwnerGraphQLIntegrationTest {
         Owner updatedOwner = Owner.builder()
                 .criticalText("updatedCriticalTextResource")
                 .build();
+        ownerEncryptor.encrypt(updatedOwner);
         Owner updatedSavedOwner = graphQlTester.document(updateMutation)
                 .variable("id", savedService.getResources().get(0).getOwners().get(0).getId())
                 .variable("owner", dtoMapper.map(updatedOwner, OwnerDTO.class))
@@ -370,6 +397,7 @@ public class OwnerGraphQLIntegrationTest {
                         )
                 )
                 .build();
+        serviceOEncryptor.encrypt(service);
         ServiceO savedService = graphQlTester.document(mutation)
                 .variable("service", dtoMapper.map(service, ServiceODTONoID.class))
                 .execute()

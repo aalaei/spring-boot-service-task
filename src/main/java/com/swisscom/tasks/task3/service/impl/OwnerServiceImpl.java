@@ -1,5 +1,6 @@
 package com.swisscom.tasks.task3.service.impl;
 
+import com.swisscom.tasks.task3.crypto.service.OwnerEncryptor;
 import com.swisscom.tasks.task3.exception.OwnerServiceException;
 import com.swisscom.tasks.task3.model.Owner;
 import com.swisscom.tasks.task3.model.Resource;
@@ -13,6 +14,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +28,7 @@ import java.util.Optional;
 public class OwnerServiceImpl implements OwnerService {
     private final OwnerRepository ownerRepository;
     private final ResourceRepository resourceRepository;
+    private final OwnerEncryptor ownerEncryptor;
 
     /**
      * Saves a given owner. It also adds the owner to the parent resource.
@@ -36,6 +39,7 @@ public class OwnerServiceImpl implements OwnerService {
     @Override
     public Owner create(Owner owner, String resourceID)
     {
+        owner= ownerEncryptor.decrypt(owner);
         Resource parentResource= resourceRepository
                 .findById(resourceID).orElseThrow(()->
                         new OwnerServiceException("Resource with id "+resourceID+" not found"));
@@ -46,7 +50,7 @@ public class OwnerServiceImpl implements OwnerService {
             parentResource.getOwners().add(newOwner);
         }
         resourceRepository.save(parentResource);
-        return newOwner;
+        return ownerEncryptor.encrypt(newOwner);
     }
 
     /**
@@ -55,7 +59,7 @@ public class OwnerServiceImpl implements OwnerService {
      */
     @Override
     public List<Owner> getAll() {
-        return ownerRepository.findAll();
+        return ownerRepository.findAll().stream().map(ownerEncryptor::encrypt).toList();
     }
 
     /**
@@ -66,7 +70,7 @@ public class OwnerServiceImpl implements OwnerService {
     @Override
     @Cacheable(key = "#id")
     public Optional<Owner> getById(String id) {
-        return ownerRepository.findById(id);
+        return ownerRepository.findById(id).map(ownerEncryptor::encrypt);
     }
 
     /**
@@ -103,10 +107,11 @@ public class OwnerServiceImpl implements OwnerService {
     @Override
     @CachePut(key = "#id")
     public Owner updateById(String id, Owner owner) {
+        owner= ownerEncryptor.decrypt(owner);
         if(!ownerRepository.existsById(id))
             return null;
         owner.setId(id);
-        return ownerRepository.save(owner);
+        return ownerEncryptor.encrypt(ownerRepository.save(owner));
     }
 
     /**
@@ -116,6 +121,8 @@ public class OwnerServiceImpl implements OwnerService {
      */
     @Override
     public Page<Owner> getAllPaged(PageRequest pr) {
-        return ownerRepository.findAll(pr);
+        return new PageImpl<>(
+                ownerRepository.findAll(pr).stream().map(ownerEncryptor::encrypt).toList()
+        );
     }
 }

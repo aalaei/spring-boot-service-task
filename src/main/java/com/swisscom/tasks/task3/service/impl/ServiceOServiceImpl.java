@@ -1,5 +1,6 @@
 package com.swisscom.tasks.task3.service.impl;
 
+import com.swisscom.tasks.task3.crypto.service.ServiceOEncryptor;
 import com.swisscom.tasks.task3.dto.service.ServiceIdDTO;
 import com.swisscom.tasks.task3.exception.ServiceOServiceException;
 import com.swisscom.tasks.task3.model.ServiceO;
@@ -14,11 +15,13 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of {@link ServiceOService} interface.
@@ -33,6 +36,7 @@ public class ServiceOServiceImpl implements ServiceOService {
     private final ServiceORepository serviceORepository;
     private final ResourceRepository resourceRepository;
     private final OwnerRepository ownerRepository;
+    private final ServiceOEncryptor serviceOEncryptor;
 
     /**
      * Saves a given service. It also saves all resources and owners of this service.
@@ -86,13 +90,14 @@ public class ServiceOServiceImpl implements ServiceOService {
      */
     @Override
     public ServiceO create(ServiceO serviceO) {
+        serviceO=serviceOEncryptor.decrypt(serviceO);
         if(serviceO.getResources()==null)
             serviceO.setResources(List.of());
         if (serviceO.getId() != null && serviceORepository.existsById(serviceO.getId()))
             throw new ServiceOServiceException("Another service with id " + serviceO.getId() + " exists before");
         log.info("Saving a new service");
         saveCascade(serviceO);
-        return serviceORepository.save(serviceO);
+        return serviceOEncryptor.encrypt(serviceORepository.save(serviceO));
     }
 
     /**
@@ -114,7 +119,7 @@ public class ServiceOServiceImpl implements ServiceOService {
     @Override
     public List<ServiceO> getAllDetailed() {
         log.info("Getting all services(Detailed)");
-        return serviceORepository.findAll();
+        return serviceORepository.findAll().stream().map(serviceOEncryptor::encrypt).toList();
     }
 
     /**
@@ -128,7 +133,8 @@ public class ServiceOServiceImpl implements ServiceOService {
     @Cacheable(key = "#id")
     public Optional<ServiceO> getById(String id) {
         log.info("Getting service with id {}", id);
-        return serviceORepository.findById(id);
+        Optional<ServiceO> plainServiceO = serviceORepository.findById(id);
+        return plainServiceO.map(serviceOEncryptor::encrypt);
     }
 
     /**
@@ -193,13 +199,13 @@ public class ServiceOServiceImpl implements ServiceOService {
      */
     @Override
     public ServiceO updateById(String id, ServiceO serviceO, boolean cascade) {
+        serviceO=serviceOEncryptor.decrypt(serviceO);
         log.info("Updating service with id {}", id);
         if (serviceORepository.existsById(id)) {
             serviceO.setId(id);
             if (cascade)
                 saveCascade(serviceO);
-            serviceORepository.save(serviceO);
-            return serviceO;
+            return serviceOEncryptor.encrypt(serviceORepository.save(serviceO));
         }
         throw new ServiceOServiceException("Service with id " + id + " does not exists");
     }
@@ -207,6 +213,7 @@ public class ServiceOServiceImpl implements ServiceOService {
     @Override
     public Page<ServiceO> getAllPaged(PageRequest pr) {
         log.info("Getting all services(Detailed) in Pages");
-        return serviceORepository.findAll(pr);
+        return new PageImpl<>(serviceORepository.findAll(pr).stream().map(serviceOEncryptor::encrypt)
+                .toList());
     }
 }

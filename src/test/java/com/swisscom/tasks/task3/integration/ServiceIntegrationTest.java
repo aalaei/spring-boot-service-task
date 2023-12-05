@@ -2,6 +2,7 @@ package com.swisscom.tasks.task3.integration;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.swisscom.tasks.task3.crypto.service.ServiceOEncryptor;
 import com.swisscom.tasks.task3.dto.mapper.DTOMapper;
 import com.swisscom.tasks.task3.dto.service.ServiceODTODefault;
 import com.swisscom.tasks.task3.dto.service.ServiceODTONoID;
@@ -47,6 +48,9 @@ public class ServiceIntegrationTest {
 
     @Autowired
     private ServiceORepository serviceRepository;
+
+    @Autowired
+    private ServiceOEncryptor serviceOEncryptor;
     RequestPostProcessor authorities = SecurityMockMvcRequestPostProcessors.jwt()
             .authorities(new SimpleGrantedAuthority("SCOPE_SUPER_USER"));
 
@@ -89,6 +93,7 @@ public class ServiceIntegrationTest {
                                         .build()
                         ))
                 .build();
+        serviceOEncryptor.encrypt(serviceO);
         MvcResult getServicesResult = mockMvc.perform(post(serviceEndpoint)
                         .with(authorities)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -99,15 +104,16 @@ public class ServiceIntegrationTest {
                 getServicesResult.getResponse().getContentAsString(),
                 HttpResponse.class
         );
-        ServiceO services = objectMapper.convertValue(
+        ServiceO services2 = objectMapper.convertValue(
                 httpResponse.getData().get("service"),
                 new TypeReference<>() {
                 }
         );
+        serviceOEncryptor.encrypt(services2);
         ResultActions resultActions = mockMvc
                 .perform(get(serviceEndpoint)
                         .with(authorities)
-                        .param("id", services.getId())
+                        .param("id", services2.getId())
                         .contentType(MediaType.APPLICATION_JSON));
         // then
         resultActions.andExpect(status().isOk())
@@ -131,7 +137,7 @@ public class ServiceIntegrationTest {
     @Test
     void canAddNewService() throws Exception {
         // given
-        ServiceODTODefault serviceODTO = dTOMapper.map(
+        ServiceO updateService=
                 new ServiceO(
                         null,
                         "criticalText",
@@ -149,8 +155,9 @@ public class ServiceIntegrationTest {
                                         ))
                                         .build()
                         )
-                )
-                , ServiceODTODefault.class);
+                );
+        serviceOEncryptor.encrypt(updateService);
+        ServiceODTODefault serviceODTO = dTOMapper.map(updateService, ServiceODTODefault.class);
 
         // when
         ResultActions resultActions = mockMvc
@@ -209,7 +216,7 @@ public class ServiceIntegrationTest {
                                 .build()
                 )
         );
-
+        serviceOEncryptor.encrypt(serviceO);
         mockMvc.perform(post(serviceEndpoint)
                         .with(authorities)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -295,6 +302,7 @@ public class ServiceIntegrationTest {
                                 .build()
                 )
         );
+        serviceOEncryptor.encrypt(serviceO);
         ServiceO newService = new ServiceO(
                 null,
                 "newCriticalText0001",
@@ -312,6 +320,7 @@ public class ServiceIntegrationTest {
                                 .build()
                 )
         );
+        serviceOEncryptor.encrypt(newService);
 
         mockMvc.perform(post(serviceEndpoint)
                         .with(authorities)
@@ -359,7 +368,7 @@ public class ServiceIntegrationTest {
 
         // then
         resultActions.andExpect(status().isOk());
-        Optional<ServiceO> extractedService = serviceRepository.findById(id);
+        Optional<ServiceO> extractedService = serviceRepository.findById(id).map(serviceOEncryptor::encrypt);
         assertThat(extractedService.isPresent()).isTrue();
         assertThat(extractedService.get().getCriticalText()).isEqualTo(newService.getCriticalText());
         ServiceODTONoID extractedServiceNoId =
@@ -376,6 +385,7 @@ public class ServiceIntegrationTest {
         // given
         String id = "id";
         ServiceO newService = ServiceO.builder().build();
+        serviceOEncryptor.encrypt(newService);
         // when
         ResultActions resultActions = mockMvc
                 .perform(put(serviceEndpoint).param("id", id)

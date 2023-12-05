@@ -1,6 +1,8 @@
 package com.swisscom.tasks.task3.integration;
 
 import com.swisscom.tasks.task3.configuration.DTOMapperBean;
+import com.swisscom.tasks.task3.crypto.service.ResourceEncryptor;
+import com.swisscom.tasks.task3.crypto.service.ServiceOEncryptor;
 import com.swisscom.tasks.task3.dto.mapper.DTOMapper;
 import com.swisscom.tasks.task3.dto.resource.ResourceDTONoID;
 import com.swisscom.tasks.task3.dto.service.ServiceODTONoID;
@@ -21,8 +23,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ResourceGraphQLIntegrationTest {
@@ -35,6 +36,11 @@ public class ResourceGraphQLIntegrationTest {
     private AuthenticationService authenticationService;
     @Autowired
     private Environment environment;
+    @Autowired
+    private ResourceEncryptor resourceEncryptor;
+    @Autowired
+    private ServiceOEncryptor serviceOEncryptor;
+    private boolean isDTOEncrypted;
 
     @LocalServerPort
     int port;
@@ -42,6 +48,9 @@ public class ResourceGraphQLIntegrationTest {
     @BeforeEach
     void setUp() {
         String defaultPassword=environment.getProperty("admin-pass", "admin");
+        isDTOEncrypted = Boolean.parseBoolean(
+                environment.getProperty("dto.encryption.enabled", "true")
+        );
         resourceService.deleteAll();
         dtoMapper = new DTOMapper(new DTOMapperBean().modelMapper());
         LoginResponseDTO loginResponseDTO = authenticationService.loginUser(
@@ -73,6 +82,7 @@ public class ResourceGraphQLIntegrationTest {
         ServiceO service = ServiceO.builder()
                 .criticalText("criticalText")
                 .build();
+        serviceOEncryptor.encrypt(service);
         ServiceO savedService = graphQlTester.document(mutation1)
                 .variable("service", dtoMapper.map(service, ServiceODTONoID.class))
                 .execute()
@@ -95,7 +105,7 @@ public class ResourceGraphQLIntegrationTest {
         Resource resource= Resource.builder().criticalText("resourceCriticalText")
                 .owners(List.of())
                 .build();
-
+        resourceEncryptor.encrypt(resource);
 
         Resource resource1 = graphQlTester.document(mutation)
                 .variable("resource", dtoMapper.map(resource, ResourceDTONoID.class))
@@ -165,19 +175,21 @@ public class ResourceGraphQLIntegrationTest {
                  }
             }
         """;
+        ServiceO service=ServiceO.builder()
+                .criticalText("criticalText8541")
+                .resources(List.of(Resource.builder()
+                        .criticalText("resourceCriticalText")
+                        .owners(List.of())
+                        .build()))
+                .build();
+        serviceOEncryptor.encrypt(service);
         graphQlTester.document(mutation)
-                .variable("service", dtoMapper.map(ServiceO.builder()
-                        .criticalText("criticalText")
-                                .resources(List.of(Resource.builder()
-                                        .criticalText("resourceCriticalText")
-                                        .owners(List.of())
-                                        .build()))
-                        .build(), ServiceODTONoID.class))
+                .variable("service", dtoMapper.map(service, ServiceODTONoID.class))
                 .execute()
                 .path("createService")
                 .entity(ServiceO.class)
                 .satisfies(s -> {
-                    assertEquals("criticalText", s.getCriticalText());
+                    assertEquals(service.getCriticalText(), s.getCriticalText());
                 });
         // language=GraphQL
         String document = """
@@ -194,7 +206,9 @@ public class ResourceGraphQLIntegrationTest {
                 .entityList(Resource.class)
                 .hasSize(1)
                 .satisfies(s -> {
-                    assertEquals("resourceCriticalText", s.get(0).getCriticalText());
+                    assertEquals(service.getResources().get(0).getCriticalText(), s.get(0).getCriticalText());
+                    if(isDTOEncrypted)
+                        assertNotEquals("resourceCriticalText", s.get(0).getCriticalText());
                 });
         ;
     }
@@ -232,6 +246,7 @@ public class ResourceGraphQLIntegrationTest {
                         )
                 )
                 .build();
+        serviceOEncryptor.encrypt(service);
         ServiceO savedService = graphQlTester.document(mutation)
                 .variable("service", dtoMapper.map(service, ServiceODTONoID.class))
                 .execute()
@@ -239,6 +254,8 @@ public class ResourceGraphQLIntegrationTest {
                 .entity(ServiceO.class)
                 .satisfies(s -> {
                     assertEquals(service.getCriticalText(), s.getCriticalText());
+                    if(isDTOEncrypted)
+                        assertNotEquals("criticalText", s.getCriticalText());
                 })
                 .get();
         // language=GraphQL
@@ -260,6 +277,7 @@ public class ResourceGraphQLIntegrationTest {
         Resource updatedResource = Resource.builder()
                 .criticalText("updatedCriticalTextResource")
                 .build();
+        resourceEncryptor.encrypt(updatedResource);
         Resource updatedSavedResource = graphQlTester.document(updateMutation)
                 .variable("id", savedService.getResources().get(0).getId())
                 .variable("resource", dtoMapper.map(updatedResource, ResourceDTONoID.class))
@@ -330,6 +348,7 @@ public class ResourceGraphQLIntegrationTest {
                         )
                 )
                 .build();
+        serviceOEncryptor.encrypt(service);
         ServiceO savedService = graphQlTester.document(mutation)
                 .variable("service", dtoMapper.map(service, ServiceODTONoID.class))
                 .execute()
