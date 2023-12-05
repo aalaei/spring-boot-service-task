@@ -30,7 +30,7 @@ Explore the capabilities of the Java client application, conveniently located in
 4. **Integrity and Confidentiality:**
    - The encryption process guarantees that even in the face of potential eavesdropping, critical texts remain inaccessible to malicious entities.
 
-For detailed information on setting up, configuring, and leveraging the capabilities of the Java client application, please refer to the [Server Documentation](./client/README.md).
+For detailed information on setting up, configuring, and leveraging the capabilities of the Java client application, please refer to the [Server Documentation](../client/README.md).
 
 ### Get Started:
 

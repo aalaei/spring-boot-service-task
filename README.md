@@ -116,9 +116,11 @@ The application utilizes Redis caching for improved performance. New objects are
 
 ## Optional Features
 ### Encryption Decryption
-    Certain text fields are encrypted for added security. Refer to the encryption service for details.
+The server app employs two layers of encryption. One is at the database level, such as when utilizing a cloud provider for our database. This ensures that critical texts are encrypted, preventing unauthorized access by the provider. The second layer is in the connection between the client and the server, where critical text in Data Transfer Objects (DTOs) is encrypted. The `algo` parameter allows the selection of encryption algorithms, with the default set to `AES/CBC/PKCS5PADDING`. The encryption process utilizes the javax.crypto.Cipher class, supporting various encryption algorithms in Java. This default signifies the use of the AES cipher system in CBC mode with PKCS5PADDING padding. Specific text fields undergo encryption for added security, and you can find more details in the encryption service.
+
 ### GraphQL
 This GraphQL API provides access to a system managing services, resources, and owners. It supports various queries and mutations to interact with the underlying data. The main entities in the system are Service, Resource, and Owner, each having specific attributes and relationships.
+
 #### Queries
 - servicesPaged(page: Int, size: Int): [Service]
 - services: [Service]
