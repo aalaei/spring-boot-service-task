@@ -15,15 +15,16 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.client.RestClient;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-@Service
+//@Service
 @Slf4j
-public class JsonPlaceholderServiceImpl implements JsonPlaceholderService {
+public class JsonPlaceholderServiceImpl {//implements JsonPlaceholderService {
     private final RestClient restClient;
     public JsonPlaceholderServiceImpl(Environment environment) {
         String username=environment.getProperty("application.connection.security.auth.user", "");
@@ -45,7 +46,7 @@ public class JsonPlaceholderServiceImpl implements JsonPlaceholderService {
         }
         restClient =restBuilder.build();
     }
-    @Override
+//    @Override
     public List<String> findAllIds() {
         try {
             ResponseEntity<httpResponseIds> httpResponse = restClient.get()
@@ -61,12 +62,22 @@ public class JsonPlaceholderServiceImpl implements JsonPlaceholderService {
         }
     }
 
-    @Override
+//    @Override
     public Optional<ServiceODTODefault> getByID(String id) {
         ResponseEntity<HttpResponseServiceDTODefault> httpResponse = restClient.get()
                 .uri("/services?id=" + id)
                 .retrieve()
-                .toEntity(HttpResponseServiceDTODefault.class);
+                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                        (req, res) ->
+                        {
+                            log.error("Couldn't delete "+res.getStatusText());
+                            String bodyStr = new String(res.getBody().readAllBytes());
+
+                            throw new HttpCallException("Error while getting the service",
+                                    ResponseEntity.status(res.getStatusCode()).body(res.getBody().readAllBytes())
+                            );
+                        }
+                ).toEntity(HttpResponseServiceDTODefault.class);
         try {
             if(httpResponse.getStatusCode().isError() || httpResponse.getBody()==null)
                 throw new Exception("");
@@ -76,7 +87,7 @@ public class JsonPlaceholderServiceImpl implements JsonPlaceholderService {
         }
     }
 
-    @Override
+//    @Override
     public ServiceO createService(ServiceODTODefault serviceODTO) {
         ResponseEntity<HttpResponseServiceO> httpResponse= restClient.post()
                 .uri("/services")
@@ -93,7 +104,7 @@ public class JsonPlaceholderServiceImpl implements JsonPlaceholderService {
         }
     }
 
-    @Override
+//    @Override
     public ServiceODTODefault updateService(String id, ServiceODTODefault serviceODTO) {
         ResponseEntity<HttpResponseServiceDTODefault> httpResponse= restClient.put()
                 .uri("/services?id="+id)
@@ -110,7 +121,7 @@ public class JsonPlaceholderServiceImpl implements JsonPlaceholderService {
         }
     }
 
-    @Override
+//    @Override
     public void deleteService(String id) {
         ResponseEntity<Void> httpResponse= restClient.delete()
                 .uri("/services?id="+id)

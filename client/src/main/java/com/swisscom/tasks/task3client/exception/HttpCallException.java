@@ -8,4 +8,8 @@ public class HttpCallException extends RuntimeException{
         super(message);
         this.responseEntity=responseEntity;
     }
+
+    public ResponseEntity<?> getResponseEntity() {
+        return responseEntity;
+    }
 }
