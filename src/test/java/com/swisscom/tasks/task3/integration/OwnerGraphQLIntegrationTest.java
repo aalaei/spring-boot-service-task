@@ -55,9 +55,9 @@ public class OwnerGraphQLIntegrationTest {
     @BeforeEach
     void setUp() {
         isDTOEncrypted = Boolean.parseBoolean(
-                environment.getProperty("dto.encryption.enabled", "true")
+                environment.getProperty("application.security.encryption.dto.enabled", "true")
         );
-        String defaultPassword = environment.getProperty("admin-pass", "admin");
+        String defaultPassword = environment.getProperty("application.security.auth.admin-pass", "admin");
         ownerService.deleteAll();
         dtoMapper = new DTOMapper(new DTOMapperBean().modelMapper());
         LoginResponseDTO loginResponseDTO = authenticationService.loginUser(

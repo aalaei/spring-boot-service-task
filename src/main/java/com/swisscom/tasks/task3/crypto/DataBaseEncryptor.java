@@ -12,10 +12,12 @@ public class DataBaseEncryptor {
     private final EncryptionUtil encryptionUtil;
 
     public DataBaseEncryptor(Environment environment) {
-        String key = environment.getProperty("db.encryption.key", "rYUwouQ16kswUnNYkdNDig==");
-        String initVector = environment.getProperty("db.encryption.initVector",
+        String key = environment.getProperty("application.security.encryption.db.key",
+                "rYUwouQ16kswUnNYkdNDig==");
+        String initVector = environment.getProperty("application.security.encryption.db.initVector",
                 "0srIh8CGYrPESYZxZO9v1A==");
-        String algo = environment.getProperty("db.encryption.algo", "AES/CBC/PKCS5PADDING");
+        String algo = environment.getProperty("application.security.encryption.db.algo",
+                "AES/CBC/PKCS5PADDING");
         this.encryptionUtil = new EncryptionUtil(key, initVector, algo);
     }
 

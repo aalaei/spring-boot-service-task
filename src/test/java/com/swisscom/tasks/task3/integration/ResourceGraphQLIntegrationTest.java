@@ -47,9 +47,9 @@ public class ResourceGraphQLIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        String defaultPassword = environment.getProperty("admin-pass", "admin");
+        String defaultPassword = environment.getProperty("application.security.auth.admin-pass", "admin");
         isDTOEncrypted = Boolean.parseBoolean(
-                environment.getProperty("dto.encryption.enabled", "true")
+                environment.getProperty("application.security.encryption.dto.enabled", "true")
         );
         resourceService.deleteAll();
         dtoMapper = new DTOMapper(new DTOMapperBean().modelMapper());

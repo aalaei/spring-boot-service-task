@@ -12,12 +12,14 @@ public class MessageEncryptor {
     private final boolean enabled;
 
     public MessageEncryptor(Environment environment) {
-        String key = environment.getProperty("dto.encryption.key", "NGHJJjWm+gp/lmJ4lX3JOA==");
-        String initVector = environment.getProperty("dto.encryption.initVector",
+        String key = environment.getProperty("application.security.encryption.dto.key",
+                "NGHJJjWm+gp/lmJ4lX3JOA==");
+        String initVector = environment.getProperty("application.security.encryption.dto.initVector",
                 "K869pc8rp6oSPQwJVGvM/Q==");
-        String algo = environment.getProperty("dto.encryption.algo", "AES/CBC/PKCS5PADDING");
+        String algo = environment.getProperty("application.security.encryption.dto.algo",
+                "AES/CBC/PKCS5PADDING");
         enabled = Boolean.parseBoolean(
-                environment.getProperty("dto.encryption.enabled", "true")
+                environment.getProperty("application.security.encryption.dto.enabled", "true")
         );
         this.encryptionUtil = new EncryptionUtil(key, initVector, algo);
     }

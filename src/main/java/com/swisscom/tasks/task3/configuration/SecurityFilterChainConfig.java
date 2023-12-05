@@ -2,8 +2,10 @@ package com.swisscom.tasks.task3.configuration;
 
 import com.swisscom.tasks.task3.service.MongoUserDetailsService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -23,6 +25,9 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityFilterChainConfig {
     private final PasswordEncoder passwordEncoder;
     private final MongoUserDetailsService mongoUserDetailsService;
+
+    @Value("${application.security.auth.enabled:true}")
+    private boolean authEnabled;
     private static final String[] WHITE_LIST_URL = {
 //            "/actuator/**",
             "/actuator/info",
@@ -40,9 +45,12 @@ public class SecurityFilterChainConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth ->
-                        auth.requestMatchers(WHITE_LIST_URL).permitAll()
-                                .anyRequest().authenticated()
+                .authorizeHttpRequests(auth -> {
+                            if(authEnabled)
+                                auth.requestMatchers(WHITE_LIST_URL).permitAll().anyRequest().authenticated();
+                            else
+                                auth.requestMatchers(WHITE_LIST_URL).permitAll().anyRequest().permitAll();
+                        }
                 )
                 .userDetailsService(mongoUserDetailsService)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

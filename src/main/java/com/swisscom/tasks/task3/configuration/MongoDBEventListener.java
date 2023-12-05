@@ -19,7 +19,7 @@ import org.springframework.data.mongodb.core.mapping.event.BeforeSaveEvent;
 public class MongoDBEventListener extends AbstractMongoEventListener<Object> {
 
     private final DataBaseEncryptor encryptionUtil;
-    @Value("${db.encryption.enabled:true}")
+    @Value("${application.security.encryption.db.enabled:true}")
     private boolean encEnabled;
 
     @Override
