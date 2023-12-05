@@ -1,6 +1,7 @@
 package com.swisscom.tasks.task3.service.impl;
 
 import com.swisscom.tasks.task3.crypto.service.ResourceEncryptor;
+import com.swisscom.tasks.task3.exception.EncryptionException;
 import com.swisscom.tasks.task3.exception.ResourceServiceException;
 import com.swisscom.tasks.task3.model.Resource;
 import com.swisscom.tasks.task3.model.ServiceO;
@@ -40,21 +41,25 @@ public class ResourceServiceImpl implements ResourceService {
      */
     @Override
     public Resource create(Resource resource, String serviceID) {
-        resource = resourceEncryptor.decrypt(resource);
-        if (resource.getOwners() == null)
-            resource.setOwners(List.of());
-        ServiceO parentService = serviceORepository
-                .findById(serviceID).orElseThrow(() ->
-                        new ResourceServiceException("Service with id " + serviceID + " not found"));
-        Resource newResource = resourceRepository.save(resource);
-        saveCascade(newResource);
-        if (parentService.getResources() == null) {
-            parentService.setResources(List.of(newResource));
-        } else {
-            parentService.getResources().add(newResource);
+        try {
+            resource = resourceEncryptor.decrypt(resource);
+            if (resource.getOwners() == null)
+                resource.setOwners(List.of());
+            ServiceO parentService = serviceORepository
+                    .findById(serviceID).orElseThrow(() ->
+                            new ResourceServiceException("Service with id " + serviceID + " not found"));
+            Resource newResource = resourceRepository.save(resource);
+            saveCascade(newResource);
+            if (parentService.getResources() == null) {
+                parentService.setResources(List.of(newResource));
+            } else {
+                parentService.getResources().add(newResource);
+            }
+            serviceORepository.save(parentService);
+            return resourceEncryptor.encrypt(newResource);
+        }catch (EncryptionException e){
+            throw new ResourceServiceException("Error while encrypting resource");
         }
-        serviceORepository.save(parentService);
-        return resourceEncryptor.encrypt(newResource);
     }
 
     /**
@@ -149,13 +154,17 @@ public class ResourceServiceImpl implements ResourceService {
     @Override
     @CachePut(key = "#id")
     public Resource updateById(String id, Resource resource, boolean cascade) {
-        resource = resourceEncryptor.decrypt(resource);
-        if (!resourceRepository.existsById(id))
-            throw new ResourceServiceException("Resource with id " + id + " not found");
-        resource.setId(id);
-        if (cascade)
-            saveCascade(resource);
-        return resourceEncryptor.encrypt(resourceRepository.save(resource));
+        try {
+            resource = resourceEncryptor.decrypt(resource);
+            if (!resourceRepository.existsById(id))
+                throw new ResourceServiceException("Resource with id " + id + " not found");
+            resource.setId(id);
+            if (cascade)
+                saveCascade(resource);
+            return resourceEncryptor.encrypt(resourceRepository.save(resource));
+        }catch (EncryptionException e){
+            throw new ResourceServiceException("Error while encrypting resource");
+        }
     }
 
     /**

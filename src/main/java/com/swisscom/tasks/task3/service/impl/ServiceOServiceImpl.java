@@ -2,6 +2,7 @@ package com.swisscom.tasks.task3.service.impl;
 
 import com.swisscom.tasks.task3.crypto.service.ServiceOEncryptor;
 import com.swisscom.tasks.task3.dto.service.ServiceIdDTO;
+import com.swisscom.tasks.task3.exception.EncryptionException;
 import com.swisscom.tasks.task3.exception.ServiceOServiceException;
 import com.swisscom.tasks.task3.model.ServiceO;
 import com.swisscom.tasks.task3.repository.OwnerRepository;
@@ -89,14 +90,18 @@ public class ServiceOServiceImpl implements ServiceOService {
      */
     @Override
     public ServiceO create(ServiceO serviceO) {
-        serviceO = serviceOEncryptor.decrypt(serviceO);
-        if (serviceO.getResources() == null)
-            serviceO.setResources(List.of());
-        if (serviceO.getId() != null && serviceORepository.existsById(serviceO.getId()))
-            throw new ServiceOServiceException("Another service with id " + serviceO.getId() + " exists before");
-        log.info("Saving a new service");
-        saveCascade(serviceO);
-        return serviceOEncryptor.encrypt(serviceORepository.save(serviceO));
+        try {
+            serviceO = serviceOEncryptor.decrypt(serviceO);
+            if (serviceO.getResources() == null)
+                serviceO.setResources(List.of());
+            if (serviceO.getId() != null && serviceORepository.existsById(serviceO.getId()))
+                throw new ServiceOServiceException("Another service with id " + serviceO.getId() + " exists before");
+            log.info("Saving a new service");
+            saveCascade(serviceO);
+            return serviceOEncryptor.encrypt(serviceORepository.save(serviceO));
+        }catch (EncryptionException e){
+            throw new ServiceOServiceException(e.getMessage());
+        }
     }
 
     /**
@@ -156,7 +161,6 @@ public class ServiceOServiceImpl implements ServiceOService {
             return true;
         } else
             throw new ServiceOServiceException("Service with id " + id + " does not exists");
-//        return false;
     }
 
     /**
@@ -199,15 +203,19 @@ public class ServiceOServiceImpl implements ServiceOService {
      */
     @Override
     public ServiceO updateById(String id, ServiceO serviceO, boolean cascade) {
-        serviceO = serviceOEncryptor.decrypt(serviceO);
-        log.info("Updating service with id {}", id);
-        if (serviceORepository.existsById(id)) {
-            serviceO.setId(id);
-            if (cascade)
-                saveCascade(serviceO);
-            return serviceOEncryptor.encrypt(serviceORepository.save(serviceO));
+        try {
+            serviceO = serviceOEncryptor.decrypt(serviceO);
+            log.info("Updating service with id {}", id);
+            if (serviceORepository.existsById(id)) {
+                serviceO.setId(id);
+                if (cascade)
+                    saveCascade(serviceO);
+                return serviceOEncryptor.encrypt(serviceORepository.save(serviceO));
+            }
+            throw new ServiceOServiceException("Service with id " + id + " does not exists");
+        }catch (EncryptionException e){
+            throw new ServiceOServiceException(e.getMessage());
         }
-        throw new ServiceOServiceException("Service with id " + id + " does not exists");
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.swisscom.tasks.task3.service.impl;
 
 import com.swisscom.tasks.task3.crypto.service.OwnerEncryptor;
+import com.swisscom.tasks.task3.exception.EncryptionException;
 import com.swisscom.tasks.task3.exception.OwnerServiceException;
 import com.swisscom.tasks.task3.model.Owner;
 import com.swisscom.tasks.task3.model.Resource;
@@ -39,18 +40,22 @@ public class OwnerServiceImpl implements OwnerService {
      */
     @Override
     public Owner create(Owner owner, String resourceID) {
-        owner = ownerEncryptor.decrypt(owner);
-        Resource parentResource = resourceRepository
-                .findById(resourceID).orElseThrow(() ->
-                        new OwnerServiceException("Resource with id " + resourceID + " not found"));
-        Owner newOwner = ownerRepository.save(owner);
-        if (parentResource.getOwners() == null) {
-            parentResource.setOwners(List.of(newOwner));
-        } else {
-            parentResource.getOwners().add(newOwner);
+        try {
+            owner = ownerEncryptor.decrypt(owner);
+            Resource parentResource = resourceRepository
+                    .findById(resourceID).orElseThrow(() ->
+                            new OwnerServiceException("Resource with id " + resourceID + " not found"));
+            Owner newOwner = ownerRepository.save(owner);
+            if (parentResource.getOwners() == null) {
+                parentResource.setOwners(List.of(newOwner));
+            } else {
+                parentResource.getOwners().add(newOwner);
+            }
+            resourceRepository.save(parentResource);
+            return ownerEncryptor.encrypt(newOwner);
+        }catch (EncryptionException e){
+            throw new OwnerServiceException(e.getMessage());
         }
-        resourceRepository.save(parentResource);
-        return ownerEncryptor.encrypt(newOwner);
     }
 
     /**
@@ -113,11 +118,16 @@ public class OwnerServiceImpl implements OwnerService {
     @Override
     @CachePut(key = "#id")
     public Owner updateById(String id, Owner owner) {
-        owner = ownerEncryptor.decrypt(owner);
-        if (!ownerRepository.existsById(id))
-            return null;
-        owner.setId(id);
-        return ownerEncryptor.encrypt(ownerRepository.save(owner));
+        try {
+            owner = ownerEncryptor.decrypt(owner);
+            if (!ownerRepository.existsById(id))
+                return null;
+            owner.setId(id);
+            return ownerEncryptor.encrypt(ownerRepository.save(owner));
+        }catch (EncryptionException e){
+            throw new OwnerServiceException(e.getMessage());
+        }
+
     }
 
     /**

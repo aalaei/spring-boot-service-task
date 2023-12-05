@@ -7,11 +7,13 @@ import com.swisscom.tasks.task3client.crypto.service.ServiceOEncryptor;
 import com.swisscom.tasks.task3client.dto.mapper.DTOMapper;
 import com.swisscom.tasks.task3client.dto.service.ServiceIdDTO;
 import com.swisscom.tasks.task3client.dto.service.ServiceODTODefault;
+import com.swisscom.tasks.task3client.exception.EncryptionException;
 import com.swisscom.tasks.task3client.exception.HttpCallException;
 import com.swisscom.tasks.task3client.model.ServiceO;
 import com.swisscom.tasks.task3client.model.http.HttpResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -78,8 +80,13 @@ public class ServiceApiService {
             );
             if(encryptedService==null)
                 return Optional.empty();
-            var service = serviceOEncryptor.decrypt(encryptedService);
-            return Optional.of(dtoMapper.map(service, ServiceODTODefault.class));
+            try {
+                var service = serviceOEncryptor.decrypt(encryptedService);
+                return Optional.of(dtoMapper.map(service, ServiceODTODefault.class));
+            }catch (EncryptionException e){
+                throw new HttpCallException(e.getMessage(),
+                        ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Unable to decrypt the service!"));
+            }
         } catch (RestClientResponseException exception) {
             ResponseEntity<?> response = ResponseEntity.status(exception.getStatusCode())
                     .contentType(MediaType.APPLICATION_JSON)
@@ -91,9 +98,9 @@ public class ServiceApiService {
 
     public ServiceO createService(ServiceODTODefault serviceODTO) {
         try {
-            ServiceO service=dtoMapper.map(serviceODTO, ServiceO.class);
+            ServiceO service = dtoMapper.map(serviceODTO, ServiceO.class);
             serviceOEncryptor.encrypt(service);
-            serviceODTO=dtoMapper.map(service, ServiceODTODefault.class);
+            serviceODTO = dtoMapper.map(service, ServiceODTODefault.class);
             ResponseEntity<?> response = apiService.createService(serviceODTO);
             return serviceOEncryptor.decrypt(
                     parseResponse(response,
@@ -102,6 +109,9 @@ public class ServiceApiService {
                             ServiceO.class
                     )
             );
+        }catch (EncryptionException e){
+                throw new HttpCallException(e.getMessage(),
+                        ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Unable to decrypt the service!"));
         } catch (RestClientResponseException exception) {
             ResponseEntity<?> response = ResponseEntity.status(exception.getStatusCode())
                     .contentType(MediaType.APPLICATION_JSON)
@@ -113,16 +123,19 @@ public class ServiceApiService {
 
     public ServiceODTODefault updateService(String id, ServiceODTODefault serviceODTO) {
         try {
-            ServiceO service=dtoMapper.map(serviceODTO, ServiceO.class);
+            ServiceO service = dtoMapper.map(serviceODTO, ServiceO.class);
             serviceOEncryptor.encrypt(service);
-            serviceODTO=dtoMapper.map(service, ServiceODTODefault.class);
+            serviceODTO = dtoMapper.map(service, ServiceODTODefault.class);
             ResponseEntity<?> response = apiService.updateService(id, serviceODTO);
-            ServiceODTODefault encryptedUpdatedServiceDTO= parseResponse(response, "service", "Error while updating the service",
+            ServiceODTODefault encryptedUpdatedServiceDTO = parseResponse(response, "service", "Error while updating the service",
                     ServiceODTODefault.class
             );
             ServiceO updatedService = dtoMapper.map(encryptedUpdatedServiceDTO, ServiceO.class);
             serviceOEncryptor.decrypt(updatedService);
             return dtoMapper.map(updatedService, ServiceODTODefault.class);
+        }catch (EncryptionException e){
+            throw new HttpCallException(e.getMessage(),
+                    ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Unable to decrypt the service!"));
         } catch (RestClientResponseException exception) {
             ResponseEntity<?> response = ResponseEntity.status(exception.getStatusCode())
                     .contentType(MediaType.APPLICATION_JSON)

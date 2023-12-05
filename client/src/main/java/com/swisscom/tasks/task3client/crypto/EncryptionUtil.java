@@ -1,5 +1,6 @@
 package com.swisscom.tasks.task3client.crypto;
 
+import com.swisscom.tasks.task3client.exception.EncryptionException;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
@@ -27,40 +28,38 @@ public class EncryptionUtil {
                         "true")
         );
     }
+    private Cipher getCipher(){
+        try {
+            IvParameterSpec iv = new IvParameterSpec(Base64.decodeBase64(initVector));
+            SecretKeySpec sKeySpec = new SecretKeySpec(Base64.decodeBase64(key), algo.split("/")[0]);
+            Cipher cipher = Cipher.getInstance(algo);
+            cipher.init(Cipher.DECRYPT_MODE, sKeySpec, iv);
+            return cipher;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new EncryptionException("Error while parsing key and IV");
+        }
+    }
 
     public String encrypt(String value) {
         if(!enabled)
             return value;
         try {
-            IvParameterSpec iv = new IvParameterSpec(Base64.decodeBase64(initVector));
-            SecretKeySpec skeySpec = new SecretKeySpec(Base64.decodeBase64(key), "AES");
-
-            Cipher cipher = Cipher.getInstance(algo);
-            cipher.init(Cipher.ENCRYPT_MODE, skeySpec, iv);
-
-            byte[] encrypted = cipher.doFinal(value.getBytes());
-            return Base64.encodeBase64String(encrypted);
+            return Base64.encodeBase64String(getCipher().doFinal(value.getBytes()));
         } catch (Exception ex) {
             ex.printStackTrace();
+            throw new EncryptionException("Error while encrypting the message");
         }
-        return null;
     }
 
     public String decrypt(String encrypted) {
         if(!enabled)
             return encrypted;
         try {
-            IvParameterSpec iv = new IvParameterSpec(Base64.decodeBase64(initVector));
-            SecretKeySpec skeySpec = new SecretKeySpec(Base64.decodeBase64(key), "AES");
-
-            Cipher cipher = Cipher.getInstance(algo);
-            cipher.init(Cipher.DECRYPT_MODE, skeySpec, iv);
-
-            byte[] original = cipher.doFinal(Base64.decodeBase64(encrypted));
-            return new String(original);
+            return new String(getCipher().doFinal(Base64.decodeBase64(encrypted)));
         } catch (Exception ex) {
             ex.printStackTrace();
+            throw new EncryptionException("Error while decrypting the message");
         }
-        return null;
     }
 }
